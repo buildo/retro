@@ -1,0 +1,12 @@
+mailgun {
+  key = ""
+  uri = ""
+}
+
+s3 {
+  key = ""
+  secret = ""
+  bucket = ""
+  mocksFolder = ""
+}
+
