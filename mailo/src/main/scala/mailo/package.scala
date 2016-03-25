@@ -33,14 +33,14 @@ abstract class MailoError(message: String) extends RuntimeException(message)
 
 class Mailo(
     mailContentFinder: MailContentFinder,
-    mailClient: MailClient
+    mailClient: MailClient,
+    loggingLevel: PartialFunction[String, nozzle.logging.EnabledState] = { case "mailo" => Enabled(Level.Debug) }
   )(implicit
     ec: ExecutionContext
   ) {
   import MailRefinedContent._
 
-  private[this] val loggingEnabler: PartialFunction[String, nozzle.logging.EnabledState] =
-  { case "mailo" => Enabled(Level.Debug) } //Logging enabled at Debug level for mailo
+  private[this] val loggingEnabler: PartialFunction[String, nozzle.logging.EnabledState] = loggingLevel
   implicit val logger = nozzle.logging.BasicLogging(loggingEnabler).logger("mailo")
 
   def send(
