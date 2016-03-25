@@ -28,14 +28,14 @@ class S3MailData(implicit
   import mailo.MailRawContent
   import S3MailDataError._
 
-  private[S3MailData] case class S3Config(key: String, secret: String, bucket: String, mocksFolder: String)
+  private[S3MailData] case class S3Config(key: String, secret: String, bucket: String, partialsFolder: String)
   private[S3MailData] lazy val conf = ConfigFactory.load()
 
   private[S3MailData] val s3Config = S3Config(
     key    = conf.getString(s"s3.key"),
     secret = conf.getString(s"s3.secret"),
     bucket = conf.getString(s"s3.bucket"),
-    mocksFolder = conf.getString(s"s3.mocksFolder")
+    partialsFolder = conf.getString(s"s3.partialsFolder")
   )
 
   private[S3MailData] implicit val region = Region.Frankfurt
@@ -43,14 +43,14 @@ class S3MailData(implicit
   private[S3MailData] def bucket = s3.bucket(s3Config.bucket)
 
   def get(name: String): Future[\/[MailoError, MailRawContent]] = Future {
-    val folder = s3Config.mocksFolder
+    val folder = s3Config.partialsFolder
 
     for {
       template <- getObject(name)
-      mocks <- getObjects(s3Config.mocksFolder)
-      //filtering mock objects dropping initial chars
-      mockObjects <- (mocks map (n => n.drop(folder.length + 1) -> getObject(n)) toMap).sequenceU
-    } yield (MailRawContent(template, mockObjects))
+      partials <- getObjects(s3Config.partialsFolder)
+      //filtering partial objects dropping initial chars
+      partialObjects <- (partials map (n => n.drop(folder.length + 1) -> getObject(n)) toMap).sequenceU
+    } yield (MailRawContent(template, partialObjects))
   }
 
   //http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string

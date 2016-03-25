@@ -20,10 +20,10 @@ object ParserError {
     justMatches: Set[String],
     overlap: Set[String]
   ) extends MailoError(s"Overlapped parameters and matches, but no exact match: just params (${justParams.toString}), just matches (${justMatches.toString}), overlapped params (${overlap.toString})")
-  case class MocksDoNotExist(mocks: Set[String]) extends
-      MailoError(s"Some of the provided mocks do not exist, here is the list ${mocks.toString}")
-  case class TooFewMocksProvided(mocks: Set[String]) extends
-      MailoError(s"Too few mocks provided to the document, here is the list ${mocks.toString}")
+  case class PartialsDoNotExist(partials: Set[String]) extends
+      MailoError(s"Some of the provided partials do not exist, here is the list ${partials.toString}")
+  case class TooFewPartialsProvided(partials: Set[String]) extends
+      MailoError(s"Too few partials provided to the document, here is the list ${partials.toString}")
   case class TooFewParamsProvided(params: Set[String]) extends
     MailoError(s"Too few params provided to the document, here is the list ${params.toString}")
   case class TooManyParamsProvided(params: Set[String]) extends
@@ -34,22 +34,22 @@ object HTMLParser {
   import ParserError._
 
   def parse(content: MailRawContent, params: Map[String, String]): \/[MailoError, String] = {
-    replaceAllTemplates(content.template, content.mocks) flatMap (replaceAllParams(_, params))
+    replaceAllTemplates(content.template, content.partials) flatMap (replaceAllParams(_, params))
   }
 
   private[this] def replaceAllTemplates(
     content: String,
-    mocks: Map[String, String]
+    partials: Map[String, String]
   ): \/[MailoError, String] = {
     val mockPattern = """\[\[([^\s\\]+)\]\]""".r
 
     val matches = mockPattern findAllMatchIn(content) map (_.group(1))
 
-    val mocksSet: Set[String] = mocks.keySet
+    val partialsSet: Set[String] = partials.keySet
     val matchesSet: Set[String] = matches.toSet
 
-    if (matchesSet subsetOf mocksSet) safelyReplaceAllInDocument(content, mocks, mockPattern).right[MailoError]
-    else MocksDoNotExist(matchesSet -- mocksSet).left[String]
+    if (matchesSet subsetOf partialsSet) safelyReplaceAllInDocument(content, partials, mockPattern).right[MailoError]
+    else PartialsDoNotExist(matchesSet -- partialsSet).left[String]
   }
 
   private[this] def replaceAllParams(

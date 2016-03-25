@@ -7,6 +7,6 @@ s3 {
   key = ""
   secret = ""
   bucket = ""
-  mocksFolder = ""
+  partialsFolder = ""
 }
 

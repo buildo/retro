@@ -7,7 +7,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
   import org.scalatest.time.{Span, Seconds, Millis}
 
   implicit val defaultPatience =
-      PatienceConfig(timeout = Span(10, Seconds), interval = Span(1, Seconds))
+      PatienceConfig(timeout = Span(20, Seconds), interval = Span(5, Seconds))
 
   "email" should "be correctly sent" in {
     (mailer.send(

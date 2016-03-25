@@ -19,7 +19,7 @@ case class MailResponse(
 
 case class MailRawContent(
   template: String,
-  mocks: Map[String, String]
+  partials: Map[String, String]
 )
 
 object MailRefinedContent {
