@@ -48,7 +48,7 @@ class MailgunClient(implicit
     val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
 
     for {
-      entity <- createEntity(from = from, to = to, subject = subject, content = content, tags = tags)
+      entity <- entity(from = from, to = to, subject = subject, content = content, tags = tags)
       request = HttpRequest(
         method = HttpMethods.POST,
         uri = s"${mailgunConfig.uri}/messages",
@@ -68,7 +68,7 @@ class MailgunClient(implicit
     } yield result
   }
 
-  private[this] def createEntity(
+  private[this] def entity(
     from: String,
     to: String,
     subject: String,
