@@ -53,7 +53,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
     ).futureValue.swap | (fail) should be (parser.ParserError.TooManyParamsProvided(Set("ciaooo")))
   }
 
-  "finder error" should "be returned" in {
+  "data error" should "be returned" in {
     mailer.send(
       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
       from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
@@ -61,7 +61,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.hl",
       params = Map(),
       tags = List("test")
-    ).futureValue.swap | (fail) should be (finder.S3MailContentError.ObjectNotFound)
+    ).futureValue.swap | (fail) should be (data.S3MailDataError.ObjectNotFound)
   }
 }
 
@@ -69,7 +69,7 @@ trait AppSpec {
   import akka.stream.ActorMaterializer
   import akka.actor.ActorSystem
 
-  import finder.S3MailContentFinder
+  import data.S3MailData
   import http.MailgunClient
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,7 +77,7 @@ trait AppSpec {
   private[this] implicit val system = ActorSystem()
   private[this] implicit val materializer = ActorMaterializer()
 
-  private[this] val s3 = new S3MailContentFinder()
+  private[this] val s3 = new S3MailData()
   private[this] val mailgun = new MailgunClient()
 
   val mailer = new Mailo(s3, mailgun)

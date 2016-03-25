@@ -1,7 +1,7 @@
 package mailo
 
 import mailo.http.MailClient
-import mailo.finder.MailContentFinder
+import mailo.data.MailData
 import mailo.parser.HTMLParser
 
 import ingredients.logging._
@@ -32,7 +32,7 @@ object MailRefinedContent {
 abstract class MailoError(message: String) extends RuntimeException(message)
 
 class Mailo(
-    mailContentFinder: MailContentFinder,
+    mailData: MailData,
     mailClient: MailClient,
     loggingLevel: PartialFunction[String, nozzle.logging.EnabledState] = { case "mailo" => Enabled(Level.Debug) }
   )(implicit
@@ -52,7 +52,7 @@ class Mailo(
     tags: List[String]
   ): Future[\/[MailoError, MailResponse]] = {
     val result = for {
-      content <- EitherT(mailContentFinder.find(templateName))
+      content <- EitherT(mailData.get(templateName))
       parsedContent <- EitherT.fromDisjunction(HTMLParser.parse(content, params))
       result <- EitherT(mailClient.send(
         to = to,

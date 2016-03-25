@@ -1,12 +1,14 @@
-package mailo.finder
+package mailo.data
 
 import awscala.s3.{ S3, Bucket, S3ObjectSummary, S3Object }
 import awscala.{ Credentials, Region }
-import nozzle.server.ServerConfig
 
 import com.typesafe.config.ConfigFactory
+
 import scalaz.\/
 import scalaz.syntax.either._
+import scalaz.syntax.traverse._
+import scalaz.std.map._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
@@ -14,39 +16,39 @@ import scala.concurrent.ExecutionContext
 import mailo.MailoError
 import scala.language.postfixOps
 
-object S3MailContentError {
+object S3MailDataError {
   case object ObjectNotFound extends MailoError("S3 object not found")
   case object BucketNotFound extends MailoError("S3 bucket not found")
-  case class InternalError(message: String) extends MailoError(message)
+  case class S3InternalError(message: String) extends MailoError(message)
 }
 
-class S3MailContentFinder(implicit
+class S3MailData(implicit
     ec: ExecutionContext
-  ) extends MailContentFinder {
+  ) extends MailData {
   import mailo.MailRawContent
-  import S3MailContentError._
+  import S3MailDataError._
 
-  case class S3Config(key: String, secret: String, bucket: String, mocksFolder: String)
-  lazy val conf = ConfigFactory.load()
+  private[S3MailData] case class S3Config(key: String, secret: String, bucket: String, mocksFolder: String)
+  private[S3MailData] lazy val conf = ConfigFactory.load()
 
-  val s3Config = S3Config(
+  private[S3MailData] val s3Config = S3Config(
     key    = conf.getString(s"s3.key"),
     secret = conf.getString(s"s3.secret"),
     bucket = conf.getString(s"s3.bucket"),
     mocksFolder = conf.getString(s"s3.mocksFolder")
   )
 
-  implicit val region = Region.Frankfurt
-  implicit val s3 = S3(new Credentials(s3Config.key, s3Config.secret))
-  def bucket = s3.bucket(s3Config.bucket)
+  private[S3MailData] implicit val region = Region.Frankfurt
+  private[S3MailData] implicit val s3 = S3(new Credentials(s3Config.key, s3Config.secret))
+  private[S3MailData] def bucket = s3.bucket(s3Config.bucket)
 
-  def find(name: String) = Future {
-    import scalaz._; import Scalaz._
+  def get(name: String): Future[\/[MailoError, MailRawContent]] = Future {
     val folder = s3Config.mocksFolder
 
     for {
       template <- getObject(name)
       mocks <- getObjects(s3Config.mocksFolder)
+      //filtering mock objects dropping initial chars
       mockObjects <- (mocks map (n => n.drop(folder.length + 1) -> getObject(n)) toMap).sequenceU
     } yield (MailRawContent(template, mockObjects))
   }
@@ -57,14 +59,14 @@ class S3MailContentFinder(implicit
     if (s.hasNext()) s.next() else ""
   }
 
-  def getObjects(folder: String): MailoError \/ Set[String] = {
+  private[this] def getObjects(folder: String): MailoError \/ Set[String] = {
     try {
       bucket match {
         case Some(b) => b.keys(folder).toSet.filter(_ != s"$folder/").right[MailoError]
         case None    => ObjectNotFound.left[Set[String]]
       }
     } catch {
-      case e: Exception => InternalError(e.getMessage).left[Set[String]]
+      case e: Exception => S3InternalError(e.getMessage).left[Set[String]]
     }
   }
 
@@ -78,6 +80,6 @@ class S3MailContentFinder(implicit
         case None    => BucketNotFound.left[String]
       }
     } catch {
-      case e: Exception => InternalError(e.getMessage).left[String]
+      case e: Exception => S3InternalError(e.getMessage).left[String]
     }
 }
