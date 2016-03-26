@@ -1,0 +1,11 @@
+language: scala
+
+scala:
+  - 2.11.7
+
+jdk:
+  - oraclejdk8
+
+before_install:
+  - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
+
