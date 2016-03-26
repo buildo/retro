@@ -9,3 +9,8 @@ jdk:
 before_install:
   - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
 
+script:
+  - sbt clean coverage test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
