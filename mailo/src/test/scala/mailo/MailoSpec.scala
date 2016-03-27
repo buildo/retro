@@ -69,16 +69,10 @@ trait AppSpec {
   import akka.stream.ActorMaterializer
   import akka.actor.ActorSystem
 
-  import data.S3MailData
-  import http.MailgunClient
-
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] implicit val system = ActorSystem()
   private[this] implicit val materializer = ActorMaterializer()
 
-  private[this] val s3 = new S3MailData()
-  private[this] val mailgun = new MailgunClient()
-
-  val mailer = new Mailo(s3, mailgun)
+  val mailer = new S3MailgunMailo()
 }

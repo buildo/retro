@@ -9,6 +9,9 @@ import nozzle.logging._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+
 import scalaz.std.scalaFuture._
 import scalaz.{EitherT, \/}
 
@@ -33,15 +36,13 @@ abstract class MailError(message: String) extends RuntimeException(message)
 
 class Mailo(
     mailData: MailData,
-    mailClient: MailClient,
-    loggingLevel: PartialFunction[String, nozzle.logging.EnabledState] = { case "mailo" => Enabled(Level.Debug) }
+    mailClient: MailClient
   )(implicit
-    ec: ExecutionContext
+    ec: ExecutionContext,
+    logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo")
   ) {
   import MailRefinedContent._
 
-  private[this] val loggingEnabler: PartialFunction[String, nozzle.logging.EnabledState] = loggingLevel
-  implicit val logger = nozzle.logging.BasicLogging(loggingEnabler).logger("mailo")
 
   def send(
     to: String,
@@ -65,4 +66,30 @@ class Mailo(
 
     result.run
   }
+}
+
+class S3MailgunMailo(implicit
+  system: ActorSystem,
+  materializer: ActorMaterializer,
+  ec: ExecutionContext,
+  logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo")
+){
+
+  import data.S3MailData
+  import http.MailgunClient
+
+  private[this] val s3 = new S3MailData()
+  private[this] val mailgun = new MailgunClient()
+
+  private[this] val mailgunS3Mailo = new Mailo(s3, mailgun)
+
+  def send(
+    to: String,
+    from: String,
+    subject: String,
+    templateName: String,
+    params: Map[String, String],
+    tags: List[String]
+  ): Future[\/[MailoError, MailResponse]] =
+    mailgunS3Mailo.send(to, from, subject, templateName, params, tags)
 }
