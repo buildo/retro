@@ -13,13 +13,13 @@ import scalaz.std.map._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 
-import mailo.MailoError
+import mailo.MailError
 import scala.language.postfixOps
 
 object S3MailDataError {
-  case object ObjectNotFound extends MailoError("S3 object not found")
-  case object BucketNotFound extends MailoError("S3 bucket not found")
-  case class S3InternalError(message: String) extends MailoError(message)
+  case object ObjectNotFound extends MailError("S3 object not found")
+  case object BucketNotFound extends MailError("S3 bucket not found")
+  case class S3InternalError(message: String) extends MailError(message)
 }
 
 class S3MailData(implicit
@@ -42,7 +42,7 @@ class S3MailData(implicit
   private[S3MailData] implicit val s3 = S3(new Credentials(s3Config.key, s3Config.secret))
   private[S3MailData] def bucket = s3.bucket(s3Config.bucket)
 
-  def get(name: String): Future[\/[MailoError, MailRawContent]] = Future {
+  def get(name: String): Future[\/[MailError, MailRawContent]] = Future {
     val folder = s3Config.partialsFolder
 
     for {
@@ -59,10 +59,10 @@ class S3MailData(implicit
     if (s.hasNext()) s.next() else ""
   }
 
-  private[this] def getObjects(folder: String): MailoError \/ Set[String] = {
+  private[this] def getObjects(folder: String): MailError \/ Set[String] = {
     try {
       bucket match {
-        case Some(b) => b.keys(folder).toSet.filter(_ != s"$folder/").right[MailoError]
+        case Some(b) => b.keys(folder).toSet.filter(_ != s"$folder/").right[MailError]
         case None    => ObjectNotFound.left[Set[String]]
       }
     } catch {
@@ -70,11 +70,11 @@ class S3MailData(implicit
     }
   }
 
-  private[this] def getObject(name: String): MailoError \/ String =
+  private[this] def getObject(name: String): MailError \/ String =
     try {
       bucket match {
         case Some(b) => b.getObject(name) match {
-          case Some(o) => convertStreamToString(o.content).right[MailoError]
+          case Some(o) => convertStreamToString(o.content).right[MailError]
           case None    => ObjectNotFound.left[String]
         }
         case None    => BucketNotFound.left[String]

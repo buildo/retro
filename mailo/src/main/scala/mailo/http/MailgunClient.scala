@@ -21,7 +21,7 @@ class MailgunClient(implicit
   system: ActorSystem,
   materializer: ActorMaterializer
 ) extends MailClient {
-  import mailo.MailoError
+  import mailo.MailError
   import MailClientError._
   import mailo.MailRefinedContent._
   import mailo.MailResponse
@@ -41,7 +41,7 @@ class MailgunClient(implicit
     tags: List[String]
   )(implicit
     executionContext: scala.concurrent.ExecutionContext
-  ): Future[MailoError \/ MailResponse] = {
+  ): Future[MailError \/ MailResponse] = {
     import de.heikoseeberger.akkahttpcirce.CirceSupport._
     import io.circe.generic.auto._
 
@@ -57,7 +57,7 @@ class MailgunClient(implicit
       )
       response <- Http().singleRequest(request)
       result <- response.status.intValue() match {
-        case 200 => Unmarshal(response.entity).to[MailResponse].map(_.right[MailoError])
+        case 200 => Unmarshal(response.entity).to[MailResponse].map(_.right[MailError])
         case 400 => Future(BadRequest.left[MailResponse])
         case 401 => Future(Unauthorized.left[MailResponse])
         case 402 => Future(RequestFailed.left[MailResponse])

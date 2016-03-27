@@ -29,7 +29,7 @@ object MailRefinedContent {
   case class TEXTContent(override val content: String) extends MailRefinedContent(content)
 }
 
-abstract class MailoError(message: String) extends RuntimeException(message)
+abstract class MailError(message: String) extends RuntimeException(message)
 
 class Mailo(
     mailData: MailData,
@@ -50,7 +50,7 @@ class Mailo(
     templateName: String,
     params: Map[String, String],
     tags: List[String]
-  ): Future[\/[MailoError, MailResponse]] = {
+  ): Future[\/[MailError, MailResponse]] = {
     val result = for {
       content <- EitherT(mailData.get(templateName))
       parsedContent <- EitherT.fromDisjunction(HTMLParser.parse(content, params))
