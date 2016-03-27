@@ -43,7 +43,6 @@ class Mailo(
   ) {
   import MailRefinedContent._
 
-
   def send(
     to: String,
     from: String,
@@ -90,6 +89,6 @@ class S3MailgunMailo(implicit
     templateName: String,
     params: Map[String, String],
     tags: List[String]
-  ): Future[\/[MailoError, MailResponse]] =
+  ): Future[\/[MailError, MailResponse]] =
     mailgunS3Mailo.send(to, from, subject, templateName, params, tags)
 }
