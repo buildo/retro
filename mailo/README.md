@@ -2,6 +2,17 @@
 
 [![Build Status](https://travis-ci.org/buildo/mailo.svg?branch=master)](https://travis-ci.org/buildo/mailo)[![codecov.io](https://codecov.io/github/buildo/mailo/coverage.svg?branch=master)](https://codecov.io/github/buildo/mailo?branch=master)
 
+- Styling HTML email is painful.
+- Managing templates stored in ESPs is painful.
+- Debugging why your email wasn't delivered is painful.
+
+# Mailo Features
+- Store your email templates where you like.
+- Send your email with the ESP you like.
+- Compose your template using HTML partials (convenient for footers and headers).
+- Collect your email errors in just one point.
+
+# How to use
 How to get mailo instance.
 ```scala
 import akka.stream.ActorMaterializer
