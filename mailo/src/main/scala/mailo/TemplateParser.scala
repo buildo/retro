@@ -48,7 +48,7 @@ object HTMLParser {
     val partialsSet: Set[String] = partials.keySet
     val matchesSet: Set[String] = matches.toSet
 
-    if (matchesSet subsetOf partialsSet) safelyReplaceAllInDocument(content, partials, mockPattern).right[MailError]
+    if (matchesSet subsetOf partialsSet) unsafelyReplaceAllInDocument(content, partials, mockPattern).right[MailError]
     else PartialsDoNotExist(matchesSet -- partialsSet).left[String]
   }
 
@@ -63,14 +63,14 @@ object HTMLParser {
     val paramsSet: Set[String] = params.keySet
     val matchesSet: Set[String] = matches.toSet
 
-    if (paramsSet == matchesSet) safelyReplaceAllInDocument(document, params, parameterPattern).right[MailError]
+    if (paramsSet == matchesSet) unsafelyReplaceAllInDocument(document, params, parameterPattern).right[MailError]
     else if (matchesSet subsetOf paramsSet) TooManyParamsProvided(paramsSet -- matchesSet).left[String]
     else if (paramsSet subsetOf matchesSet) TooFewParamsProvided(matchesSet -- paramsSet).left[String]
     else if ((paramsSet intersect matchesSet).isEmpty) DisjointParametersAndMatches(paramsSet, matchesSet).left[String]
     else OverlappedParametersAndMatches(paramsSet -- matchesSet, matchesSet -- paramsSet, matchesSet intersect paramsSet).left[String]
   }
 
-  private[this] def safelyReplaceAllInDocument(
+  private[this] def unsafelyReplaceAllInDocument(
     document: String,
     values: Map[String, String],
     pattern: Regex
