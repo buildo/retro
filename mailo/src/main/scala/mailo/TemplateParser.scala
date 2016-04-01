@@ -34,10 +34,10 @@ object HTMLParser {
   import ParserError._
 
   def parse(content: MailRawContent, params: Map[String, String]): \/[MailError, String] = {
-    replaceAllTemplates(content.template, content.partials) flatMap (replaceAllParams(_, params))
+    replaceAllPartials(content.template, content.partials) flatMap (replaceAllParams(_, params))
   }
 
-  private[this] def replaceAllTemplates(
+  private[this] def replaceAllPartials(
     content: String,
     partials: Map[String, String]
   ): \/[MailError, String] = {
