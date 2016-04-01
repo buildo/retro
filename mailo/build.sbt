@@ -29,7 +29,7 @@ val commonSettings = Seq(
   fork in run := true
 )
 
-lazy val authentication = (project in file(".")).
+lazy val mailo = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "mailo",
