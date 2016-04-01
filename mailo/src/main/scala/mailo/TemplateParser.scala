@@ -33,9 +33,8 @@ object ParserError {
 object HTMLParser {
   import ParserError._
 
-  def parse(content: MailRawContent, params: Map[String, String]): \/[MailError, String] = {
+  def parse(content: MailRawContent, params: Map[String, String]): \/[MailError, String] =
     replaceAllPartials(content.template, content.partials) flatMap (replaceAllParams(_, params))
-  }
 
   private[this] def replaceAllPartials(
     content: String,
@@ -79,7 +78,7 @@ object HTMLParser {
     def replacement(m: Match) = {
       import java.util.regex.Matcher
       require(m.groupCount == 1)
-      Matcher.quoteReplacement( values(m group 1) )
+      Matcher.quoteReplacement(values(m group 1))
     }
 
     pattern replaceAllIn(document, replacement _)
