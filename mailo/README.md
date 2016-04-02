@@ -11,7 +11,6 @@
 - Send your email with the ESP you like.
 - Compose your template using HTML partials (convenient for footers and headers).
 - Collect your email errors in "just one point".
-- Fail at compile-time if parameters are not correctly provided to the template.
 
 # How to use
 How to get mailo instance.
