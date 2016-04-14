@@ -1,13 +1,6 @@
-branches:
-  - master
-
 build:
   labonline-escalapio:
     image: hseeberger/scala-sbt
     commands:
       - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
       - sbt test -Dsbt.ivy.home=/drone/.ivy
-    when:
-      branch:
-        - master
-      event: push
