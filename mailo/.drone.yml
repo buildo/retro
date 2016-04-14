@@ -1,5 +1,5 @@
 build:
-  labonline-escalapio:
+  mailo:
     image: hseeberger/scala-sbt
     commands:
       - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
