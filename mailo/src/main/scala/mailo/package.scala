@@ -15,6 +15,8 @@ import akka.stream.ActorMaterializer
 import scalaz.std.scalaFuture._
 import scalaz.{EitherT, \/}
 
+import com.typesafe.config.{ ConfigFactory, Config }
+
 case class MailResponse(
   id: String,
   message: String
@@ -39,7 +41,8 @@ class Mailo(
     mailClient: MailClient
   )(implicit
     ec: ExecutionContext,
-    logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo")
+    logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo"),
+    conf: Config = ConfigFactory.load()
   ) {
   import MailRefinedContent._
 
