@@ -1,7 +1,3 @@
-branches:
-  - master
-  - mailo-*
-
 build:
   mailo:
     image: hseeberger/scala-sbt
