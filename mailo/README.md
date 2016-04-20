@@ -19,7 +19,7 @@ In your `build.sbt` add buildo Bintray resolver
 resolvers += Resolver.bintrayRepo("buildo", "maven")
 ```
 
-then
+then add the dependency
 
 ```scala
 libraryDependencies += "io.buildo" %% "mailo" % "0.1.0"
