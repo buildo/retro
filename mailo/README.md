@@ -1,7 +1,6 @@
 #Mailo
 
-[![Build Status](https://drone.our.buildo.io/api/badges/buildo/mailo/status.svg)](https://drone.our.buildo.io/buildo/mailo)
-[![codecov.io](https://codecov.io/github/buildo/mailo/coverage.svg?branch=master)](https://codecov.io/github/buildo/mailo?branch=master)
+[![Bintray](https://img.shields.io/bintray/v/buildo/maven/mailo.svg)](https://bintray.com/buildo/maven/mailo/view)
 
 - Styling HTML email is painful.
 - Managing templates stored in ESPs is painful.
@@ -12,6 +11,19 @@
 - Send your email with the ESP you like.
 - Compose your template using HTML partials (convenient for footers and headers).
 - Collect your email errors in "just one point".
+
+# Install
+In your `build.sbt` add buildo Bintray resolver
+
+```scala
+resolvers += Resolver.bintrayRepo("buildo", "maven")
+```
+
+then
+
+```scala
+libraryDependencies += "io.buildo" %% "mailo" % "0.1.0"
+```
 
 # How to use
 How to get mailo instance.
