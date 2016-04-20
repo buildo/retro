@@ -9,6 +9,20 @@ build:
       - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
       - sbt test -Dsbt.ivy.home=/drone/.ivy
 
+  publish:
+    image: hseeberger/scala-sbt
+    environment:
+      BINTRAY_CREDENTIALS_FILE: './.bintrayCredentials'
+    commands:
+      - echo 'realm = Bintray API Realm' >> .bintrayCredentials
+      - echo 'host = api.bintray.com' >> .bintrayCredentials
+      - echo 'user = $$BINTRAY_USERNAME' >> .bintrayCredentials
+      - echo 'password = $$BINTRAY_PASSWORD' >> .bintrayCredentials
+      - echo 'bintrayCredentialsFile := new File(".bintrayCredentials")' >> build.sbt
+      - sbt publish -Dsbt.ivy.home=/drone/.ivy
+    when:
+      event: tag
+
 cache:
   mount:
     - /drone/.ivy
