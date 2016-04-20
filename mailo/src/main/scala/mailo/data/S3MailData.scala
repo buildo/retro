@@ -3,7 +3,7 @@ package mailo.data
 import awscala.s3.{ S3, Bucket, S3ObjectSummary, S3Object }
 import awscala.{ Credentials, Region }
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ ConfigFactory, Config }
 
 import scalaz.\/
 import scalaz.syntax.either._
@@ -23,13 +23,13 @@ object S3MailDataError {
 }
 
 class S3MailData(implicit
-    ec: ExecutionContext
+    ec: ExecutionContext,
+    conf: com.typesafe.config.Config = ConfigFactory.load()
   ) extends MailData {
   import mailo.MailRawContent
   import S3MailDataError._
 
   private[S3MailData] case class S3Config(key: String, secret: String, bucket: String, partialsFolder: String)
-  private[S3MailData] lazy val conf = ConfigFactory.load()
 
   private[S3MailData] val s3Config = S3Config(
     key    = conf.getString(s"s3.key"),

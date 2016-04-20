@@ -12,14 +12,15 @@ import akka.actor.ActorSystem
 
 import scala.concurrent.Future
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ ConfigFactory, Config }
 
 import scalaz.\/
 import scalaz.syntax.either._
 
 class MailgunClient(implicit
   system: ActorSystem,
-  materializer: ActorMaterializer
+  materializer: ActorMaterializer,
+  conf: Config = ConfigFactory.load()
 ) extends MailClient {
   import mailo.MailError
   import MailClientError._
@@ -27,7 +28,6 @@ class MailgunClient(implicit
   import mailo.MailResponse
 
   private[this] case class MailgunConfig(key: String, uri: String)
-  private[this] val conf = ConfigFactory.load()
   private[this] val mailgunConfig = MailgunConfig(
     key = conf.getString("mailgun.key"),
     uri = conf.getString("mailgun.uri")
