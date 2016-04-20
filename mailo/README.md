@@ -1,6 +1,7 @@
 #Mailo
 
-[![Build Status](https://travis-ci.org/buildo/mailo.svg?branch=master)](https://travis-ci.org/buildo/mailo)[![codecov.io](https://codecov.io/github/buildo/mailo/coverage.svg?branch=master)](https://codecov.io/github/buildo/mailo?branch=master)
+[![Build Status](https://drone.our.buildo.io/api/badges/buildo/mailo/status.svg)](https://drone.our.buildo.io/buildo/mailo)
+[![codecov.io](https://codecov.io/github/buildo/mailo/coverage.svg?branch=master)](https://codecov.io/github/buildo/mailo?branch=master)
 
 - Styling HTML email is painful.
 - Managing templates stored in ESPs is painful.
