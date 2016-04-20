@@ -19,6 +19,7 @@ How to get mailo instance.
 import akka.stream.ActorMaterializer
 import akka.actor.ActorSystem
 
+import mailo.Mailo
 import mailo.data.S3MailData
 import mailo.http.MailgunClient
 
