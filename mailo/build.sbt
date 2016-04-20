@@ -14,6 +14,8 @@ val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val ingredients = "io.buildo" %% "ingredients-logging" % "0.6.0"
 
 val commonSettings = Seq(
+  bintrayOrganization := Some("buildo"),
+  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
   version       := "0.1.0",
   scalaVersion  := "2.11.7",
