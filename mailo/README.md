@@ -13,16 +13,8 @@
 - Collect your email errors in "just one point".
 
 # Install
-In your `build.sbt` add buildo Bintray resolver
-
 ```scala
-resolvers += Resolver.bintrayRepo("buildo", "maven")
-```
-
-then add the dependency
-
-```scala
-libraryDependencies += "io.buildo" %% "mailo" % "0.1.0"
+libraryDependencies += "io.buildo" %% "mailo" % "<MAILO_VERSION>"
 ```
 
 # How to use
