@@ -4,8 +4,6 @@ import mailo.http.MailClient
 import mailo.data.MailData
 import mailo.parser.HTMLParser
 
-import ingredients.logging._
-import nozzle.logging._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 
@@ -41,7 +39,6 @@ class Mailo(
     mailClient: MailClient
   )(implicit
     ec: ExecutionContext,
-    logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo"),
     conf: Config = ConfigFactory.load()
   ) {
   import MailRefinedContent._
@@ -73,10 +70,8 @@ class Mailo(
 class S3MailgunMailo(implicit
   system: ActorSystem,
   materializer: ActorMaterializer,
-  ec: ExecutionContext,
-  logger: Logger = nozzle.logging.BasicLogging({case "mailo" => Enabled(Level.Debug)}).logger("mailo")
+  ec: ExecutionContext
 ){
-
   import data.S3MailData
   import http.MailgunClient
 

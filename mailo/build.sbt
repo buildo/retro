@@ -1,6 +1,5 @@
 val akkaV = "2.0.3"
 
-val nozzle = "io.buildo" %% "nozzle" % "0.10"
 val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
 val akkaHttpCore = "com.typesafe.akka" % "akka-http-core-experimental_2.11" % akkaV
 val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaV
@@ -10,13 +9,12 @@ val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.5.2"
 val circeCore = "io.circe" %% "circe-core" % "0.3.0"
 val circeGeneric = "io.circe" %% "circe-generic" % "0.3.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
-val ingredients = "io.buildo" %% "ingredients-logging" % "0.6.0"
 
 val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
-  version       := "0.1.1",
+  version       := "0.1.2",
   scalaVersion  := "2.11.7",
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
@@ -39,13 +37,11 @@ lazy val mailo = (project in file(".")).
       akkaHttp,
       akkaHttpCore,
       s3,
-      nozzle,
       scalaz,
       akkaHttpCirce,
       circeCore,
       circeGeneric,
-      typesafeConfig,
-      ingredients
+      typesafeConfig
     )
   )
 
