@@ -32,10 +32,10 @@ class S3MailData(implicit
   private[S3MailData] case class S3Config(key: String, secret: String, bucket: String, partialsFolder: String)
 
   private[S3MailData] val s3Config = S3Config(
-    key    = conf.getString(s"s3.key"),
-    secret = conf.getString(s"s3.secret"),
-    bucket = conf.getString(s"s3.bucket"),
-    partialsFolder = conf.getString(s"s3.partialsFolder")
+    key    = conf.getString(s"mailo.s3.key"),
+    secret = conf.getString(s"mailo.s3.secret"),
+    bucket = conf.getString(s"mailo.s3.bucket"),
+    partialsFolder = conf.getString(s"mailo.s3.partialsFolder")
   )
 
   private[S3MailData] implicit val region = Region.Frankfurt
