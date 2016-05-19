@@ -1,7 +1,6 @@
 val akkaV = "2.0.3"
 
 val nozzle = "io.buildo" %% "nozzle" % "0.10"
-val sprayTest = "io.spray" %% "spray-testkit" % "1.3.3" % "test"
 val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
 val akkaHttpCore = "com.typesafe.akka" % "akka-http-core-experimental_2.11" % akkaV
 val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaV
@@ -36,7 +35,6 @@ lazy val mailo = (project in file(".")).
   settings(
     name := "mailo",
     libraryDependencies ++= Seq(
-      sprayTest,
       scalaTest,
       akkaHttp,
       akkaHttpCore,
