@@ -17,7 +17,7 @@ val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
-  version       := "0.1.0",
+  version       := "0.1.1",
   scalaVersion  := "2.11.7",
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
