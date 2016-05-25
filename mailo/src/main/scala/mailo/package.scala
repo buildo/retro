@@ -15,6 +15,14 @@ import scalaz.{EitherT, \/}
 
 import com.typesafe.config.{ ConfigFactory, Config }
 
+import akka.http.scaladsl.model.ContentType
+
+case class Attachment(
+  name: String,
+  `type`: ContentType,
+  content: String
+)
+
 case class MailResponse(
   id: String,
   message: String
@@ -49,7 +57,8 @@ class Mailo(
     subject: String,
     templateName: String,
     params: Map[String, String],
-    tags: List[String]
+    attachments: List[Attachment] = Nil,
+    tags: List[String] = Nil
   ): Future[\/[MailError, MailResponse]] = {
     val result = for {
       content <- EitherT(mailData.get(templateName))
@@ -59,6 +68,7 @@ class Mailo(
         from = from,
         subject = subject,
         content = HTMLContent(parsedContent),
+        attachments = attachments,
         tags = tags
       ))
     } yield result
@@ -86,7 +96,8 @@ class S3MailgunMailo(implicit
     subject: String,
     templateName: String,
     params: Map[String, String],
-    tags: List[String]
+    attachments: List[Attachment] = Nil,
+    tags: List[String] = Nil
   ): Future[\/[MailError, MailResponse]] =
-    mailgunS3Mailo.send(to, from, subject, templateName, params, tags)
+    mailgunS3Mailo.send(to, from, subject, templateName, params, attachments, tags)
 }

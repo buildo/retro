@@ -3,7 +3,7 @@ package mailo.http
 import scalaz.\/
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import mailo.MailError
+import mailo.{ MailError, Attachment }
 
 object MailClientError {
   case object BadRequest extends MailError("400 Bad Request - Often missing a required parameter")
@@ -24,6 +24,7 @@ trait MailClient {
     from: String,
     subject: String,
     content: MailRefinedContent,
+    attachments: List[Attachment],
     tags: List[String]
   )(implicit
     executionContext: ExecutionContext
