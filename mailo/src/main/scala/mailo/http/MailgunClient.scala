@@ -1,5 +1,7 @@
 package mailo.http
 
+import mailo.Attachment
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials}
@@ -16,6 +18,9 @@ import com.typesafe.config.{ ConfigFactory, Config }
 
 import scalaz.\/
 import scalaz.syntax.either._
+
+import akka.http.scaladsl.model.ContentType
+import akka.util.ByteString
 
 class MailgunClient(implicit
   system: ActorSystem,
@@ -38,6 +43,7 @@ class MailgunClient(implicit
     from: String,
     subject: String,
     content: MailRefinedContent,
+    attachments: List[Attachment],
     tags: List[String]
   )(implicit
     executionContext: scala.concurrent.ExecutionContext
@@ -48,7 +54,14 @@ class MailgunClient(implicit
     val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
 
     for {
-      entity <- entity(from = from, to = to, subject = subject, content = content, tags = tags)
+      entity <- entity(
+        from = from,
+        to = to,
+        subject = subject,
+        content = content,
+        attachments = attachments,
+        tags = tags
+      )
       request = HttpRequest(
         method = HttpMethods.POST,
         uri = s"${mailgunConfig.uri}/messages",
@@ -68,11 +81,20 @@ class MailgunClient(implicit
     } yield result
   }
 
+  private[this] def attachmentForm(name: String, `type`: ContentType, content: String) = {
+    Multipart.FormData.BodyPart.Strict(
+      name = "attachment",
+      entity = HttpEntity(`type`, ByteString(content)),
+      additionalDispositionParams = Map("filename" -> name)
+    )
+  }
+
   private[this] def entity(
     from: String,
     to: String,
     subject: String,
     content: MailRefinedContent,
+    attachments: List[Attachment],
     tags: List[String]
   )(implicit
     executionCon: scala.concurrent.ExecutionContext
@@ -85,11 +107,13 @@ class MailgunClient(implicit
       case TEXTContent(text) => Multipart.FormData.BodyPart.Strict("text", text)
     }
 
+    val attachmentsForm = attachments map (attachment => attachmentForm(attachment.name, attachment.`type`, attachment.content))
+
     val multipartForm = Multipart.FormData(Source(List(
       Multipart.FormData.BodyPart.Strict("from", from),
       Multipart.FormData.BodyPart.Strict("to", to),
       Multipart.FormData.BodyPart.Strict("subject", subject)
-    ) ++ tagsForm :+ contentForm ))
+    ) ++ tagsForm ++ attachmentsForm :+ contentForm ))
 
     Marshal(multipartForm).to[RequestEntity]
   }

@@ -63,6 +63,23 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       tags = List("test")
     ).futureValue.swap | (fail) should be (data.S3MailDataError.ObjectNotFound)
   }
+
+  "email" should "not explode sending attachments" in {
+    import akka.http.scaladsl.model.MediaTypes._
+    import akka.http.scaladsl.model.HttpCharsets._
+
+    val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plain` withCharset `UTF-8`)
+
+    (mailer.send(
+       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+       from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+       subject = "Test mail",
+       templateName = "mail.html",
+       params = Map("ciao" -> "CIAOOOONE"),
+       attachments = List(attachment),
+       tags = List("test")
+     ).futureValue | (fail)).message should be ("Queued. Thank you.")
+  }
 }
 
 trait AppSpec {

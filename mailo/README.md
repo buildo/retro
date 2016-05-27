@@ -50,3 +50,37 @@ mailo.send(
   tags = List("test")
 )
 ```
+
+# How to send attachments
+
+Mailo provide a case class `Attachment` that is used to send attachments in emails.
+`Attachment` case class is defined as:
+```scala
+import akka.http.scaladsl.model.ContentType
+case class Attachment(
+  name: String,
+  `type`: ContentType,
+  content: String
+)
+```
+
+An attachment can be created as follows:
+
+```scala
+import akka.http.scaladsl.model.MediaTypes._
+import akka.http.scaladsl.model.HttpCharsets._
+val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plain` withCharset `UTF-8`)
+```
+
+And sent as:
+```scala
+mailer.send(
+   to = "recipient@mail.com",
+   from = "Mailo sender@mail.com",
+   subject = "Test mail",
+   templateName = "mail.html",
+   params = Map("ciao" -> "CIAOOOONE"),
+   attachments = List(attachment),
+   tags = List("test")
+)
+```
