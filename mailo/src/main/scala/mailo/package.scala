@@ -20,7 +20,8 @@ import akka.http.scaladsl.model.ContentType
 case class Attachment(
   name: String,
   `type`: ContentType,
-  content: String
+  content: String,
+  transferEncoding: Option[String] = None
 )
 
 case class MailResponse(

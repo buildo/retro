@@ -4,7 +4,7 @@ import mailo.Attachment
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials}
+import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, RawHeader}
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 
@@ -81,11 +81,15 @@ class MailgunClient(implicit
     } yield result
   }
 
-  private[this] def attachmentForm(name: String, `type`: ContentType, content: String) = {
+  private[this] def attachmentForm(name: String, `type`: ContentType, content: String, transferEncoding: Option[String] = None) = {
     Multipart.FormData.BodyPart.Strict(
       name = "attachment",
       entity = HttpEntity(`type`, ByteString(content)),
-      additionalDispositionParams = Map("filename" -> name)
+      additionalDispositionParams = Map("filename" -> name),
+      additionalHeaders = transferEncoding match {
+                            case Some(e) => List(RawHeader("Content-Transfer-Encoding", e))
+                            case None => Nil
+                          }
     )
   }
 
@@ -107,7 +111,7 @@ class MailgunClient(implicit
       case TEXTContent(text) => Multipart.FormData.BodyPart.Strict("text", text)
     }
 
-    val attachmentsForm = attachments map (attachment => attachmentForm(attachment.name, attachment.`type`, attachment.content))
+    val attachmentsForm = attachments map (attachment => attachmentForm(attachment.name, attachment.`type`, attachment.content, attachment.transferEncoding))
 
     val multipartForm = Multipart.FormData(Source(List(
       Multipart.FormData.BodyPart.Strict("from", from),
