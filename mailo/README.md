@@ -89,5 +89,5 @@ mailer.send(
 You can specify add a Content-Transfer-Encoding header in the attachments as follows.
 
 ```scala
-val attachment = Attachment(name = "test.pdf", content="{base64pdf}", `type`=`application/pdf`, transferEncoding = Some("base64"))
+val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`application/pdf`, transferEncoding = Some("base64"))
 ```
