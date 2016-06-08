@@ -41,6 +41,31 @@ To enable the macro paradise plugin (for the @enum annotation), also add
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
 ```
 
+## Supported syntaxes
+The `object` keyword is optional in the case declarations. So this:
+
+```scala
+@enum trait Planet {
+  object Earth
+  object Venus
+  object Mercury
+}
+```
+
+can also be written more concisely as
+
+```scala
+@enum trait Planet {
+  Earth
+  Venus
+  Mercury
+}
+```
+
+The first version (slightly more verbose) has a more "scalish feel", and allows you maintain your code closer to the result of the macro expansion.
+
+The second version (more compact) looks a bit less like scala, but it allows you to strip away another bit of boilerplate.
+
 ## Convention and marker trait
 
 The `@enum` annotation builds enumerations that follow the library's convention for how ADT-based enums should be encoded. However, usage of the macro annotation can be avoided by manually writing out the ADT. Here's an example that serves as an informal definition of the convention.
