@@ -4,9 +4,14 @@ import org.scalatest.{ Matchers, WordSpec }
 
 class CaseEnumMacroSpec extends WordSpec with Matchers {
   @enum trait Planet {
-    object Mercury
-    object Venus
-    object Earth
+    Mercury
+    Venus
+    Earth
+  }
+
+  @enum trait Beer {
+    object Lager
+    object Ale
   }
 
   "@enum annotation" should {
@@ -17,6 +22,14 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
       Planet.Mercury should not be a [Planet.Earth.type]
       Planet.Earth shouldBe Planet.Earth
     }
+
+    "produce a valid CaseEnum-style ADT (alternative syntax)" in {
+      Beer.Lager shouldBe a[Product]
+      Beer.Lager shouldBe a[Serializable]
+      Beer.Lager shouldBe a[Beer]
+      Beer.Ale should not be a [Beer.Lager.type]
+      Beer.Lager shouldBe Beer.Lager
+    }
   }
 
 }
@@ -24,9 +37,15 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
 class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
   @indexedEnum trait Planet {
     type Index = Int
-    object Mercury { 1 }
-    object Venus   { 2 }
-    object Earth   { 3 }
+    Mercury { 1 }
+    Venus   { 2 }
+    Earth   { 3 }
+  }
+
+  @indexedEnum trait Beer {
+    type Index = Int
+    Lager { 1 }
+    Ale { 2 }
   }
 
   "@indexedEnum annotation" should {
@@ -38,6 +57,16 @@ class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
       Planet.Mercury should not be a [Planet.Earth.type]
       Planet.Earth shouldBe Planet.Earth
       Planet.Earth.index shouldBe 3
+    }
+
+    "produce a valid IndexedCaseEnum-style ADT (alternative syntax)" in {
+      val typecheck: Int = 2: Planet#Index
+      Beer.Lager shouldBe a[Product]
+      Beer.Lager shouldBe a[Serializable]
+      Beer.Lager shouldBe a[Beer]
+      Beer.Ale should not be a [Beer.Lager.type]
+      Beer.Lager shouldBe Beer.Lager
+      Beer.Ale.index shouldBe 2
     }
   }
 
