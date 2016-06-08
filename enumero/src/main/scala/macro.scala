@@ -118,13 +118,13 @@ object IndexedEnumMacro {
       }
       val typeAliasTree :: memberTrees = body
       val members = memberTrees.map {
-        case Apply(Ident(memberName: TermName), List(statement)) =>
+        case Apply(Ident(memberName: TermName), List(expression)) =>
           q"""case object $memberName extends $enumName {
-                val index = $statement
+                val index = $expression
               }"""
-        case q"object $memberName { $statement  }" =>
+        case q"object $memberName { $expression  }" =>
           q"""case object $memberName extends $enumName {
-                val index = $statement
+                val index = $expression
               }"""
         case _ =>
           c.abort(c.enclosingPosition, "Enum members should be plain objects")
