@@ -1,6 +1,6 @@
 name := "ingredients-caseenum"
 
-version       := "0.2.1-SNAPSHOT"
+version       := "0.2.1"
 
 libraryDependencies <+= (scalaVersion) { sv =>
   "org.scala-lang" %  "scala-reflect" % sv
