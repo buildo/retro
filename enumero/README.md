@@ -30,8 +30,6 @@ res1: String = close
 Add the buildo/maven Bintray resolver and the dependency to your `build.sbt`
 
 ```scala
-resolvers += "bintray buildo/maven" at "http://dl.bintray.com/buildo/maven"
-
 libraryDependencies += "io.buildo" %% "ingredients-caseenum" % "..."
 ```
 
