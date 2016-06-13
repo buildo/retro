@@ -56,7 +56,7 @@ class Mailo(
   ) {
   import MailRefinedContent._
 
-  implicit val scalaCache = ScalaCache(GuavaCache())
+  implicit private[this] val scalaCache = ScalaCache(GuavaCache())
 
   private[this] case class MailoConfig(cachingTTLSeconds: Int)
   private[this] val mailoConfig = MailoConfig(
