@@ -24,19 +24,18 @@ class CacheSpec extends FlatSpec with Matchers with ScalaFutures with Eventually
   val templateName1 = "mail.html"
   val templateName2 = "mail-image.html"
 
+  def action(templateName: String, ttl: Int) = cachingWithTTL(templateName)(ttl.seconds) {
+    s3.get(templateName)
+  }
+
   "cache" should "initially be empty" in {
     get[String, NoSerialization](templateName1).futureValue should be (None)
     get[String, NoSerialization](templateName2).futureValue should be (None)
   }
 
   "cache" should "be populated correctly " in {
-    cachingWithTTL(templateName1)(10.seconds) {
-      s3.get(templateName1)
-    }.futureValue
-
-    cachingWithTTL(templateName2)(30.seconds) {
-      s3.get(templateName2)
-    }.futureValue
+    action(templateName1, 10).futureValue
+    action(templateName2, 30).futureValue
 
     get[String, NoSerialization](templateName2).futureValue should not be (None)
     get[String, NoSerialization](templateName1).futureValue should not be (None)
@@ -47,5 +46,10 @@ class CacheSpec extends FlatSpec with Matchers with ScalaFutures with Eventually
       get[String, NoSerialization](templateName1).futureValue should be (None)
       get[String, NoSerialization](templateName2).futureValue should not be (None)
     }
+  }
+
+  "cache" should "work correctly after" in {
+    action(templateName1, 1).futureValue
+    action(templateName2, 1).futureValue
   }
 }
