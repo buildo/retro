@@ -91,3 +91,8 @@ You can specify add a Content-Transfer-Encoding header in the attachments as fol
 ```scala
 val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`application/pdf`, transferEncoding = Some("base64"))
 ```
+
+# Templates caching
+
+Since version `0.1.5` templates are cached.
+It's possible to set caching TTL in the `application.conf` as `mailo.cachingTTLSeconds: 30`.
