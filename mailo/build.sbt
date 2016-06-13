@@ -9,6 +9,7 @@ val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.5.2"
 val circeCore = "io.circe" %% "circe-core" % "0.3.0"
 val circeGeneric = "io.circe" %% "circe-generic" % "0.3.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
+val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.1"
 
 val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
@@ -41,7 +42,8 @@ lazy val mailo = (project in file(".")).
       akkaHttpCirce,
       circeCore,
       circeGeneric,
-      typesafeConfig
+      typesafeConfig,
+      scalaCacheGuava
     )
   )
 
