@@ -17,6 +17,10 @@ import com.typesafe.config.{ ConfigFactory, Config }
 
 import akka.http.scaladsl.model.ContentType
 
+import scala.concurrent.duration._
+import scalacache._
+import guava._
+
 case class Attachment(
   name: String,
   `type`: ContentType,
@@ -52,6 +56,13 @@ class Mailo(
   ) {
   import MailRefinedContent._
 
+  implicit private[this] val scalaCache = ScalaCache(GuavaCache())
+
+  private[this] case class MailoConfig(cachingTTLSeconds: Int)
+  private[this] val mailoConfig = MailoConfig(
+    cachingTTLSeconds = conf.getInt("mailo.cachingTTLSeconds")
+  )
+
   def send(
     to: String,
     from: String,
@@ -62,7 +73,9 @@ class Mailo(
     tags: List[String] = Nil
   ): Future[\/[MailError, MailResponse]] = {
     val result = for {
-      content <- EitherT(mailData.get(templateName))
+      content <- EitherT(cachingWithTTL(templateName)(mailoConfig.cachingTTLSeconds.seconds) {
+        mailData.get(templateName)
+      })
       parsedContent <- EitherT.fromDisjunction(HTMLParser.parse(content, params))
       result <- EitherT(mailClient.send(
         to = to,
