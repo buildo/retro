@@ -27,6 +27,8 @@ trait CaseEnumSerialization[T <: CaseEnum] {
    *         None otherwise
    */
   def caseFromString(str: String): Option[T]
+  val name: String
+  val values: Set[T]
 }
 
 // Companion object to provide typeclass instances for all CaseEnums
@@ -52,12 +54,16 @@ object CaseEnumMacro {
       q"($companion.$name, $decoded)"
     }
 
+    val enumResourceName: String = typeName.name.decodedName.toString
+
     q"""
       new _root_.ingredients.caseenum.CaseEnumSerialization[$typeName] {
         private[this] val map: Map[$typeName, String] = Map(..$mapComponents)
         private[this] val revMap = map.map(_ swap)
         def caseToString(value: $typeName): String = map(value)
         def caseFromString(str: String): Option[$typeName] = revMap.get(str)
+        val name: String = $enumResourceName
+        val values: Set[$typeName] = map.keys.toSet
       }
     """
   }

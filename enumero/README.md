@@ -91,14 +91,17 @@ Usage of the @enum macro annotations requires the macro paradise plugin to be en
 
 ## To and from String
 
-The `CaseEnumSerialization` typeclass provides operations to convert ADT-based enumerations to and from strings.
+The `CaseEnumSerialization` typeclass provides operations to convert ADT-based enumerations to and from strings,
+as well as the name of the `CaseEnum` (e.g. `"Planet"`) and a `Set` of enum values (e.g. `Set(Earth, Venus, Mercury)`)
 
 Implemetors of encoding and decoding (serialization) protocols may use it as follows:
 
 ```scala
 implicit def caseEnumJsonEncoding[T <: CaseEnum](implicit instance: CaseEnumSerialization[T]) = new JsonEncoding[T] {
   def write(value: T): JsonObject = JsonString(instance.caseToString(value))
-  def read(jsonObject: JsonObject) = ... instance.caseFromString(str).get
+  def read(jsonObject: JsonObject) = ... instance.caseFromString(str).getOrElse(
+    throw new Exception(s"$str is not a valid ${instance.name}. Valid values are: ${instance.values.mkString(", ")}")
+  )
 }
 ```
 
