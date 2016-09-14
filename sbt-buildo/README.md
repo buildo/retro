@@ -19,4 +19,4 @@ inThisBuild(Seq(
 
 This plugins makes some common dependencies available. If you just want the default dependencies, import them in bulk using `defaultDependencies`.
 
-If you prefer to cherry-pick, refer to https://github.com/buildo/sbt-buildo/blob/master/src/main/scala/buildo/CommonDependenciesSetting.scala
+If you prefer to cherry-pick, refer to https://github.com/buildo/sbt-buildo/blob/master/src/main/scala/buildo/CommonDependenciesSettingPlugin.scala

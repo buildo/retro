@@ -4,7 +4,7 @@ import sbt._
 import Keys._
 
 
-object CommonDependencySettings extends AutoPlugin {
+object CommonDependencySettingPlugin extends AutoPlugin {
 
   object autoImport {
     val nozzle = "io.buildo" %% "nozzle" % "0.10.7"
