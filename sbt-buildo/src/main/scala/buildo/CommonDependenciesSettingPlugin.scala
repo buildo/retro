@@ -3,7 +3,6 @@ package buildo
 import sbt._
 import Keys._
 
-
 object CommonDependencySettingPlugin extends AutoPlugin {
 
   object autoImport {
@@ -26,6 +25,7 @@ object CommonDependencySettingPlugin extends AutoPlugin {
       hikari,
       logging,
       sprayJson,
+      metarpheusAnnotations,
       scalaTest,
       sprayTest
     )

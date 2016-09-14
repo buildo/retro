@@ -16,6 +16,7 @@ object ScalaSettingPlugin extends AutoPlugin {
   )
 
   lazy val baseSettings: Seq[Def.Setting[_]] = Seq(
+    cancelable in Global := true,
     scalacOptions ++= Seq("-encoding", "utf8"),
     scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
     scalacOptions  += "-language:higherKinds",
