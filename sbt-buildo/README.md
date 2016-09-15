@@ -1,4 +1,4 @@
-[ ![Download](https://api.bintray.com/packages/buildo/maven/sbt-buildo/images/download.svg) ](https://bintray.com/buildo/maven/sbt-buildo/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/buildo/sbt-plugins/sbt-buildo/images/download.svg) ](https://bintray.com/buildo/maven/sbt-buildo/_latestVersion)
 
 # sbt-buildo
 sbt plugin to share settings and dependencies across scala projects in buildo
