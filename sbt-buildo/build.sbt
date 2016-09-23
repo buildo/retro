@@ -16,5 +16,5 @@ lazy val root = (project in file(".")).
     licenses := Seq("MIT" -> url("https://github.com/buildo/sbt-buildo/blob/master/LICENSE")),
     scmInfo := Some(ScmInfo(url("https://github.com/buildo/sbt-buildo"), "git@github.com:buildo/sbt-buildo.git")),
     bintrayOrganization := Some("buildo"),
-    bintrayRepository := "maven"
+    bintrayRepository := "sbt-plugins"
   )
