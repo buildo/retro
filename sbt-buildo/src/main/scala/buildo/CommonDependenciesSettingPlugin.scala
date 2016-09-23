@@ -5,6 +5,12 @@ import Keys._
 
 object CommonDependencySettingPlugin extends AutoPlugin {
 
+  override def buildSettings: Seq[Def.Setting[_]] = baseBuildSettings
+
+  lazy val baseBuildSettings: Seq[Def.Setting[_]] = Seq(
+    resolvers += Resolver.bintrayRepo("buildo", "maven")
+  )
+
   object autoImport {
     val nozzle = "io.buildo" %% "nozzle" % "0.10.7"
     val caseenum =  "io.buildo" %% "ingredients-caseenum" % "0.3.0"
