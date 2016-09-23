@@ -12,6 +12,7 @@ object MailClientError {
   case object NotFound extends MailError("404 Not Found - The requested item doesn’t exist")
   case object ServerError extends MailError("500, 502, 503, 504 Server Errors - something is wrong on the email server")
   case object UnknownCode extends MailError("Unknown response")
+  case class UnkownError(msg: String) extends MailError(msg)
 }
 
 trait MailClient {

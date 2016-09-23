@@ -21,6 +21,8 @@ import scala.concurrent.duration._
 import scalacache._
 import guava._
 
+import java.io.{ StringWriter, PrintWriter }
+
 case class Attachment(
   name: String,
   `type`: ContentType,
@@ -114,4 +116,14 @@ class S3MailgunMailo(implicit
     tags: List[String] = Nil
   ): Future[\/[MailError, MailResponse]] =
     mailgunS3Mailo.send(to, from, subject, templateName, params, attachments, tags)
+}
+
+package object util {
+  implicit class PimpThrowable(t: Throwable) {
+    def getStackTraceAsString = {
+      val sw = new StringWriter
+      t.printStackTrace(new PrintWriter(sw))
+      sw.toString
+    }
+  }
 }

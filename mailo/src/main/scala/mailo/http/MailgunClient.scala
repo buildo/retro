@@ -1,6 +1,5 @@
-package mailo.http
-
-import mailo.Attachment
+package mailo
+package http
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
@@ -22,12 +21,13 @@ import scalaz.syntax.either._
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
 
+import util._
+
 class MailgunClient(implicit
   system: ActorSystem,
   materializer: ActorMaterializer,
   conf: Config = ConfigFactory.load()
 ) extends MailClient {
-  import mailo.MailError
   import MailClientError._
   import mailo.MailRefinedContent._
   import mailo.MailResponse
@@ -53,7 +53,7 @@ class MailgunClient(implicit
 
     val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
 
-    for {
+    val res = (for {
       entity <- entity(
         from = from,
         to = to,
@@ -78,7 +78,11 @@ class MailgunClient(implicit
         case 500 | 502 | 503 | 504 => Future(ServerError.left[MailResponse])
         case _ => Future(UnknownCode.left[MailResponse])
       }
-    } yield result
+    } yield result) recover {
+      case t: Throwable => UnkownError(t.getStackTraceAsString).left[MailResponse]
+    }
+
+    res
   }
 
   private[this] def attachmentForm(name: String, `type`: ContentType, content: String, transferEncoding: Option[String] = None) = {
