@@ -69,7 +69,7 @@ class MailgunClient(implicit
         entity = entity
       )
       response <- Http().singleRequest(request)
-      result <- response.status.intValue() match {
+      result <- response.status.intValue match {
         case 200 => Unmarshal(response.entity).to[MailResponse] map (_.right[MailError])
         case 400 => Future(BadRequest.left[MailResponse])
         case 401 => Future(Unauthorized.left[MailResponse])
