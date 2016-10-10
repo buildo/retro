@@ -3,15 +3,10 @@
 [![Bintray](https://img.shields.io/bintray/v/buildo/maven/mailo.svg)](https://bintray.com/buildo/maven/mailo/view)
 [![Build Status](https://drone.our.buildo.io/api/badges/buildo/mailo/status.svg)](https://drone.our.buildo.io/buildo/mailo)
 
-- Styling HTML email is painful.
-- Managing templates stored in ESPs is painful.
-- Debugging why your email wasn't delivered is painful.
-
-# Mailo Features
 - Store your email templates where you like.
 - Send your email with the ESP you like.
 - Compose your template using HTML partials (convenient for footers and headers).
-- Collect your email errors in "just one point".
+- Conveniently collect errors.
 
 # Install
 ```scala
