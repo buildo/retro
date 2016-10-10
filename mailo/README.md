@@ -46,6 +46,21 @@ mailo.send(
 )
 ```
 
+# Templates
+
+Use double curly breakets for parameters `{{parameter}}`, remember to include parameters in `params` argument.
+
+Use double square breakets for partials `[[partial.html]]`. Mailo looks for partials in `partial` folder.
+
+
+
+Complete example:
+```html
+[[header.html]]
+Hello {{personFirstName}} {{personLastName}}
+[[footer.html]]
+```
+
 # How to send attachments
 
 Mailo provide a case class `Attachment` that is used to send attachments in emails.
