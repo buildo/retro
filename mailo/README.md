@@ -50,7 +50,7 @@ mailo.send(
 
 Use double curly breakets for parameters `{{parameter}}`, remember to include parameters in `params` argument.
 
-Use double square breakets for partials `[[partial.html]]`. Mailo looks for partials in `partial` folder.
+Use double square breakets for partials `[[partial.html]]`. Mailo looks for partials in `partials` folder.
 
 
 
