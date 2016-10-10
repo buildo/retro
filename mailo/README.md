@@ -90,4 +90,4 @@ val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`
 # Templates caching
 
 Since version `0.1.5` templates are cached.
-It's possible to set caching TTL (time to live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.
+You can set caching TTL (time to live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.
