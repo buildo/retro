@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "io.buildo",
-  version := "0.1.4"
+  version := "0.1.5"
 )
 
 lazy val root = (project in file(".")).
