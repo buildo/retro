@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "io.buildo",
-  version := "0.1.4"
+  version := "0.1.5"
 )
 
 lazy val root = (project in file(".")).
@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
     addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0"),
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3"),
-    addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "0.7.0"),
+    addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "0.8.0"),
     licenses := Seq("MIT" -> url("https://github.com/buildo/sbt-buildo/blob/master/LICENSE")),
     scmInfo := Some(ScmInfo(url("https://github.com/buildo/sbt-buildo"), "git@github.com:buildo/sbt-buildo.git")),
     bintrayOrganization := Some("buildo"),
