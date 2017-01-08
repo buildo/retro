@@ -23,7 +23,6 @@ object ScalaSettingPlugin extends AutoPlugin {
     scalacOptions  += "-language:implicitConversions",
     scalacOptions  += "-Xfuture",
     scalacOptions  += "-Yinline-warnings",
-    scalacOptions  += "-Yno-adapted-args",
     scalacOptions  += "-Ywarn-dead-code",
     scalacOptions  += "-Ywarn-numeric-widen",
     scalacOptions  += "-Ywarn-value-discard",
