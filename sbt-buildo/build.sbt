@@ -1,13 +1,9 @@
-lazy val commonSettings = Seq(
-  organization := "io.buildo",
-  version := "0.1.5"
-)
-
 lazy val root = (project in file(".")).
   settings(
-    commonSettings,
     sbtPlugin := true,
     name := "sbt-buildo",
+    version := "0.1.5",
+    organization := "io.buildo",
     description := "sbt plugin for sharing configuration across projects at buildo",
     addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0"),
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0"),
