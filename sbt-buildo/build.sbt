@@ -1,8 +1,9 @@
+enablePlugins(GitVersioning)
+
 lazy val root = (project in file(".")).
   settings(
     sbtPlugin := true,
     name := "sbt-buildo",
-    version := "0.1.5",
     organization := "io.buildo",
     description := "sbt plugin for sharing configuration across projects at buildo",
     addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0"),
