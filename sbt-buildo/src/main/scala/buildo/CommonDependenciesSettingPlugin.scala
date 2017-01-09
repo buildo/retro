@@ -12,7 +12,7 @@ object CommonDependencySettingPlugin extends AutoPlugin {
   )
 
   object autoImport {
-    val nozzle = "io.buildo" %% "nozzle" % "0.10.9"
+    val nozzle = "io.buildo" %% "nozzle" % "0.10.10"
     val caseenum =  "io.buildo" %% "ingredients-caseenum" % "0.3.0"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.0"
     val slick = "com.typesafe.slick" %% "slick" % "3.1.1"
