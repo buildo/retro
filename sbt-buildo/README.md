@@ -7,7 +7,7 @@ sbt plugin to share settings and dependencies across scala projects in buildo
 Add this to your `project/plugins.sbt`
 
 ```scala
-addSbtPlugin("io.buildo" % "sbt-buildo" % "latest.integration")
+addSbtPlugin("io.buildo" % "sbt-buildo" % <version>)
 ```
 
 Then in `build.sbt`
