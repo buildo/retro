@@ -11,23 +11,30 @@ object ScalaSettingPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] = baseSettings
 
   lazy val baseBuildSettings: Seq[Def.Setting[_]] = Seq(
-    organization := "io.buildo",
-    scalaVersion := "2.11.8"
+    organization := "io.buildo"
   )
+
+  def crossFlags(scalaVersion: String): Seq[String] =
+    CrossVersion.partialVersion(scalaVersion) match {
+      case Some((2, 11)) => Seq("-Yinline-warnings")
+      case Some((2, 12)) => Seq("-opt-warnings")
+      case _ => Nil
+    }
 
   lazy val baseSettings: Seq[Def.Setting[_]] = Seq(
     cancelable in Global := true,
-    scalacOptions ++= Seq("-encoding", "utf8"),
-    scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
-    scalacOptions  += "-language:higherKinds",
-    scalacOptions  += "-language:implicitConversions",
-    scalacOptions  += "-Xfuture",
-    scalacOptions  += "-Yinline-warnings",
-    scalacOptions  += "-Ywarn-dead-code",
-    scalacOptions  += "-Ywarn-numeric-widen",
-    scalacOptions  += "-Ywarn-value-discard",
-    scalacOptions  += "-Ywarn-unused",
-    scalacOptions  += "-Ywarn-unused-import"
+    scalacOptions ++= Seq(
+      "-encoding", "utf8",
+      "-deprecation", "-feature", "-unchecked", "-Xlint",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-Xfuture",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Ywarn-value-discard",
+      "-Ywarn-unused",
+      "-Ywarn-unused-import"
+    ) ++ crossFlags(scalaVersion.value)
   )
 }
 
