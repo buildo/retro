@@ -23,6 +23,6 @@ object BintraySettingPlugin extends AutoPlugin {
   )
 
   lazy val baseSettings: Seq[Setting[_]] = Seq(
-    bintrayPackage := (name in ThisBuild).value
+    bintrayPackage := name.value
   )
 }
