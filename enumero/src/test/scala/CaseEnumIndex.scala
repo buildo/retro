@@ -1,4 +1,4 @@
-import ingredients.caseenum._
+import io.buildo.enumero._
 
 import org.scalatest.{ Matchers, WordSpec }
 

@@ -1,6 +1,6 @@
-# Ingredients CaseEnum
+# 🔢 Enumero
 
-[ ![Download](https://api.bintray.com/packages/buildo/maven/ingredients-caseenum/images/download.svg) ](https://bintray.com/buildo/maven/ingredients-caseenum/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/buildo/maven/enumero/images/download.svg) ](https://bintray.com/buildo/maven/enumero/_latestVersion)
 
 A convention and utility functions for ADT-based safe enumerations.
 
@@ -30,13 +30,13 @@ res1: String = close
 Add the buildo/maven Bintray resolver and the dependency to your `build.sbt`
 
 ```scala
-libraryDependencies += "io.buildo" %% "ingredients-caseenum" % "..."
+libraryDependencies += "io.buildo" %% "enumero" % "..."
 ```
 
-To enable the macro paradise plugin (for the @enum annotation), also add
+To enable the macro paradise plugin (for the `@enum` annotation), also add
 
 ```scala
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ```
 
 ## Supported syntaxes

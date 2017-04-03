@@ -1,4 +1,4 @@
-package ingredients.caseenum
+package io.buildo.enumero
 
 import io.circe._
 

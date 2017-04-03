@@ -1,4 +1,4 @@
-import ingredients.caseenum.annotations.{enum, indexedEnum}
+import io.buildo.enumero.annotations.{enum, indexedEnum}
 
 import org.scalatest.{ Matchers, WordSpec }
 

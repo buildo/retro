@@ -1,4 +1,4 @@
-package ingredients.caseenum.annotations
+package io.buildo.enumero.annotations
 
 import scala.reflect.macros._
 import scala.reflect.macros.blackbox.Context
@@ -57,7 +57,7 @@ object EnumMacro {
           c.abort(c.enclosingPosition, "Enum members should be plain objects")
       }
       c.Expr(q"""
-        sealed abstract trait $enumName extends _root_.ingredients.caseenum.CaseEnum
+        sealed abstract trait $enumName extends _root_.io.buildo.enumero.CaseEnum
         object ${enumName.toTermName} {
           ..$members
         }
@@ -134,7 +134,7 @@ object IndexedEnumMacro {
         case _ => c.abort(c.enclosingPosition, "Invalid type alias declaration")
       }
       c.Expr(q"""
-        sealed abstract trait $enumName extends _root_.ingredients.caseenum.IndexedCaseEnum {
+        sealed abstract trait $enumName extends _root_.io.buildo.enumero.IndexedCaseEnum {
           type Index = $indexType
         }
         object ${enumName.toTermName} {

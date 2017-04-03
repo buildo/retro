@@ -1,4 +1,4 @@
-package ingredients.caseenum
+package io.buildo.enumero
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
@@ -46,7 +46,7 @@ object CaseEnumIndexMacro {
     }
 
     q"""
-      new _root_.ingredients.caseenum.CaseEnumIndex[$typeName] {
+      new _root_.io.buildo.enumero.CaseEnumIndex[$typeName] {
         private[this] val revMap: Map[$typeName#Index, $typeName] =
           List(..$items).map(c => (c.index, c)).toMap
         def caseToIndex(c: $typeName): $typeName#Index = c.index

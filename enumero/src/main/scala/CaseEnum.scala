@@ -1,4 +1,4 @@
-package ingredients.caseenum
+package io.buildo.enumero
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
@@ -57,7 +57,7 @@ object CaseEnumMacro {
     val enumResourceName: String = typeName.name.decodedName.toString
 
     q"""
-      new _root_.ingredients.caseenum.CaseEnumSerialization[$typeName] {
+      new _root_.io.buildo.enumero.CaseEnumSerialization[$typeName] {
         private[this] val map: Map[$typeName, String] = Map(..$mapComponents)
         private[this] val revMap = map.map(_ swap)
         def caseToString(value: $typeName): String = map(value)
