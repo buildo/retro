@@ -46,7 +46,7 @@ object CaseEnumMacro {
     val companion = tpe.typeSymbol.companion
     val enumElements = tpe.typeSymbol.companion.typeSignature.decls.collect {
       case x: ModuleSymbol => x
-    } toList
+    }.toList
 
     val mapComponents = enumElements.map { x =>
       val name = x.name

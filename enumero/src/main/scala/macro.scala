@@ -33,7 +33,7 @@ import scala.annotation.compileTimeOnly
  */
 @compileTimeOnly("Enable macro paradise to expand macro annotations.")
 class enum extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro EnumMacro.impl
+  def macroTransform(annottees: Any*): Any = macro EnumMacro.impl
 }
    
 object EnumMacro {
@@ -101,7 +101,7 @@ object EnumMacro {
  */
 @compileTimeOnly("Enable macro paradise to expand macro annotations.")
 class indexedEnum extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro IndexedEnumMacro.impl
+  def macroTransform(annottees: Any*): Any = macro IndexedEnumMacro.impl
 }
  
 object IndexedEnumMacro {
