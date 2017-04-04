@@ -13,6 +13,7 @@ lazy val root = project.in(file("."))
   .settings(commonSettings)
   .settings(
     name := "enumero",
+    description := "Beautiful and safe enumerations in Scala",
     libraryDependencies ++= Seq(
       scalaOrganization.value % "scala-reflect" % scalaVersion.value
     ) ++ Seq(
@@ -32,3 +33,20 @@ lazy val circeSupport = project
   .dependsOn(root)
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+
+lazy val docs = project
+  .enablePlugins(MicrositesPlugin)
+  .settings(
+    micrositeName := "enumero",
+    micrositeDescription := "Beautiful and safe enumerations in Scala",
+    micrositeHighlightTheme := "atom-one-light",
+    micrositeHomepage := "http://buildo.github.io/enumero/",
+    micrositeBaseUrl := "enumero",
+    micrositeGithubOwner := "buildo",
+    micrositeGithubRepo := "enumero",
+    autoAPIMappings := false,
+    fork in tut := true,
+    git.remoteRepo := "git@github.com:buildo/enumero.git",
+    ghpagesNoJekyll := false,
+    includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
+  )
