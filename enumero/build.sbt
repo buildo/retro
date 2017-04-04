@@ -39,8 +39,9 @@ lazy val docs = project
   .settings(
     micrositeName := "enumero",
     micrositeDescription := "Beautiful and safe enumerations in Scala",
+    micrositeAuthor := "buildo",
+    micrositeHomepage := "http://buildo.io",
     micrositeHighlightTheme := "atom-one-light",
-    micrositeHomepage := "http://buildo.github.io/enumero/",
     micrositeBaseUrl := "enumero",
     micrositeGithubOwner := "buildo",
     micrositeGithubRepo := "enumero",
