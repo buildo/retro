@@ -48,5 +48,10 @@ class CaseEnumSpec extends WordSpec with Matchers {
         "Wrong is not a valid Planet. Valid values are: Mercury, Venus, Earth"
       ))
     }
+
+    "retrieve a typeclass instance using apply" in {
+      CaseEnumSerialization[Planet].caseFromString("Mercury") shouldBe Some(Planet.Mercury)
+    }
   }
+
 }

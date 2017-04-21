@@ -27,7 +27,12 @@ trait CaseEnumIndex[T <: IndexedCaseEnum] {
 }
 
 object CaseEnumIndex {
-  implicit def caseEnumIndex[T <: IndexedCaseEnum]: CaseEnumIndex[T] = macro CaseEnumIndexMacro.caseEnumIndexMacro[T]
+  def apply[T <: IndexedCaseEnum](
+      implicit instance: CaseEnumIndex[T]): CaseEnumIndex[T] =
+    instance
+
+  implicit def caseEnumIndex[T <: IndexedCaseEnum]: CaseEnumIndex[T] =
+    macro CaseEnumIndexMacro.caseEnumIndexMacro[T]
 }
 
 object CaseEnumIndexMacro {

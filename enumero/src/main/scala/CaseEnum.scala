@@ -33,6 +33,10 @@ trait CaseEnumSerialization[T <: CaseEnum] {
 
 // Companion object to provide typeclass instances for all CaseEnums
 object CaseEnumSerialization {
+  def apply[T <: CaseEnum](
+      implicit instance: CaseEnumSerialization[T]): CaseEnumSerialization[T] =
+    instance
+
   implicit def caseEnumSerialization[T <: CaseEnum]: CaseEnumSerialization[T] =
     macro CaseEnumMacro.caseEnumSerializationMacro[T]
 }

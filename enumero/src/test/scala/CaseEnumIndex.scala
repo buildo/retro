@@ -59,5 +59,10 @@ class CaseEnumIndexSpec extends WordSpec with Matchers {
       }
       binaryPickler.unpickle(unpicklerState).shouldBe(Some(Planet.Earth))
     }
+
+    "retrieve a typeclass instance using apply" in {
+      CaseEnumIndex[Planet].caseFromIndex(1) shouldBe Some(Planet.Mercury)
+    }
+
   }
 }
