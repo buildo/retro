@@ -60,6 +60,10 @@ object EnumMacro {
         sealed abstract trait $enumName extends _root_.io.buildo.enumero.CaseEnum
         object ${enumName.toTermName} {
           ..$members
+          def values(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Set[$enumName] = ces.values
+          def caseToString(value: $enumName)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.caseToString(value)
+          def caseFromString(str: String)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Option[$enumName] = ces.caseFromString(str)
+          def name(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.name
         }
       """)
     }

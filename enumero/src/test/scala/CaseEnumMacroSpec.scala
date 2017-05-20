@@ -30,6 +30,22 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
       Beer.Ale should not be a [Beer.Lager.type]
       Beer.Lager shouldBe Beer.Lager
     }
+
+    "allow accessing the values of the enumeration" in {
+      val typecheck: Set[Planet] = Planet.values
+      Planet.values shouldBe Set(Planet.Mercury, Planet.Venus, Planet.Earth)
+    }
+
+    "allow printing / parsing the values of the enumeration" in {
+      Planet.caseFromString("Earth") shouldBe Some(Planet.Earth)
+      Planet.caseFromString("Nope") shouldBe None
+      Planet.caseToString(Planet.Earth) shouldBe "Earth"
+      "Planet.caseToString(Beer.Lager)" shouldNot typeCheck
+    }
+
+    "allow accessing the enumeration name" in {
+      Planet.name shouldBe "Planet"
+    }
   }
 
 }
