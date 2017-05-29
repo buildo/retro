@@ -11,6 +11,9 @@ lazy val commonSettings = Seq(
 )
 
 lazy val root = project.in(file("."))
+  .aggregate(enumero, circeSupport)
+
+lazy val enumero = project.in(file("."))
   .settings(commonSettings)
   .settings(
     name := "enumero",
@@ -20,7 +23,7 @@ lazy val root = project.in(file("."))
     ) ++ Seq(
       "org.scalatest"  %% "scalatest"     % "3.0.1",
       "org.mockito"    %  "mockito-all"   % "1.9.5"
-    ).map(_ % "test")
+    ).map(_ % Test)
   )
 
 lazy val circeSupport = project
@@ -31,7 +34,7 @@ lazy val circeSupport = project
       "io.circe" %% "circe-core" % "0.7.0"
     )
   )
-  .dependsOn(root)
+  .dependsOn(enumero)
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
