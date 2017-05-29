@@ -2,11 +2,12 @@ enablePlugins(GitVersioning)
 
 lazy val commonSettings = Seq(
   organization  := "io.buildo",
-  crossScalaVersions := Seq("2.11.8", "2.12.1"),
   scalaVersion := "2.12.1",
+  crossScalaVersions := Seq("2.11.8", "2.12.1"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
-  bintrayVcsUrl := Some("git@github.com:buildo/enumero")
+  bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
+  releaseCrossBuild := true
 )
 
 lazy val root = project.in(file("."))
