@@ -7,13 +7,23 @@ lazy val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
-  releaseCrossBuild := true
+  releaseCrossBuild := true,
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+)
+
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
 )
 
 lazy val root = project.in(file("."))
-  .aggregate(enumero, circeSupport)
+  .settings(commonSettings)
+  .settings(noPublishSettings)
+  .aggregate(core, circeSupport)
+  .dependsOn(core, circeSupport)
 
-lazy val enumero = project.in(file("."))
+lazy val core = project
   .settings(commonSettings)
   .settings(
     name := "enumero",
@@ -34,9 +44,7 @@ lazy val circeSupport = project
       "io.circe" %% "circe-core" % "0.7.0"
     )
   )
-  .dependsOn(enumero)
-
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  .dependsOn(core)
 
 lazy val docs = project
   .enablePlugins(MicrositesPlugin)
