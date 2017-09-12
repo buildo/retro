@@ -2,8 +2,8 @@ enablePlugins(GitVersioning)
 
 lazy val commonSettings = Seq(
   organization  := "io.buildo",
-  scalaVersion := "2.12.1",
-  crossScalaVersions := Seq("2.11.8", "2.12.1"),
+  scalaVersion := "2.12.3",
+  crossScalaVersions := Seq("2.11.11", "2.12.3"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
