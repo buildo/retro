@@ -33,7 +33,8 @@ object ScalaSettingPlugin extends AutoPlugin {
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
       "-Ywarn-unused",
-      "-Ywarn-unused-import"
+      "-Ywarn-unused-import",
+      "-Yrangepos"
     ) ++ crossFlags(scalaVersion.value),
     resolvers += Resolver.jcenterRepo
   )
