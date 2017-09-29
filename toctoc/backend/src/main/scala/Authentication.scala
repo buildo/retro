@@ -1,13 +1,15 @@
 import scala.concurrent.Future
+import io.buildo.enumero.annotations.enum
 
 object Authentication {
 
   abstract trait Credentials {}
 
-  sealed abstract trait AuthenticationError
-  case object InvalidAccessToken extends AuthenticationError
-  case object ExpiredAccessToken extends AuthenticationError
-  case object InvalidCredentials extends AuthenticationError
+  @enum trait AuthenticationError {
+    object InvalidAccessToken
+    object ExpiredAccessToken
+    object InvalidCredentials
+  }
 
   trait Subject {
     def ref: String
@@ -19,6 +21,6 @@ object Authentication {
     def unregister(s: Subject): Future[Either[AuthenticationError, AuthenticationDomain[C]]]
   }
 
-  def exchangeCredentials[C<: Credentials, C2 <: Credentials](ac: AuthenticationDomain[C], at: AuthenticationDomain[C2])(c: C, t: C2): Future[Either[AuthenticationError, (AuthenticationDomain[C], AuthenticationDomain[C2])]]
+  // def exchangeCredentials[C<: Credentials, C2 <: Credentials](ac: AuthenticationDomain[C], at: AuthenticationDomain[C2])(c: C, t: C2): Future[Either[AuthenticationError, (AuthenticationDomain[C], AuthenticationDomain[C2])]]
 
 }
