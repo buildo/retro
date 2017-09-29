@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 import Authentication._
 
-object TokenBasedAuthentication  {
+object TokenBasedAuthentication {
   case class AccessToken(
     value: String,
     expiresAt: Instant
@@ -43,7 +43,6 @@ object TokenBasedAuthentication  {
     { i => Timestamp.from(i) },
     { t => t.toInstant() }
   )
-
 
   object SlickUsernamePasswordAuthenticationDomain extends UsernamePasswordAuthenticationDomain {
     val db = Database.forConfig("db")

@@ -13,7 +13,8 @@ lazy val root = (project in file(".")).
       Seq(
         slick,
         postgresql,
-        enumero
+        enumero,
+        cats
       ).flatten
   )
 
