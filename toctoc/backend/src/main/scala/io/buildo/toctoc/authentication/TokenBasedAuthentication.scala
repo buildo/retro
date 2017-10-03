@@ -3,6 +3,11 @@ package io.buildo.toctoc.authentication
 import java.time.Instant
 import scala.concurrent.Future
 
+import cats.data.EitherT
+import cats.implicits._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
 object TokenBasedAuthentication {
   case class AccessToken(
     value: String,
@@ -33,6 +38,24 @@ object TokenBasedAuthentication {
     def unregister(s: Subject): Future[Either[AuthenticationError, AccessTokenDomain]]
   }
 
-  // flow authentication goes here
+  class TokenBasedAuthenticationFlow(
+    loginD: LoginAuthenticationDomain,
+    accessTokenD: AccessTokenAuthenticationDomain,
+    tokenExpireTimeSeconds: Long = 365 * 24 * 60 * 60 // 1 year
+  ) extends HashModule {
+    def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] =
+      (for {
+        login <- EitherT(loginD.authenticate(l))
+        (_, s) = login
+        accessToken = AccessToken(randomString(64), Instant.now().plusSeconds(tokenExpireTimeSeconds))
+        _ <- EitherT(accessTokenD.register(s, accessToken))
+      } yield accessToken).value
+
+    def validateToken(at: AccessToken): Future[Either[AuthenticationError, Subject]] =
+      (for {
+        login <- EitherT(accessTokenD.authenticate(at))
+        (_, s) = login
+      } yield s).value
+  }
 
 }
