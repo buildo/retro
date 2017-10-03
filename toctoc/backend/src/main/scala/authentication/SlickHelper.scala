@@ -1,4 +1,4 @@
-package io.buildo.toctoc.authentication
+package io.buildo.toctoc.slick
 
 import java.time.Instant
 import java.sql.Timestamp

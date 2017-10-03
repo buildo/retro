@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
-import io.buildo.toctoc.authentication.SlickHelper._
+import io.buildo.toctoc.slick.SlickHelper._
 
 object SlickLoginAuthenticationDomain extends LoginAuthenticationDomain {
   val db = Database.forConfig("db")
