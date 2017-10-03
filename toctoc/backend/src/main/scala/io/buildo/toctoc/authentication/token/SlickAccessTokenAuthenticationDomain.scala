@@ -1,7 +1,6 @@
 package io.buildo.toctoc.authentication.token
 
 import java.time.Instant
-import java.sql.Timestamp
 import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
@@ -20,12 +19,14 @@ object SlickAccessTokenAuthenticationDomain extends AccessTokenAuthenticationDom
     def token = column[String]("token")
     def expiresAt = column[Instant]("expires_at")
 
+    def uniqueTokenIdx = index("unique_token_idx", token, unique = true)
+
     def * = (id, ref, token, expiresAt)
   }
   val tStore = TableQuery[AccessTokenTable]
 
   def register(s: Subject, c: AccessToken): Future[Either[AuthenticationError, AccessTokenDomain]] = {
-    db.run(tStore += (0, s.ref, c.value, c.expiresAt)) map { case _ =>
+    db.run(tStore += ((0, s.ref, c.value, c.expiresAt))) map { case _ =>
       Right(this)
     }
   }
