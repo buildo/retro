@@ -8,7 +8,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 
-object SlickLoginAuthenticationDomain extends LoginAuthenticationDomain {
+object SlickLoginAuthenticationDomain
+  extends LoginAuthenticationDomain
+  with HashModule {
+
   val db = Database.forConfig("db")
 
   class LoginTable(tag: Tag) extends Table[(Int, String, String, String, String)](tag, "login_auth_domain") {
@@ -22,8 +25,6 @@ object SlickLoginAuthenticationDomain extends LoginAuthenticationDomain {
   }
   val upStore = TableQuery[LoginTable]
 
-  private[this] def hashPassword(p: String, s: String) = s"$p$s"
-  private[this] def generateSalt() = "asdasd"
   private[this] def checkLoginCredentials(clearPassword: String, salt: String, hashedPassword: String) =
     hashPassword(clearPassword, salt) == hashedPassword
 
