@@ -9,10 +9,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object Authentication {
 
-  trait Subject {
-    def ref: String
-  }
-
   trait AuthenticationDomain[C <: Credential] {
     def authenticate(c: C): Future[Either[AuthenticationError, (AuthenticationDomain[C], Subject)]]
     def register(s: Subject, c: C): Future[Either[AuthenticationError, AuthenticationDomain[C]]]
