@@ -7,7 +7,6 @@ import scala.concurrent.Future
 import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import Authentication._
 import TokenBasedAuthentication._
 
 import SlickHelper._

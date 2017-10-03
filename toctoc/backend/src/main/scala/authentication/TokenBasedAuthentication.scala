@@ -4,8 +4,6 @@ import java.time.Instant
 import java.sql.Timestamp
 import scala.concurrent.Future
 
-import Authentication._
-
 object TokenBasedAuthentication {
   case class AccessToken(
     value: String,
