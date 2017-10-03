@@ -11,7 +11,6 @@ import authentication._
 import authentication.TokenBasedAuthentication._
 import authentication.SlickHelper._
 
-
 object SlickAccessTokenAuthenticationDomain extends AccessTokenAuthenticationDomain {
   val db = Database.forConfig("db")
 
