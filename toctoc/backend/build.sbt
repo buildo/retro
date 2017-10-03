@@ -8,7 +8,7 @@ lazy val root = (project in file(".")).
       version      := "0.1.0-SNAPSHOT",
       resolvers    += Resolver.bintrayRepo("buildo", "maven")
     )),
-    name := "Autho",
+    name := "toctoc",
     libraryDependencies ++=
       Seq(
         slick,
