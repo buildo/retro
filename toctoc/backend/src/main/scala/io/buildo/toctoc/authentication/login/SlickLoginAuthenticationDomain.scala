@@ -1,7 +1,5 @@
 package io.buildo.toctoc.authentication.login
 
-import java.time.Instant
-import java.sql.Timestamp
 import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
@@ -9,7 +7,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
-import io.buildo.toctoc.slick.SlickHelper._
 
 object SlickLoginAuthenticationDomain extends LoginAuthenticationDomain {
   val db = Database.forConfig("db")
@@ -32,7 +29,7 @@ object SlickLoginAuthenticationDomain extends LoginAuthenticationDomain {
 
   def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = {
     val salt = generateSalt()
-    db.run(upStore += (0, s.ref, c.username, hashPassword(c.password, salt), salt)) map { case _ =>
+    db.run(upStore += ((0, s.ref, c.username, hashPassword(c.password, salt), salt))) map { case _ =>
       Right(this)
     }
   }

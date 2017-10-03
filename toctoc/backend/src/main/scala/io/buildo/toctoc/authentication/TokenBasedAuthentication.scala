@@ -1,7 +1,6 @@
 package io.buildo.toctoc.authentication
 
 import java.time.Instant
-import java.sql.Timestamp
 import scala.concurrent.Future
 
 object TokenBasedAuthentication {
