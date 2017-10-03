@@ -1,3 +1,5 @@
+package authentication
+
 import scala.concurrent.Future
 import io.buildo.enumero.annotations.enum
 
