@@ -1,7 +1,6 @@
 package authentication
 
 import scala.concurrent.Future
-import io.buildo.enumero.annotations.enum
 
 import cats.data.EitherT
 import cats.implicits._
@@ -9,12 +8,6 @@ import cats.implicits._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Authentication {
-
-  @enum trait AuthenticationError {
-    object InvalidAccessToken
-    object ExpiredAccessToken
-    object InvalidCredentials
-  }
 
   trait Subject {
     def ref: String
