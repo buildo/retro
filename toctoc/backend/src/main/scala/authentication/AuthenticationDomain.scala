@@ -1,4 +1,4 @@
-package authentication
+package io.buildo.toctoc.authentication
 
 import scala.concurrent.Future
 import cats.data.EitherT

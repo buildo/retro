@@ -1,4 +1,4 @@
-package authentication.token
+package io.buildo.toctoc.authentication.token
 
 import java.time.Instant
 import java.sql.Timestamp
@@ -7,9 +7,9 @@ import scala.concurrent.Future
 import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import authentication._
-import authentication.TokenBasedAuthentication._
-import authentication.SlickHelper._
+import io.buildo.toctoc.authentication._
+import io.buildo.toctoc.authentication.TokenBasedAuthentication._
+import io.buildo.toctoc.authentication.SlickHelper._
 
 object SlickAccessTokenAuthenticationDomain extends AccessTokenAuthenticationDomain {
   val db = Database.forConfig("db")

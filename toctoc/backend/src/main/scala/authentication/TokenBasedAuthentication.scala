@@ -1,4 +1,4 @@
-package authentication
+package io.buildo.toctoc.authentication
 
 import java.time.Instant
 import java.sql.Timestamp
