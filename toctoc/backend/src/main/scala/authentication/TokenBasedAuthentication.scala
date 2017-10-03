@@ -10,12 +10,12 @@ object TokenBasedAuthentication {
   case class AccessToken(
     value: String,
     expiresAt: Instant
-  ) extends Credentials
+  ) extends Credential
 
   case class Login(
     username: String,
     password: String
-  ) extends Credentials
+  ) extends Credential
 
   type LoginDomain = AuthenticationDomain[Login]
 
