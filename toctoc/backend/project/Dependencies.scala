@@ -14,5 +14,8 @@ object Dependencies {
   lazy val scalaTest = Seq(
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   )
+  lazy val bCrypt = Seq(
+    "org.mindrot" % "jbcrypt" % "0.4"
+  )
 }
 

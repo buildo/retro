@@ -1,16 +1,18 @@
 package io.buildo.toctoc.authentication
-import java.security.MessageDigest
+import org.mindrot.jbcrypt.BCrypt
 import scala.util.Random
 
 trait HashModule {
-  private lazy val random = new Random(new java.security.SecureRandom())
-  private def sha1 = MessageDigest.getInstance("SHA-1")
-  private def randomString(n: Int, alphabet: String = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-{}[]\\|"): String =
+  private val random = new Random()
+  def randomString(n: Int, alphabet: String = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-{}[]\\|"): String =
     Stream.continually(random.nextInt(alphabet.size)).map(alphabet).take(n).mkString
 
-  def hashPassword(p: String, s: String) =
-    sha1.digest((p + s).getBytes).map("%02x".format(_)).mkString
+  def hashPassword(p: String) =
+    BCrypt.hashpw(p, generateSalt())
 
-  def generateSalt() = randomString(64)
+  def generateSalt() = BCrypt.gensalt()
+
+  def checkPassword(candidate: String, hashed: String) =
+    BCrypt.checkpw(candidate, hashed)
 }
 
