@@ -10,21 +10,21 @@ object TokenBasedAuthentication {
     expiresAt: Instant
   ) extends Credentials
 
-  case class UsernamePassword(
+  case class Login(
     username: String,
     password: String
   ) extends Credentials
 
-  type UsernamePasswordDomain = AuthenticationDomain[UsernamePassword]
+  type LoginDomain = AuthenticationDomain[Login]
 
   case class UserSubject(
     ref: String
   ) extends Subject
 
-  trait UsernamePasswordAuthenticationDomain extends UsernamePasswordDomain {
-    def authenticate(c: UsernamePassword): Future[Either[AuthenticationError, (UsernamePasswordDomain, Subject)]]
-    def register(s: Subject, c: UsernamePassword): Future[Either[AuthenticationError, UsernamePasswordDomain]]
-    def unregister(s: Subject): Future[Either[AuthenticationError, UsernamePasswordDomain]]
+  trait LoginAuthenticationDomain extends LoginDomain {
+    def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]]
+    def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]]
+    def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]]
   }
 
   type AccessTokenDomain = AuthenticationDomain[AccessToken]
