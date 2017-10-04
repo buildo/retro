@@ -14,7 +14,8 @@ lazy val root = (project in file(".")).
         postgresql,
         enumero,
         cats,
-        scalaTest
+        scalaTest,
+        bCrypt
       ).flatten
   )
 
