@@ -10,37 +10,40 @@ import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 
 object SlickLoginAuthenticationDomain
   extends LoginAuthenticationDomain
-  with HashModule {
+  with BCryptHashing {
 
   val db = Database.forConfig("db")
 
   class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, "login_auth_domain") {
-    def id = column[Int]("id", O.PrimaryKey)
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def username = column[String]("username")
     def passwordHash = column[String]("password_hash")
 
     def * = (id, ref, username, passwordHash)
   }
-  val upStore = TableQuery[LoginTable]
+  val loginTable = TableQuery[LoginTable]
 
   def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = {
-    db.run(upStore += ((0, s.ref, c.username, hashPassword(c.password)))) map { case _ =>
+    db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password)))) map { case _ =>
       Right(this)
     }
   }
 
   def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]] =
-    db.run(upStore.filter(_.ref === s.ref).delete) map { case _ =>
+    db.run(loginTable.filter(_.ref === s.ref).delete) map { case _ =>
       Right(this)
     }
 
   def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = {
-    db.run(upStore.filter(_.username === c.username).result.headOption) map {
-      case None =>
-        Left(AuthenticationError.InvalidCredentials)
-      case Some((_, ref, _, passwordHash)) if checkPassword(c.password, passwordHash) =>
-        Right((this, UserSubject(ref)))
+    db.run(loginTable.filter(_.username === c.username).result) map {
+      case l if l.size > 0 =>
+        l.find(el => checkPassword(c.password, el._4)) match {
+          case Some(el) =>
+            Right((this, UserSubject(el._2)))
+          case None =>
+            Left(AuthenticationError.InvalidCredentials)
+        }
       case _ =>
         Left(AuthenticationError.InvalidCredentials)
     }
