@@ -3,16 +3,15 @@ package io.buildo.toctoc.authentication.login
 import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.JdbcBackend.Database
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 
-object SlickLoginAuthenticationDomain
+class SlickLoginAuthenticationDomain(db: Database)
   extends LoginAuthenticationDomain
   with BCryptHashing {
-
-  val db = Database.forConfig("db")
 
   class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, "login_auth_domain") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
