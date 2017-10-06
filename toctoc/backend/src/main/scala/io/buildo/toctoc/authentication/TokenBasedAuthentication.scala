@@ -42,7 +42,7 @@ object TokenBasedAuthentication {
     loginD: LoginAuthenticationDomain,
     accessTokenD: AccessTokenAuthenticationDomain,
     tokenExpireTimeSeconds: Long = 365 * 24 * 60 * 60 // 1 year
-  ) extends HashModule {
+  ) extends BCryptHashing {
     def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] =
       (for {
         login <- EitherT(loginD.authenticate(l))
