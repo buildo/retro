@@ -45,6 +45,11 @@ object TokenBasedAuthentication {
     accessTokenD: AccessTokenAuthenticationDomain,
     tokenExpireTimeSeconds: Long = 365 * 24 * 60 * 60 // 1 year
   ) extends BCryptHashing {
+    def registerSubjectCredentials(s: Subject, l: Login): Future[Either[AuthenticationError, Unit]] =
+      (for {
+        _ <- EitherT(loginD.register(s, l))
+      } yield (())).value
+
     def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] =
       (for {
         login <- EitherT(loginD.authenticate(l))
