@@ -12,7 +12,11 @@ import io.buildo.toctoc.authentication.token._
 import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec with BeforeAndAfterAll with ScalaFutures with EitherValues {
+class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
+  with BeforeAndAfterAll
+  with ScalaFutures
+  with EitherValues
+  with Matchers {
 
   val db = Database.forConfig("db")
   val loginAuthDomain = new SlickLoginAuthenticationDomain(db)
@@ -32,9 +36,10 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec with BeforeAndAfte
     db.run((schema).drop).futureValue
   }
 
-  case class User(ref: String) extends Subject
   val login = Login("username", "password")
-  val subject = User("test")
+  val login2 = Login("usernameoso", "password")
+  val subject = UserSubject("test")
+  val subject2 = UserSubject("test2")
 
   "unregistered login credentials" should "not be accepted when exchanging for token" in {
     authFlow.exchangeForTokens(login).futureValue.left.get
@@ -47,11 +52,18 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec with BeforeAndAfte
 
   "token obtained by login" should "be validated" in {
     val token = authFlow.exchangeForTokens(login).futureValue.right.get
-    authFlow.validateToken(token).futureValue.right.get
+    authFlow.validateToken(token).futureValue.right.value should be (subject)
   }
 
   "multiple login with same values" should "not be accepted in registration" in {
     authFlow.registerSubjectCredentials(subject, login).futureValue.left.get
+  }
+
+  "multiple login with different values" should "be accepted in registration" in {
+    println(authFlow.registerSubjectCredentials(subject2, login2).futureValue)
+    authFlow.registerSubjectCredentials(subject2, login2).futureValue.left.get
+    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
+    authFlow.validateToken(token2).futureValue.right.value should be (subject2)
   }
 
 }
