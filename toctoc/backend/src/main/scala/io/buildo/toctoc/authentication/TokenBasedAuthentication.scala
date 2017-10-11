@@ -48,7 +48,7 @@ object TokenBasedAuthentication {
     def registerSubjectCredentials(s: Subject, l: Login): Future[Either[AuthenticationError, Unit]] =
       (for {
         _ <- EitherT(loginD.register(s, l))
-      } yield (())).value
+      } yield ()).value
 
     def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] =
       (for {
@@ -63,6 +63,21 @@ object TokenBasedAuthentication {
         login <- EitherT(accessTokenD.authenticate(at))
         (_, s) = login
       } yield s).value
+
+    def unregisterToken(at: AccessToken): Future[Either[AuthenticationError, Unit]] =
+      (for {
+        _ <- EitherT(accessTokenD.unregister(at))
+      } yield ()).value
+
+    def unregisterAllSubjectTokens(s: Subject): Future[Either[AuthenticationError, Unit]] =
+      (for {
+        _ <- EitherT(accessTokenD.unregister(s))
+      } yield ()).value
+
+    def unregisterSubjectCredentials(l: Login): Future[Either[AuthenticationError, Unit]] =
+      (for {
+        _ <- EitherT(loginD.unregister(l))
+      } yield ()).value
   }
 
 }
