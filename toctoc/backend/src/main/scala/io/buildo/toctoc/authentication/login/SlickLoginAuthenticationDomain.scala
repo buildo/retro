@@ -9,6 +9,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 
+import cats.data.EitherT
+import cats.implicits._
+
 class SlickLoginAuthenticationDomain(db: Database)
   extends LoginAuthenticationDomain
   with BCryptHashing {
@@ -33,6 +36,13 @@ class SlickLoginAuthenticationDomain(db: Database)
     db.run(loginTable.filter(_.ref === s.ref).delete) map { case _ =>
       Right(this)
     }
+
+  def unregister(c: Login): Future[Either[AuthenticationError, LoginDomain]] =
+    (for {
+      a <- EitherT(authenticate(c))
+      (_, s) = a
+      res <- EitherT(unregister(s))
+    } yield res).value
 
   def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = {
     db.run(loginTable.filter(_.username === c.username).result) map {

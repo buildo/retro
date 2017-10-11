@@ -36,6 +36,11 @@ class SlickAccessTokenAuthenticationDomain(db: Database) extends AccessTokenAuth
       Right(this)
     }
 
+  def unregister(c: AccessToken): Future[Either[AuthenticationError, AccessTokenDomain]] =
+    db.run(accessTokenTable.filter(_.token === c.value).delete) map { case _ =>
+      Right(this)
+    }
+
   def authenticate(c: AccessToken): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]] = {
     db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt < Instant.now()).result.headOption) map {
       case None =>

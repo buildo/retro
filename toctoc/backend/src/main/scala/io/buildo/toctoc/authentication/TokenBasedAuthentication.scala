@@ -29,6 +29,7 @@ object TokenBasedAuthentication {
     def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]]
     def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]]
     def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]]
+    def unregister(c: Login): Future[Either[AuthenticationError, LoginDomain]]
   }
 
   type AccessTokenDomain = AuthenticationDomain[AccessToken]
@@ -36,6 +37,7 @@ object TokenBasedAuthentication {
     def authenticate(c: AccessToken): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]]
     def register(s: Subject, c: AccessToken): Future[Either[AuthenticationError, AccessTokenDomain]]
     def unregister(s: Subject): Future[Either[AuthenticationError, AccessTokenDomain]]
+    def unregister(c: AccessToken): Future[Either[AuthenticationError, AccessTokenDomain]]
   }
 
   class TokenBasedAuthenticationFlow(
