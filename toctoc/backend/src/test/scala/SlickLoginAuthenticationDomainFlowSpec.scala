@@ -60,10 +60,33 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   "multiple login with different values" should "be accepted in registration" in {
-    println(authFlow.registerSubjectCredentials(subject2, login2).futureValue)
-    authFlow.registerSubjectCredentials(subject2, login2).futureValue.left.get
+    authFlow.registerSubjectCredentials(subject2, login2).futureValue.right.get
     val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
     authFlow.validateToken(token2).futureValue.right.value should be (subject2)
+  }
+
+  "single token unregistration" should "unregister only the specific token" in {
+    val token = authFlow.exchangeForTokens(login2).futureValue.right.get
+    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
+    authFlow.unregisterToken(token).futureValue
+    authFlow.validateToken(token).futureValue.left.get
+    authFlow.validateToken(token2).futureValue.right.get
+  }
+
+  "token unregistration" should "unregister all subject's tokens" in {
+    val token = authFlow.exchangeForTokens(login).futureValue.right.get
+    val token2 = authFlow.exchangeForTokens(login).futureValue.right.get
+    val token3 = authFlow.exchangeForTokens(login2).futureValue.right.get
+    authFlow.unregisterAllSubjectTokens(subject).futureValue
+    println(authFlow.validateToken(token).futureValue)
+    authFlow.validateToken(token).futureValue.left.get
+    authFlow.validateToken(token2).futureValue.left.get
+    authFlow.validateToken(token3).futureValue.right.get
+  }
+
+  "subject credentials unregistration" should "take effect" in  {
+    authFlow.unregisterSubjectCredentials(login).futureValue
+    authFlow.exchangeForTokens(login).futureValue.left.get
   }
 
 }
