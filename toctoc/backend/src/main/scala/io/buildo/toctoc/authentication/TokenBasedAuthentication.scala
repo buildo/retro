@@ -50,18 +50,17 @@ object TokenBasedAuthentication {
         _ <- EitherT(loginD.register(s, l))
       } yield ()).value
 
-    def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] =
+    def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] = {
+      val accessToken = AccessToken(randomString(64), Instant.now().plusSeconds(tokenExpireTimeSeconds))
       (for {
-        login <- EitherT(loginD.authenticate(l))
-        (_, s) = login
-        accessToken = AccessToken(randomString(64), Instant.now().plusSeconds(tokenExpireTimeSeconds))
-        _ <- EitherT(accessTokenD.register(s, accessToken))
+        _ <- EitherT(AuthenticationDomain.exchangeCredentials(loginD, accessTokenD)(l, accessToken))
       } yield accessToken).value
+    }
 
     def validateToken(at: AccessToken): Future[Either[AuthenticationError, Subject]] =
       (for {
-        login <- EitherT(accessTokenD.authenticate(at))
-        (_, s) = login
+        ref <- EitherT(accessTokenD.authenticate(at))
+        (_, s) = ref
       } yield s).value
 
     def unregisterToken(at: AccessToken): Future[Either[AuthenticationError, Unit]] =
