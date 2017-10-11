@@ -42,7 +42,7 @@ class SlickAccessTokenAuthenticationDomain(db: Database) extends AccessTokenAuth
     }
 
   def authenticate(c: AccessToken): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]] = {
-    db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt < Instant.now()).result.headOption) map {
+    db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt > Instant.now()).result.headOption) map {
       case None =>
         Left(AuthenticationError.InvalidCredentials)
       case Some((_, ref, _, _)) =>

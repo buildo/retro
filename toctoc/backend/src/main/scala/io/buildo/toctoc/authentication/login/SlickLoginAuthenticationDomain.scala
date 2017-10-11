@@ -23,14 +23,16 @@ class SlickLoginAuthenticationDomain(db: Database)
     def passwordHash = column[String]("password_hash")
 
     def * = (id, ref, username, passwordHash)
+
+    def uniqueRefIdx = index("unique_ref_idx", username, unique = true)
+    def uniqueUserPassIdx = index("unique_user_pass_idx", (username, passwordHash), unique = true)
   }
   val loginTable = TableQuery[LoginTable]
 
-  def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = {
+  def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] =
     db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password)))) map { case _ =>
       Right(this)
-    }
-  }
+    } recover { case _ => Left(AuthenticationError.InvalidCredentials) }
 
   def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]] =
     db.run(loginTable.filter(_.ref === s.ref).delete) map { case _ =>
