@@ -73,6 +73,11 @@ object TokenBasedAuthentication {
         _ <- EitherT(accessTokenD.unregister(s))
       } yield ()).value
 
+    def unregisterAllSubjectLogins(s: Subject): Future[Either[AuthenticationError, Unit]] =
+      (for {
+        _ <- EitherT(loginD.unregister(s))
+      } yield ()).value
+
     def unregisterLogin(l: Login): Future[Either[AuthenticationError, Unit]] =
       (for {
         _ <- EitherT(loginD.unregister(l))

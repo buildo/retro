@@ -5,13 +5,14 @@ import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.JdbcBackend.Database
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 import io.buildo.toctoc.slick.SlickHelper._
 
-class SlickAccessTokenAuthenticationDomain(db: Database) extends AccessTokenAuthenticationDomain {
+class SlickAccessTokenAuthenticationDomain(db: Database)(implicit ec: ExecutionContext)
+  extends AccessTokenAuthenticationDomain {
 
   class AccessTokenTable(tag: Tag) extends Table[(Int, String, String, Instant)](tag, "access_token_auth_domain") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)

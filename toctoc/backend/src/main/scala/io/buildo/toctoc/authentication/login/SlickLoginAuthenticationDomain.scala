@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.JdbcBackend.Database
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
@@ -12,7 +12,7 @@ import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 import cats.data.EitherT
 import cats.implicits._
 
-class SlickLoginAuthenticationDomain(db: Database)
+class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext)
   extends LoginAuthenticationDomain
   with BCryptHashing {
 
@@ -25,7 +25,6 @@ class SlickLoginAuthenticationDomain(db: Database)
     def * = (id, ref, username, passwordHash)
 
     def uniqueRefIdx = index("unique_ref_idx", username, unique = true)
-    def uniqueUserPassIdx = index("unique_user_pass_idx", (username, passwordHash), unique = true)
   }
   val loginTable = TableQuery[LoginTable]
 

@@ -5,6 +5,8 @@ import org.scalatest._
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.JdbcBackend.Database
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 import io.buildo.toctoc.authentication.login._
 import io.buildo.toctoc.authentication.token._
@@ -18,8 +20,8 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   with Matchers {
 
   val db = Database.forConfig("db")
-  val loginAuthDomain = new SlickLoginAuthenticationDomain(db)
-  val accessTokenAuthDomain = new SlickAccessTokenAuthenticationDomain(db)
+  val loginAuthDomain = new SlickLoginAuthenticationDomain(db)(global)
+  val accessTokenAuthDomain = new SlickAccessTokenAuthenticationDomain(db)(global)
 
   val loginTable = loginAuthDomain.loginTable
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
@@ -38,6 +40,7 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
 
   val login = Login("username", "password")
   val login2 = Login("usernameoso", "password")
+  val login3 = Login("usernameosone", "password")
   val subject = UserSubject("test")
   val subject2 = UserSubject("test2")
 
@@ -78,15 +81,22 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
     val token2 = authFlow.exchangeForTokens(login).futureValue.right.get
     val token3 = authFlow.exchangeForTokens(login2).futureValue.right.get
     authFlow.unregisterAllSubjectTokens(subject).futureValue
-    println(authFlow.validateToken(token).futureValue)
     authFlow.validateToken(token).futureValue.left.get
     authFlow.validateToken(token2).futureValue.left.get
     authFlow.validateToken(token3).futureValue.right.get
   }
 
-  "subject credentials unregistration" should "take effect" in  {
+  "single subject credentials unregistration" should "take effect" in  {
     authFlow.unregisterLogin(login).futureValue
     authFlow.exchangeForTokens(login).futureValue.left.get
+  }
+
+  "subject credentials unregistration" should "take effect" in  {
+    authFlow.registerSubjectLogin(subject, login).futureValue.right.get
+    authFlow.registerSubjectLogin(subject, login3).futureValue.right.get
+    authFlow.unregisterAllSubjectLogins(subject).futureValue
+    authFlow.exchangeForTokens(login).futureValue.left.get
+    authFlow.exchangeForTokens(login3).futureValue.left.get
   }
 
 }
