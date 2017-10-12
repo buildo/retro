@@ -1,6 +1,6 @@
 package io.buildo.toctoc.authentication
 
-import java.time.Instant
+import java.time.{ Instant, Duration }
 import scala.concurrent.Future
 
 import cats.data.EitherT
@@ -43,15 +43,15 @@ object TokenBasedAuthentication {
   class TokenBasedAuthenticationFlow(
     loginD: LoginAuthenticationDomain,
     accessTokenD: AccessTokenAuthenticationDomain,
-    tokenExpireTimeSeconds: Long = 365 * 24 * 60 * 60 // 1 year
+    tokenDuration: Duration = Duration.ofDays(365)
   ) extends BCryptHashing {
-    def registerSubjectCredentials(s: Subject, l: Login): Future[Either[AuthenticationError, Unit]] =
+    def registerSubjectLogin(s: Subject, l: Login): Future[Either[AuthenticationError, Unit]] =
       (for {
         _ <- EitherT(loginD.register(s, l))
       } yield ()).value
 
     def exchangeForTokens(l: Login): Future[Either[AuthenticationError, AccessToken]] = {
-      val accessToken = AccessToken(randomString(64), Instant.now().plusSeconds(tokenExpireTimeSeconds))
+      val accessToken = AccessToken(randomString(64), Instant.now().plus(tokenDuration))
       (for {
         _ <- EitherT(AuthenticationDomain.exchangeCredentials(loginD, accessTokenD)(l, accessToken))
       } yield accessToken).value
@@ -73,7 +73,7 @@ object TokenBasedAuthentication {
         _ <- EitherT(accessTokenD.unregister(s))
       } yield ()).value
 
-    def unregisterSubjectCredentials(l: Login): Future[Either[AuthenticationError, Unit]] =
+    def unregisterLogin(l: Login): Future[Either[AuthenticationError, Unit]] =
       (for {
         _ <- EitherT(loginD.unregister(l))
       } yield ()).value

@@ -10,7 +10,6 @@ import io.buildo.toctoc.authentication.login._
 import io.buildo.toctoc.authentication.token._
 
 import org.scalatest.concurrent.ScalaFutures
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   with BeforeAndAfterAll
@@ -26,14 +25,15 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
   val schema = loginTable.schema ++ accessTokenTable.schema
 
-  val authFlow = new SlickTokenBasedAuthenticationFlow(24 * 60 * 60, db)
+  val authFlow = new SlickTokenBasedAuthenticationFlow(db)
 
   override def beforeAll() = {
-    db.run((schema).create).futureValue
+    db.run(schema.create).futureValue
   }
 
   override def afterAll() = {
-    db.run((schema).drop).futureValue
+    db.run(schema.drop).futureValue
+    db.close()
   }
 
   val login = Login("username", "password")
@@ -46,7 +46,7 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   "registered login credentials" should "be accepted when exchanging for token" in {
-    authFlow.registerSubjectCredentials(subject, login).futureValue.right.get
+    authFlow.registerSubjectLogin(subject, login).futureValue.right.get
     authFlow.exchangeForTokens(login).futureValue.right.get
   }
 
@@ -56,11 +56,11 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   "multiple login with same values" should "not be accepted in registration" in {
-    authFlow.registerSubjectCredentials(subject, login).futureValue.left.get
+    authFlow.registerSubjectLogin(subject, login).futureValue.left.get
   }
 
   "multiple login with different values" should "be accepted in registration" in {
-    authFlow.registerSubjectCredentials(subject2, login2).futureValue.right.get
+    authFlow.registerSubjectLogin(subject2, login2).futureValue.right.get
     val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
     authFlow.validateToken(token2).futureValue.right.value should be (subject2)
   }
@@ -85,7 +85,7 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   "subject credentials unregistration" should "take effect" in  {
-    authFlow.unregisterSubjectCredentials(login).futureValue
+    authFlow.unregisterLogin(login).futureValue
     authFlow.exchangeForTokens(login).futureValue.left.get
   }
 

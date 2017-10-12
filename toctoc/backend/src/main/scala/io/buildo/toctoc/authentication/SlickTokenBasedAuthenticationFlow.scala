@@ -8,8 +8,11 @@ import io.buildo.toctoc.authentication.login.SlickLoginAuthenticationDomain
 
 import slick.jdbc.JdbcBackend.Database
 
-class SlickTokenBasedAuthenticationFlow(tokenExpireTimeSeconds: Long, db: Database)
+import java.time.Duration
+
+class SlickTokenBasedAuthenticationFlow(db: Database, tokenDuration: Duration = Duration.ofDays(365))
   extends TokenBasedAuthenticationFlow(
     loginD = new SlickLoginAuthenticationDomain(db),
-    accessTokenD = new SlickAccessTokenAuthenticationDomain(db)
+    accessTokenD = new SlickAccessTokenAuthenticationDomain(db),
+    tokenDuration = tokenDuration
   )
