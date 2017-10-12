@@ -9,7 +9,7 @@ object Dependencies {
   )
   lazy val postgresql = Seq("org.postgresql" % "postgresql" % "9.4.1212")
   lazy val enumero = Seq("io.buildo" %% "enumero" % "1.1.0")
-  lazy val cats = Seq("org.typelevel" %% "cats-core" % "1.0.0-MF")
+  lazy val cats = Seq("org.typelevel" %% "cats-core" % "0.9.0")
   lazy val scalaTestVersion = "3.0.1"
   lazy val scalaTest = Seq(
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test"

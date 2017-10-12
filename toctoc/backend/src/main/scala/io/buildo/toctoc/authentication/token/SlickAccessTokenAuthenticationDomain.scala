@@ -4,14 +4,15 @@ import java.time.Instant
 import scala.concurrent.Future
 
 import slick.jdbc.PostgresProfile.api._
-import scala.concurrent.ExecutionContext.Implicits.global
+import slick.jdbc.JdbcBackend.Database
+import scala.concurrent.ExecutionContext
 
 import io.buildo.toctoc.authentication._
 import io.buildo.toctoc.authentication.TokenBasedAuthentication._
 import io.buildo.toctoc.slick.SlickHelper._
 
-object SlickAccessTokenAuthenticationDomain extends AccessTokenAuthenticationDomain {
-  val db = Database.forConfig("db")
+class SlickAccessTokenAuthenticationDomain(db: Database)(implicit ec: ExecutionContext)
+  extends AccessTokenAuthenticationDomain {
 
   class AccessTokenTable(tag: Tag) extends Table[(Int, String, String, Instant)](tag, "access_token_auth_domain") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -36,8 +37,13 @@ object SlickAccessTokenAuthenticationDomain extends AccessTokenAuthenticationDom
       Right(this)
     }
 
+  def unregister(c: AccessToken): Future[Either[AuthenticationError, AccessTokenDomain]] =
+    db.run(accessTokenTable.filter(_.token === c.value).delete) map { case _ =>
+      Right(this)
+    }
+
   def authenticate(c: AccessToken): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]] = {
-    db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt < Instant.now()).result.headOption) map {
+    db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt > Instant.now()).result.headOption) map {
       case None =>
         Left(AuthenticationError.InvalidCredentials)
       case Some((_, ref, _, _)) =>
