@@ -50,4 +50,3 @@ describe('LocalStorageSerializer', () => {
     expect(LocalStorageSerializer.deserialize('AUTH_TOKEN')).toEqual(value)
   })
 })
-
