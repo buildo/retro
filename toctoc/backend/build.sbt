@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       scalaVersion := "2.12.3",
-      version      := "0.1.0",
+      version      := "0.1.1",
       resolvers    += Resolver.bintrayRepo("buildo", "maven"),
       licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
     )),
