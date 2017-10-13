@@ -43,7 +43,9 @@
       "json"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "cookies-js": "^1.2.3"
+  },
   "devDependencies": {
     "@types/jest": "^21.1.2",
     "jest": "^21.2.1",

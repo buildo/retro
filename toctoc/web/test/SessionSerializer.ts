@@ -1,4 +1,5 @@
-import { SessionSerializer } from '../src/SessionSerializer'
+import { SessionSerializer, CookieSerializer } from '../src/SessionSerializer'
+import * as Cookies from 'cookies-js'
 
 describe('SessionSerializer', () => {
   const value = {
@@ -18,3 +19,19 @@ describe('SessionSerializer', () => {
   })
 })
 
+describe('CookieSerializer', () => {
+
+  const value = {
+    foo: 42
+  }
+
+  it('should serialize a value in cookies', () => {
+    CookieSerializer.serialize(value)
+    expect(Cookies.get('AUTH_TOKEN')).toBe(JSON.stringify(value))
+  })
+
+  it('should deserialize a value from cookies', () => {
+    CookieSerializer.serialize(value)
+    expect(CookieSerializer.deserialize('AUTH_TOKEN')).toEqual(value)
+  })
+})
