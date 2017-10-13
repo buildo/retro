@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       scalaVersion := "2.12.3",
-      version      := "0.1.1",
+      version      := "0.1.2-SNAPSHOT",
       resolvers    += Resolver.bintrayRepo("buildo", "maven"),
       licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
     )),
@@ -16,7 +16,8 @@ lazy val root = (project in file(".")).
         enumero,
         cats,
         scalaTest,
-        bCrypt
+        bCrypt,
+        wiroServer
       ).flatten
   )
 
