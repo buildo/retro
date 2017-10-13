@@ -1,0 +1,46 @@
+{
+  "name": "toctoc",
+  "version": "0.0.1",
+  "description": "A library that handles authentication with toctoc in a React webapp using buildo stack",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test-watch": "jest --watch",
+    "build": "rm -rf lib && mkdir lib && tsc",
+    "lint": "scriptoni lint src test",
+    "lint-fix": "scriptoni lint --fix src test",
+    "preversion": "npm run lint && npm run test",
+    "prepublish": "npm run build",
+    "release-version": "smooth-release",
+    "metarpheus": "scriptoni metarpheus-ts && scriptoni metarpheus",
+    "metarpheus-diff": "scriptoni metarpheus-ts-diff && scriptoni metarpheus-diff"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:buildo/toctoc.git"
+  },
+  "keywords": [
+    "authentication",
+    "authorization",
+    "auth",
+    "toctoc"
+  ],
+  "author": "Vincenzo Guerrisi <vincenzo@buildo.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/buildo/toctoc/issues"
+  },
+  "homepage": "https://github.com/buildo/toctoc#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^21.2.1",
+    "scriptoni": "^0.7.6",
+    "smooth-release": "^8.0.4",
+    "tslint": "^5.7.0",
+    "tslint-config-standard": "^6.0.1",
+    "typescript": "^2.5.3"
+  }
+}
