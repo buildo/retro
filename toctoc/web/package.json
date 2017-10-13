@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/buildo/metarpheus-js-http-api.git"
+    "url": "git+ssh://git@github.com:buildo/toctoc.git"
   },
   "keywords": [
     "authentication",
@@ -28,9 +28,9 @@
   "author": "Vincenzo Guerrisi <vincenzo@buildo.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/buildo/metarpheus-js-http-api/issues"
+    "url": "https://github.com/buildo/toctoc/issues"
   },
-  "homepage": "https://github.com/buildo/metarpheus-js-http-api#readme",
+  "homepage": "https://github.com/buildo/toctoc#readme",
   "jest": {
     "testEnvironment": "node"
   },
