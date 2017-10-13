@@ -41,6 +41,9 @@
       "tsx",
       "js",
       "json"
+    ],
+    "setupFiles": [
+      "jest-localstorage-mock"
     ]
   },
   "dependencies": {
@@ -49,6 +52,7 @@
   "devDependencies": {
     "@types/jest": "^21.1.2",
     "jest": "^21.2.1",
+    "jest-localstorage-mock": "^2.0.1",
     "scriptoni": "^0.7.6",
     "smooth-release": "^8.0.4",
     "ts-jest": "^21.1.2",

@@ -1,5 +1,5 @@
 type SessionSetter = (key: string, jsonValue: string) => void
-type SessionGetter = (key: string) => string
+type SessionGetter = (key: string) => string | null
 
 export default function SessionSerializer({ getter, setter }: { getter: SessionGetter, setter: SessionSetter }) {
   return {
