@@ -31,7 +31,7 @@ class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext
   def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] =
     db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password)))) map { case _ =>
       Right(this)
-    } recover { case _ => Left(AuthenticationError.InvalidCredentials) }
+    } recover { case _ => Left(AuthenticationError.InvalidCredential) }
 
   def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]] =
     db.run(loginTable.filter(_.ref === s.ref).delete) map { case _ =>
@@ -52,10 +52,10 @@ class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext
           case Some(el) =>
             Right((this, UserSubject(el._2)))
           case None =>
-            Left(AuthenticationError.InvalidCredentials)
+            Left(AuthenticationError.InvalidCredential)
         }
       case _ =>
-        Left(AuthenticationError.InvalidCredentials)
+        Left(AuthenticationError.InvalidCredential)
     }
   }
 }
