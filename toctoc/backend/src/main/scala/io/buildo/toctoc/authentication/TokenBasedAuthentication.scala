@@ -1,23 +1,34 @@
 package io.buildo.toctoc.authentication
 
 import java.time.{ Instant, Duration }
-import scala.concurrent.Future
+import scala.concurrent.{ Future, ExecutionContext }
 
 import cats.data.EitherT
-import cats.implicits._
+import cats.instances.future._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import io.buildo.toctoc.authentication.token.Token
 
 object TokenBasedAuthentication {
   case class AccessToken(
     value: String,
     expiresAt: Instant
-  ) extends Credential
+  ) extends Token[String]
+
+  case class RefreshToken(
+    value: String,
+    expiresAt: Instant
+  ) extends Token[String]
+
+  case class TocTocToken(
+    accessToken: AccessToken,
+    refreshToken: RefreshToken
+  )
 
   case class Login(
     username: String,
     password: String
   ) extends Credential
+
 
   type LoginDomain = AuthenticationDomain[Login]
 
@@ -44,6 +55,8 @@ object TokenBasedAuthentication {
     loginD: LoginAuthenticationDomain,
     accessTokenD: AccessTokenAuthenticationDomain,
     tokenDuration: Duration = Duration.ofDays(365)
+  )(implicit
+    ec: ExecutionContext
   ) extends BCryptHashing {
     def registerSubjectLogin(s: Subject, l: Login): Future[Either[AuthenticationError, Unit]] =
       (for {
