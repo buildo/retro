@@ -32,13 +32,24 @@
   },
   "homepage": "https://github.com/buildo/toctoc#readme",
   "jest": {
-    "testEnvironment": "node"
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ]
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^21.1.2",
     "jest": "^21.2.1",
     "scriptoni": "^0.7.6",
     "smooth-release": "^8.0.4",
+    "ts-jest": "^21.1.2",
     "tslint": "^5.7.0",
     "tslint-config-standard": "^6.0.1",
     "typescript": "^2.5.3"
