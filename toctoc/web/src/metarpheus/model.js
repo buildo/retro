@@ -14,7 +14,7 @@ export const TocTocToken = t.declare('TocTocToken');
 
 AccessToken.define(t.struct({
   value: t.String,
-  expiresAt: Instant
+  expiresAt: t.Date
 }));
 
 Login.define(t.struct({
@@ -24,7 +24,7 @@ Login.define(t.struct({
 
 RefreshToken.define(t.struct({
   value: t.String,
-  expiresAt: Instant
+  expiresAt: t.Date
 }));
 
 TocTocToken.define(t.struct({

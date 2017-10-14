@@ -28,7 +28,7 @@ export default [
     method: 'post',
     name: ['tokenAuthenticationController', 'logout'],
     authenticated: true,
-    returnType: t.Nil,
+    returnType: t.interface({}, { strict: true, name: 'Unit' }),
     route: (...routeParams) => ['toctoc', 'logout'].join('/'),
     routeParamTypes: [],
     params: {
