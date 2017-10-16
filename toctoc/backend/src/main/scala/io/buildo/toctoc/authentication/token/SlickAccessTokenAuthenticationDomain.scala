@@ -45,11 +45,11 @@ class SlickAccessTokenAuthenticationDomain(db: Database)(implicit ec: ExecutionC
   def authenticate(c: AccessToken): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]] = {
     db.run(accessTokenTable.filter(t => t.token === c.value && t.expiresAt > Instant.now()).result.headOption) map {
       case None =>
-        Left(AuthenticationError.InvalidCredentials)
+        Left(AuthenticationError.InvalidCredential)
       case Some((_, ref, _, _)) =>
         Right((this, UserSubject(ref)))
       case _ =>
-        Left(AuthenticationError.InvalidCredentials)
+        Left(AuthenticationError.InvalidCredential)
     }
   }
 }
