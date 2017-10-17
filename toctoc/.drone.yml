@@ -16,7 +16,7 @@ pipeline:
       - BINTRAY_USER=nemobot
     commands:
       - cd backend
-      - sbt +releaseEarlyPublish
+      - sbt +releaseEarly
     secrets: [ bintray_pass ]
     when:
       event: [ push, tag ]
