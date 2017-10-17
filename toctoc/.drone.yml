@@ -2,6 +2,7 @@ pipeline:
   backend-test:
     image: hseeberger/scala-sbt
     commands:
+      - cd backend
       - sbt test
 
 services:
