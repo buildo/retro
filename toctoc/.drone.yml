@@ -17,6 +17,7 @@ pipeline:
     environment:
       - BINTRAY_USER=nemobot
       - BINTRAY_PASS=${BINTRAY_PASSWORD}
+    secrets: [ bintray_password ]
     when:
       event: [ push, tag ]
       status: success
