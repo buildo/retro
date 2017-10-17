@@ -9,22 +9,18 @@ pipeline:
       - DB_PASSWORD=
       - DB_SERVER=database
       - DB_NAME=toctoc
+
   backend-publish:
     image: hseeberger/scala-sbt
     environment:
       - BINTRAY_USER=nemobot
-      - BINTRAY_PASS=${BINTRAY_PASSWORD}
     commands:
-      - echo $BINTRAY_USER
-      - echo $BINTRAY_PASS
-      - echo $BINTRAY_PASSWORD
       - cd backend
       - sbt +releaseEarlyPublish
-    secrets: [ bintray_password ]
+    secrets: [ bintray_pass ]
     when:
       event: [ push, tag ]
       status: success
-
 
 services:
   database:
