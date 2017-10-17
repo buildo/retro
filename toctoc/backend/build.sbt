@@ -12,7 +12,12 @@ lazy val root = (project in file(".")).
         Developer("@bytecodeguru", "Giuseppe Moscarella", "giuseppe.moscarella@buildo.io", url("https://buildo.io"))
       ),
       homepage := Some(url("https://github.com/buildo/toctoc")),
-      releaseEarlyWith := BintrayPublisher
+      releaseEarlyWith := BintrayPublisher,
+      scmInfo := Some(ScmInfo(
+        url("https://github.com/buildo/toctoc"),
+        "scm:git:https://github.com/buildo/toctoc.git",
+        Some("scm:git:git@github.com:buildo/toctoc.git")
+      ))
     )),
     name := "toctoc",
     libraryDependencies ++=
