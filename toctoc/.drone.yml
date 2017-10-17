@@ -4,6 +4,11 @@ pipeline:
     commands:
       - cd backend
       - sbt test
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=
+      - DB_SERVER=database
+      - DB_NAME=toctoc
 
 services:
   database:
