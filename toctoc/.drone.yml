@@ -13,7 +13,7 @@ pipeline:
     image: hseeberger/scala-sbt
     commands:
       - cd backend
-      - sbt +releaseEarly
+      - sbt +releaseEarlyPublish
     environment:
       - BINTRAY_USER=nemobot
       - BINTRAY_PASS=${BINTRAY_PASSWORD}
