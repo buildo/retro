@@ -1,6 +1,9 @@
 import sbt._
 
 object Dependencies {
+  lazy val scala211 = "2.11.8" 
+  lazy val scala212 = "2.12.3"
+
   lazy val slickVersion = "3.2.1"
   lazy val slick = Seq(
     "com.typesafe.slick" %% "slick" % slickVersion,

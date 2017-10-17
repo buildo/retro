@@ -3,7 +3,8 @@ import Dependencies._
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
-      scalaVersion := "2.12.3",
+      scalaVersion := scala212,
+      crossScalaVersions := Seq(scala211, scala212),
       version      := "0.1.2-SNAPSHOT",
       resolvers    += Resolver.bintrayRepo("buildo", "maven"),
       licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
