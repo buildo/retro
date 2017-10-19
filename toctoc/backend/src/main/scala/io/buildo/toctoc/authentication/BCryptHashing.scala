@@ -5,7 +5,7 @@ import scala.util.Random
 
 trait BCryptHashing {
   private val random = new Random()
-  private val defaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-{}[]\\|"
+  private val defaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   def randomString(n: Int, alphabet: String = defaultAlphabet): String =
     Stream.continually(random.nextInt(alphabet.size)).map(alphabet).take(n).mkString
 
