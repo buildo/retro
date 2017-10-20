@@ -1,16 +1,17 @@
+import { TocTocToken } from '../metarpheus/model-ts'
+
 type SessionSetter = (key: string, jsonValue: string) => void
 type SessionGetter = (key: string) => string | null
 
-export default function SessionSerializer({ getter, setter }: { getter: SessionGetter, setter: SessionSetter }) {
 const serializationKey = 'AUTH_TOKEN'
+
+export default function SessionSerializer<T = TocTocToken>({ getter, setter }: { getter: SessionGetter, setter: SessionSetter }) {
   return {
-    serialize<T>(value: T, key: string = 'AUTH_TOKEN'): void {
-      setter(key, JSON.stringify(value))
+    serialize(value: T): void {
       setter(serializationKey, JSON.stringify(value))
     },
 
-    deserialize<T>(key: string = 'AUTH_TOKEN'): T {
-      return JSON.parse(getter(key) || 'null')
+    deserialize(): T {
       return JSON.parse(getter(serializationKey) || 'null')
     }
   }
