@@ -19,7 +19,7 @@ describe('SessionSerializer', () => {
   })
 
   it('should return a deserialized value', () => {
-    Serializer.deserialize()
+    expect(Serializer.deserialize()).toEqual(value)
   })
 })
 
