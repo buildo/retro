@@ -1,5 +1,5 @@
 {
-  "name": "toctoc",
+  "name": "buildo-toctoc",
   "version": "0.0.1",
   "description": "A library that handles authentication with toctoc in a React webapp using buildo stack",
   "main": "lib",
