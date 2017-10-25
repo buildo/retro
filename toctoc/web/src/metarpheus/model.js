@@ -1,7 +1,7 @@
 
 // DO NOT EDIT MANUALLY - metarpheus-generated
 /* eslint-disable */
-import t from 'tcomb';
+import * as t from 'tcomb';
 
 
 export const AccessToken = t.declare('AccessToken');

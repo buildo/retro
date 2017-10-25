@@ -2,7 +2,7 @@
   "name": "toctoc",
   "version": "0.0.1",
   "description": "A library that handles authentication with toctoc in a React webapp using buildo stack",
-  "main": "index.js",
+  "main": "lib",
   "scripts": {
     "test": "jest",
     "test-watch": "jest --watch",
