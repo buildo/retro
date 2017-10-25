@@ -15,6 +15,10 @@
     "metarpheus": "scriptoni metarpheus-ts && scriptoni metarpheus",
     "metarpheus-diff": "scriptoni metarpheus-ts-diff && scriptoni metarpheus-diff"
   },
+  "files": [
+    "lib",
+    "typings"
+  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:buildo/toctoc.git"
