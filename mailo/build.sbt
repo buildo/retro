@@ -1,13 +1,10 @@
-val akkaV = "2.0.3"
-
 val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
-val akkaHttpCore = "com.typesafe.akka" % "akka-http-core-experimental_2.11" % akkaV
-val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaV
+val akkaHttp = "com.typesafe.akka" %% "akka-http" % "10.0.3"
 val s3 =  "com.github.seratch" %% "awscala" % "0.5.+"
 val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.0"
-val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.5.2"
-val circeCore = "io.circe" %% "circe-core" % "0.3.0"
-val circeGeneric = "io.circe" %% "circe-generic" % "0.3.0"
+val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.16.0"
+val circeCore = "io.circe" %% "circe-core" % "0.8.0"
+val circeGeneric = "io.circe" %% "circe-generic" % "0.8.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.1"
 
@@ -15,8 +12,9 @@ val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
-  version       := "0.1.5",
-  scalaVersion  := "2.11.7",
+  version       := "0.2.1",
+  scalaVersion  := "2.11.8",
+  crossScalaVersions := Seq("2.11.8", "2.12.1"),
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
     "-language:implicitConversions"
@@ -36,13 +34,12 @@ lazy val mailo = (project in file(".")).
     libraryDependencies ++= Seq(
       scalaTest,
       akkaHttp,
-      akkaHttpCore,
       s3,
       scalaz,
-      akkaHttpCirce,
       circeCore,
       circeGeneric,
       typesafeConfig,
+      akkaHttpCirce,
       scalaCacheGuava
     )
   )
