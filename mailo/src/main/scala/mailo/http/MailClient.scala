@@ -1,6 +1,5 @@
 package mailo.http
 
-import scalaz.\/
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import mailo.{ MailError, Attachment }
@@ -29,5 +28,5 @@ trait MailClient {
     tags: List[String]
   )(implicit
     executionContext: ExecutionContext
-  ): Future[MailError \/ MailResponse]
+  ): Future[Either[MailError, MailResponse]]
 }

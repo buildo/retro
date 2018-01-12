@@ -15,8 +15,7 @@ import scala.concurrent.Future
 
 import com.typesafe.config.{ ConfigFactory, Config }
 
-import scalaz.\/
-import scalaz.syntax.either._
+import cats.syntax.either._
 
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
@@ -47,8 +46,8 @@ class MailgunClient(implicit
     tags: List[String]
   )(implicit
     executionContext: scala.concurrent.ExecutionContext
-  ): Future[MailError \/ MailResponse] = {
-    import de.heikoseeberger.akkahttpcirce.CirceSupport._
+  ): Future[Either[MailError, MailResponse]] = {
+    import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
     import io.circe.generic.auto._
 
     val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
@@ -70,16 +69,16 @@ class MailgunClient(implicit
       )
       response <- Http().singleRequest(request)
       result <- response.status.intValue match {
-        case 200 => Unmarshal(response.entity).to[MailResponse] map (_.right[MailError])
-        case 400 => Future(BadRequest.left[MailResponse])
-        case 401 => Future(Unauthorized.left[MailResponse])
-        case 402 => Future(RequestFailed.left[MailResponse])
-        case 404 => Future(NotFound.left[MailResponse])
-        case 500 | 502 | 503 | 504 => Future(ServerError.left[MailResponse])
-        case _ => Future(UnknownCode.left[MailResponse])
+        case 200 => Unmarshal(response.entity).to[MailResponse] map (_.asRight[MailError])
+        case 400 => Future(BadRequest.asLeft[MailResponse])
+        case 401 => Future(Unauthorized.asLeft[MailResponse])
+        case 402 => Future(RequestFailed.asLeft[MailResponse])
+        case 404 => Future(NotFound.asLeft[MailResponse])
+        case 500 | 502 | 503 | 504 => Future(ServerError.asLeft[MailResponse])
+        case _ => Future(UnknownCode.asLeft[MailResponse])
       }
     } yield result) recover {
-      case t: Throwable => UnkownError(t.getStackTraceAsString).left[MailResponse]
+      case t: Throwable => UnkownError(t.getStackTraceAsString).asLeft[MailResponse]
     }
 
     res
