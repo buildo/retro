@@ -56,7 +56,7 @@ lazy val circeSupport = project
   .settings(
     name := "enumero-circe-support",
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.8.0"
+      "io.circe" %% "circe-core" % "0.9.0"
     )
   )
   .dependsOn(core)
