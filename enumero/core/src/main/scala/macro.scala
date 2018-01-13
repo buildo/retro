@@ -5,7 +5,7 @@ import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
 import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
-import scala.util.Try
+import scala.util.{Success, Failure, Try}
 
 /**
  * Macro annotation that transforms a trait with only bare,
@@ -45,29 +45,29 @@ object EnumMacro {
       Try {
         val q"trait $enumName { ..$body }" = classDecl
         (enumName, body)
-      }.fold({
-        case _: MatchError =>
+      } match {
+        case Failure(_) =>
           c.abort(c.enclosingPosition, "Annotation is only supported on objects")
-      }, { case (enumName, body) =>
-        val members = body.map {
-          case Ident(memberName: TermName) =>
-            q"case object $memberName extends $enumName"
-          case q"object $memberName { ..$more  }" =>
-            q"case object $memberName extends $enumName"
-          case _ =>
-            c.abort(c.enclosingPosition, "Enum members should be plain objects")
-        }
-        c.Expr(q"""
-          sealed abstract trait $enumName extends _root_.io.buildo.enumero.CaseEnum
-          object ${enumName.toTermName} {
-            ..$members
-            def values(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Set[$enumName] = ces.values
-            def caseToString(value: $enumName)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.caseToString(value)
-            def caseFromString(str: String)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Option[$enumName] = ces.caseFromString(str)
-            def name(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.name
+        case Success((enumName, body)) =>
+          val members = body.map {
+            case Ident(memberName: TermName) =>
+              q"case object $memberName extends $enumName"
+            case q"object $memberName { ..$more  }" =>
+              q"case object $memberName extends $enumName"
+            case _ =>
+              c.abort(c.enclosingPosition, "Enum members should be plain objects")
           }
-        """)
-      })
+          c.Expr(q"""
+            sealed abstract trait $enumName extends _root_.io.buildo.enumero.CaseEnum
+            object ${enumName.toTermName} {
+              ..$members
+              def values(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Set[$enumName] = ces.values
+              def caseToString(value: $enumName)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.caseToString(value)
+              def caseFromString(str: String)(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): Option[$enumName] = ces.caseFromString(str)
+              def name(implicit ces: _root_.io.buildo.enumero.CaseEnumSerialization[$enumName]): String = ces.name
+            }
+          """)
+      }
 
     annottees.map(_.tree) match {
       case (classDecl: ClassDef) :: Nil => modifiedClass(classDecl)
