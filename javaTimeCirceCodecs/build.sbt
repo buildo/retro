@@ -9,7 +9,7 @@ lazy val commonSettings = Seq(
   bintrayVcsUrl := Some("git@github.com:buildo/java-time-circe-codecs")
 )
 
-val circeVersion = "0.7.0"
+val circeVersion = "0.9.0"
 
 lazy val javaTimeCirceCodecs = project
   .settings(commonSettings)
