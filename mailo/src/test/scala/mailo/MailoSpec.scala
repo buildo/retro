@@ -13,8 +13,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
 
   "email" should "be correctly sent" in {
     (mailer.send(
-      to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-      from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+      to = "mailo@buildo.io",
+      from = "Mailo mailo@buildo.io",
       subject = "Test mail",
       templateName = "mail.html",
       params = Map("ciao" -> "CIAOOOONE"),
@@ -25,7 +25,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
   "email with wrong recipient" should "correctly fail" in {
     mailer.send(
       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.",
-      from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+      from = "Mailo mailo@buildo.io",
       subject = "Test mail 1",
       templateName = "mail.html",
       params = Map("ciao" -> "CIAOOOONE"),
@@ -35,8 +35,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
 
   "too few parameter error" should "be returned" in {
     mailer.send(
-      to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-      from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+      to = "mailo@buildo.io",
+      from = "Mailo mailo@buildo.io",
       subject = "Test mail 2",
       templateName = "mail.html",
       params = Map(),
@@ -46,8 +46,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
 
   "too many parameter error" should "be returned" in {
     mailer.send(
-      to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-      from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+      to = "mailo@buildo.io",
+      from = "Mailo mailo@buildo.io",
       subject = "Test mail 3",
       templateName = "mail.html",
       params = Map("ciao" -> "CIAONE", "ciaooo" -> "CIAONE"),
@@ -57,8 +57,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
 
   "data error" should "be returned" in {
     mailer.send(
-      to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-      from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+      to = "mailo@buildo.io",
+      from = "Mailo mailo@buildo.io",
       subject = "Test mail 4",
       templateName = "mail.hl",
       params = Map(),
@@ -73,8 +73,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
     val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plain` withCharset `UTF-8`)
 
     (mailer.send(
-       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-       from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+       to = "mailo@buildo.io",
+       from = "Mailo mailo@buildo.io",
        subject = "Test mail",
        templateName = "mail.html",
        params = Map("ciao" -> "CIAOOOONE"),
@@ -89,8 +89,8 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
     val attachment = Attachment(name = "helloworld.pdf", content = pdf.get, `type` = `application/pdf`, transferEncoding = Some("base64"))
 
     (mailer.send(
-       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
-       from = "Mailo postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.org",
+       to = "mailo@buildo.io",
+       from = "Mailo mailo@buildo.io",
        subject = "Test mail",
        templateName = "mail.html",
        params = Map("ciao" -> "CIAOOOONE"),
