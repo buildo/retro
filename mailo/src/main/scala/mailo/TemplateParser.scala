@@ -2,8 +2,7 @@ package mailo.parser
 
 import mailo.MailError
 
-import scalaz.\/
-import scalaz.syntax.either._
+import cats.syntax.either._
 
 import mailo.MailRawContent
 
@@ -33,13 +32,13 @@ object ParserError {
 object HTMLParser {
   import ParserError._
 
-  def parse(content: MailRawContent, params: Map[String, String]): \/[MailError, String] =
+  def parse(content: MailRawContent, params: Map[String, String]): Either[MailError, String] =
     replaceAllPartials(content.template, content.partials) flatMap (replaceAllParams(_, params))
 
   private[this] def replaceAllPartials(
     content: String,
     partials: Map[String, String]
-  ): \/[MailError, String] = {
+  ): Either[MailError, String] = {
     val mockPattern = """\[\[([^\s\\]+)\]\]""".r
 
     val matches = mockPattern findAllMatchIn(content) map (_.group(1))
@@ -47,14 +46,14 @@ object HTMLParser {
     val partialsSet: Set[String] = partials.keySet
     val matchesSet: Set[String] = matches.toSet
 
-    if (matchesSet subsetOf partialsSet) unsafelyReplaceAllInDocument(content, partials, mockPattern).right[MailError]
-    else PartialsDoNotExist(matchesSet -- partialsSet).left[String]
+    if (matchesSet subsetOf partialsSet) unsafelyReplaceAllInDocument(content, partials, mockPattern).asRight
+    else PartialsDoNotExist(matchesSet -- partialsSet).asLeft
   }
 
   private[this] def replaceAllParams(
     document: String,
     params: Map[String, String]
-  ): \/[MailError, String] = {
+  ): Either[MailError, String] = {
     val parameterPattern = """\{\{([^\s\\]+)\}\}""".r
 
     val matches = parameterPattern findAllMatchIn (document) map (_.group(1))
@@ -62,11 +61,11 @@ object HTMLParser {
     val paramsSet: Set[String] = params.keySet
     val matchesSet: Set[String] = matches.toSet
 
-    if (paramsSet == matchesSet) unsafelyReplaceAllInDocument(document, params, parameterPattern).right[MailError]
-    else if (matchesSet subsetOf paramsSet) TooManyParamsProvided(paramsSet -- matchesSet).left[String]
-    else if (paramsSet subsetOf matchesSet) TooFewParamsProvided(matchesSet -- paramsSet).left[String]
-    else if ((paramsSet intersect matchesSet).isEmpty) DisjointParametersAndMatches(paramsSet, matchesSet).left[String]
-    else OverlappedParametersAndMatches(paramsSet -- matchesSet, matchesSet -- paramsSet, matchesSet intersect paramsSet).left[String]
+    if (paramsSet == matchesSet) unsafelyReplaceAllInDocument(document, params, parameterPattern).asRight[MailError]
+    else if (matchesSet subsetOf paramsSet) TooManyParamsProvided(paramsSet -- matchesSet).asLeft[String]
+    else if (paramsSet subsetOf matchesSet) TooFewParamsProvided(matchesSet -- paramsSet).asLeft[String]
+    else if ((paramsSet intersect matchesSet).isEmpty) DisjointParametersAndMatches(paramsSet, matchesSet).asLeft[String]
+    else OverlappedParametersAndMatches(paramsSet -- matchesSet, matchesSet -- paramsSet, matchesSet intersect paramsSet).asLeft[String]
   }
 
   private[this] def unsafelyReplaceAllInDocument(
@@ -88,5 +87,5 @@ object HTMLParser {
 object HTMLValidator {
   import ParserError._
 
-  def validate(document: String): MailError \/ String = document.right[MailError]
+  def validate(document: String): Either[MailError, String] = document.asRight[MailError]
 }

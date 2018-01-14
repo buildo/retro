@@ -1,11 +1,10 @@
 package mailo.data
 
 import mailo.MailError
-import scala.concurrent.Future
-import scalaz.\/
-
 import mailo.MailRawContent
 
+import scala.concurrent.Future
+
 trait MailData {
-  def get(name: String): Future[mailo.MailError \/ MailRawContent]
+  def get(name: String): Future[Either[MailError, MailRawContent]]
 }

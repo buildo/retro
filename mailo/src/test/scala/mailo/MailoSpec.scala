@@ -3,6 +3,8 @@ package mailo
 import org.scalatest.{ FlatSpec, Matchers }
 import org.scalatest.concurrent.ScalaFutures
 
+import cats.syntax.either._
+
 class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
   import org.scalatest.time.{Span, Seconds, Millis}
 
@@ -17,7 +19,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.html",
       params = Map("ciao" -> "CIAOOOONE"),
       tags = List("test")
-    ).futureValue | (fail)).message should be ("Queued. Thank you.")
+    ).futureValue.getOrElse(fail)).message should be ("Queued. Thank you.")
   }
 
   "email with wrong recipient" should "correctly fail" in {
@@ -28,7 +30,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.html",
       params = Map("ciao" -> "CIAOOOONE"),
       tags = List("test")
-    ).futureValue.swap | (fail) should be (http.MailClientError.BadRequest)
+    ).futureValue.swap.getOrElse(fail) should be (http.MailClientError.BadRequest)
   }
 
   "too few parameter error" should "be returned" in {
@@ -39,7 +41,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.html",
       params = Map(),
       tags = List("test")
-    ).futureValue.swap | (fail) should be (parser.ParserError.TooFewParamsProvided(Set("ciao")))
+    ).futureValue.swap.getOrElse(fail) should be (parser.ParserError.TooFewParamsProvided(Set("ciao")))
   }
 
   "too many parameter error" should "be returned" in {
@@ -50,7 +52,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.html",
       params = Map("ciao" -> "CIAONE", "ciaooo" -> "CIAONE"),
       tags = List("test")
-    ).futureValue.swap | (fail) should be (parser.ParserError.TooManyParamsProvided(Set("ciaooo")))
+    ).futureValue.swap.getOrElse(fail) should be (parser.ParserError.TooManyParamsProvided(Set("ciaooo")))
   }
 
   "data error" should "be returned" in {
@@ -61,7 +63,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
       templateName = "mail.hl",
       params = Map(),
       tags = List("test")
-    ).futureValue.swap | (fail) should be (data.S3MailDataError.ObjectNotFound)
+    ).futureValue.swap.getOrElse(fail) should be (data.S3MailDataError.ObjectNotFound)
   }
 
   "email" should "not explode sending attachments" in {
@@ -78,7 +80,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
        params = Map("ciao" -> "CIAOOOONE"),
        attachments = List(attachment),
        tags = List("test")
-     ).futureValue | (fail)).message should be ("Queued. Thank you.")
+     ).futureValue.getOrElse(fail)).message should be ("Queued. Thank you.")
   }
 
   "email" should "not explode sending pdf attachments" in {
@@ -94,7 +96,7 @@ class MailoSpec extends FlatSpec with AppSpec with Matchers with ScalaFutures {
        params = Map("ciao" -> "CIAOOOONE"),
        attachments = List(attachment),
        tags = List("test")
-     ).futureValue | (fail)).message should be ("Queued. Thank you.")
+     ).futureValue.getOrElse(fail)).message should be ("Queued. Thank you.")
   }
 }
 

@@ -10,8 +10,8 @@ import scala.concurrent.ExecutionContext
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 
-import scalaz.std.scalaFuture._
-import scalaz.{EitherT, \/}
+import cats.data.EitherT
+import cats.instances.future._
 
 import com.typesafe.config.{ ConfigFactory, Config }
 
@@ -73,12 +73,12 @@ class Mailo(
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
     tags: List[String] = Nil
-  ): Future[\/[MailError, MailResponse]] = {
+  ): Future[Either[MailError, MailResponse]] = {
     val result = for {
       content <- EitherT(cachingWithTTL(templateName)(mailoConfig.cachingTTLSeconds.seconds) {
         mailData.get(templateName)
       })
-      parsedContent <- EitherT.fromDisjunction(HTMLParser.parse(content, params))
+      parsedContent <- EitherT.fromEither(HTMLParser.parse(content, params))
       result <- EitherT(mailClient.send(
         to = to,
         from = from,
@@ -89,7 +89,7 @@ class Mailo(
       ))
     } yield result
 
-    result.run
+    result.value
   }
 }
 
@@ -114,7 +114,7 @@ class S3MailgunMailo(implicit
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
     tags: List[String] = Nil
-  ): Future[\/[MailError, MailResponse]] =
+  ): Future[Either[MailError, MailResponse]] =
     mailgunS3Mailo.send(to, from, subject, templateName, params, attachments, tags)
 }
 
