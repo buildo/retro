@@ -1,4 +1,4 @@
-val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
 val akkaHttp = "com.typesafe.akka" %% "akka-http" % "10.0.3"
 val s3 =  "com.github.seratch" %% "awscala" % "0.5.+"
 val catsCore = "org.typelevel" %% "cats-core" % "1.0.1"
@@ -7,15 +7,15 @@ val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.19.0"
 val circeCore = "io.circe" %% "circe-core" % "0.9.0"
 val circeGeneric = "io.circe" %% "circe-generic" % "0.9.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
-val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.1"
+val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 
 val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
-  version       := "0.2.2",
-  scalaVersion  := "2.11.12",
-  crossScalaVersions := Seq("2.11.12", "2.12.1"),
+  version       := "0.3.0",
+  scalaVersion  := "2.12.4",
+  crossScalaVersions := Seq("2.11.12", "2.12.4"),
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
     "-language:implicitConversions",
