@@ -7,7 +7,7 @@ object Dependencies {
   lazy val slickVersion = "3.2.1"
   lazy val slick = Seq(
     "com.typesafe.slick" %% "slick" % slickVersion,
-    "org.slf4j" % "slf4j-nop" % "1.6.4",
+    "org.slf4j" % "slf4j-nop" % "1.6.4" % "test",
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion
   )
   lazy val postgresql = Seq("org.postgresql" % "postgresql" % "9.4.1212")
