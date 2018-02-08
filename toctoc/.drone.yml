@@ -19,7 +19,7 @@ pipeline:
       - sbt +releaseEarly
     secrets: [ bintray_pass ]
     when:
-      event: [ push, tag ]
+      event: [ push, tag, deployment ]
       status: success
 
   frontend-test:
