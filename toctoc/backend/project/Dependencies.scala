@@ -17,6 +17,7 @@ object Dependencies {
   val cats = "org.typelevel" %% "cats-core" % "0.9.0"
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
   val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
+  val quillAsync = "io.getquill" %% "quill-async" % "2.3.2"
 
   lazy val coreDependencies = List(
     bCrypt,
@@ -33,9 +34,12 @@ object Dependencies {
     slf4jNop,
   ).map(_ % Test)
 
+  lazy val quillDependencies = List(
+    quillAsync,
+  )
+
   lazy val wiroDependencies = List(
     wiroServer,
     cats,
   )
 }
-

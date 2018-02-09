@@ -5,6 +5,7 @@ This is the backend-side of toctoc. It comes in different modules:
 - `toctoc-core`: defines the abstractions
 - `toctoc-wiro`: provides wiro-specific controllers
 - `toctoc-slick`: provides slick-specific implementations
+- `toctoc-quill`: provides quill-specific implementations
 
 ## Quick start:
 

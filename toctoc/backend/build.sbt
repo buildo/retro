@@ -47,6 +47,13 @@ lazy val slick = project
   )
   .dependsOn(core)
 
+lazy val quill = project
+  .settings(
+    name := "toctoc-quill",
+    libraryDependencies ++= quillDependencies
+  )
+  .dependsOn(core)
+
 lazy val wiro = project
   .settings(
     name := "toctoc-wiro",
