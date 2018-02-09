@@ -29,6 +29,8 @@ pipeline:
     image: hseeberger/scala-sbt
     environment:
       - BINTRAY_USER=nemobot
+    volumes:
+      - /root/bintray-keys:/bintray-keys
     commands:
       - cd backend
       - sbt +releaseEarly
