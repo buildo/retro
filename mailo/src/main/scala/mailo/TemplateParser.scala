@@ -39,7 +39,7 @@ object HTMLParser {
     content: String,
     partials: Map[String, String]
   ): Either[MailError, String] = {
-    val mockPattern = """\[\[([^\s\\]+)\]\]""".r
+    val mockPattern = """\[\[([a-zA-Z0-9_.-]+)\]\]""".r
 
     val matches = mockPattern findAllMatchIn(content) map (_.group(1))
 
@@ -54,7 +54,7 @@ object HTMLParser {
     document: String,
     params: Map[String, String]
   ): Either[MailError, String] = {
-    val parameterPattern = """\{\{([^\s\\]+)\}\}""".r
+    val parameterPattern = """\{\{([a-zA-Z0-9_.-]+)\}\}""".r
 
     val matches = parameterPattern findAllMatchIn (document) map (_.group(1))
 
