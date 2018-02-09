@@ -5,6 +5,17 @@ clone:
     recursive: true
 
 pipeline:
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - /drone/.ivy2
+      - /drone/.sbt
+    volumes:
+      - /tmp/cache:/cache
+    when:
+      event: [ push, pull_request ]
+
   backend-test:
     image: hseeberger/scala-sbt
     commands:
@@ -25,7 +36,7 @@ pipeline:
       - sbt +releaseEarly
     secrets: [ bintray_pass ]
     when:
-      event: [ push, tag, deployment ]
+      event: [ push, tag ]
       status: success
 
   frontend-test:
@@ -34,6 +45,15 @@ pipeline:
       - cd web
       - yarn
       - yarn test
+
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - /drone/.ivy2
+      - /drone/.sbt
+    volumes:
+      - /tmp/cache:/cache
 
 services:
   database:
