@@ -1,12 +1,16 @@
-mailgun {
-  key = ""
-  uri = ""
-}
+mailo {
+  s3 {
+    key = ""
+    secret = ""
+    bucket = ""
+    region = ""
+    partialsFolder = ""
+  }
 
-s3 {
-  key = ""
-  secret = ""
-  bucket = ""
-  partialsFolder = ""
-}
+  mailgun {
+    key = ""
+    uri = ""
+  }
 
+  cachingTTLSeconds = 30
+}
