@@ -15,6 +15,7 @@ pipeline:
       - /tmp/cache:/cache
 
   backend-test:
+    group: test
     image: hseeberger/scala-sbt
     commands:
       - cd backend
@@ -24,6 +25,14 @@ pipeline:
       - DB_PASSWORD=
       - DB_SERVER=database
       - DB_NAME=toctoc
+
+  frontend-test:
+    group: test
+    image: node:8
+    commands:
+      - cd web
+      - yarn
+      - yarn test
 
   backend-publish:
     image: hseeberger/scala-sbt
@@ -38,13 +47,6 @@ pipeline:
     when:
       event: [ push, tag ]
       status: success
-
-  frontend-test:
-    image: node:8
-    commands:
-      - cd web
-      - yarn
-      - yarn test
 
   rebuild-cache:
     image: drillster/drone-volume-cache
