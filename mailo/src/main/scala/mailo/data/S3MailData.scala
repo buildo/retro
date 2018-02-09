@@ -35,7 +35,7 @@ class S3MailData(implicit
     key: String,
     secret: String,
     bucket: String,
-    region: String,
+    regionName: String,
     partialsFolder: String
   )
 
@@ -43,11 +43,11 @@ class S3MailData(implicit
     key    = conf.getString(s"mailo.s3.key"),
     secret = conf.getString(s"mailo.s3.secret"),
     bucket = conf.getString(s"mailo.s3.bucket"),
-    region = conf.getString(s"mailo.s3.region"),
+    regionName = conf.getString(s"mailo.s3.region"),
     partialsFolder = conf.getString(s"mailo.s3.partialsFolder")
   )
 
-  private[S3MailData] implicit val region = RegionUtils.getRegion(s3Config.region)
+  private[S3MailData] implicit val region = RegionUtils.getRegion(s3Config.regionName)
   private[S3MailData] implicit val s3 = S3(new Credentials(s3Config.key, s3Config.secret))
   private[S3MailData] def bucket = s3.bucket(s3Config.bucket)
 
