@@ -64,4 +64,4 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=toctoc
     volumes:
-      - $PWD/backend/quill/src/test/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - /drone/src/github.com/buildo/toctoc/backend/quill/src/test/resources:/docker-entrypoint-initdb.d
