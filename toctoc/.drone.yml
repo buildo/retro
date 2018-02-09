@@ -13,8 +13,6 @@ pipeline:
       - /drone/.sbt
     volumes:
       - /tmp/cache:/cache
-    when:
-      event: [ push, pull_request ]
 
   backend-test:
     image: hseeberger/scala-sbt
