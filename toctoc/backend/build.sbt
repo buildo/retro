@@ -13,6 +13,7 @@ lazy val root = (project in file(".")).
       ),
       homepage := Some(url("https://github.com/buildo/toctoc")),
       releaseEarlyWith := BintrayPublisher,
+      releaseEarlyRemoteSignature := true
       scmInfo := Some(ScmInfo(
         url("https://github.com/buildo/toctoc"),
         "scm:git:https://github.com/buildo/toctoc.git",
