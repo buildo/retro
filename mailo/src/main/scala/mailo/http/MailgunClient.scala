@@ -33,8 +33,8 @@ class MailgunClient(implicit
 
   private[this] case class MailgunConfig(key: String, uri: String)
   private[this] val mailgunConfig = MailgunConfig(
-    key = conf.getString("mailgun.key"),
-    uri = conf.getString("mailgun.uri")
+    key = conf.getString("mailo.mailgun.key"),
+    uri = conf.getString("mailo.mailgun.uri")
   )
 
   def send(
