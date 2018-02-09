@@ -6,6 +6,7 @@
 - Store your email templates where you like.
 - Send your email with the ESP you like.
 - Compose your template using HTML partials (convenient for footers and headers).
+  - Allowed chars in the names of the partials are given by the following regex `a-zA-Z0-9_.-_`
 - Conveniently collect errors.
 
 # Install
