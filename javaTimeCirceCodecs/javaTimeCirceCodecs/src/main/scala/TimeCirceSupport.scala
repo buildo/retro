@@ -14,7 +14,7 @@ trait TimeCirceSupport extends TimeInstances {
   private[this] val dateTimeFormatter = dateTimeFormatterBuilder.appendInstant(3).toFormatter
 
   //overrides default circe encoder/decoder
-  implicit val decodeOffsetDateTime: Decoder[OffsetDateTime] = decodeOffsetDateTime(dateTimeFormatter)
+  implicit val decodeOffsetDateTime: Decoder[OffsetDateTime] = decodeOffsetDateTimeDefault
   implicit val encodeOffsetDateTime: Encoder[OffsetDateTime] = encodeOffsetDateTime(dateTimeFormatter)
 }
 
