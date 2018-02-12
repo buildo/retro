@@ -5,6 +5,7 @@ lazy val commonSettings = Seq(
   crossScalaVersions := Seq("2.11.8", "2.12.1"),
   scalaVersion := "2.12.1",
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+  version       := "0.3.0",
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/java-time-circe-codecs")
 )
