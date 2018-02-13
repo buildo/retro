@@ -2,7 +2,7 @@
 import * as t from 'io-ts';
 
 export interface Unit {};
-export const Unit = t.interface({}, 'Unit');
+export const Unit = t.strict({}, 'Unit');
 
 export interface AccessToken {
   value: string,
