@@ -1,1 +1,2 @@
-export { API } from './metarpheus/api';
+import API from './metarpheus/api';
+export { API };

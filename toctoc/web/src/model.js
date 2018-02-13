@@ -1,1 +1,2 @@
-export { Model } from './metarpheus/model';
+import * as Model from './metarpheus/model';
+export { Model };
