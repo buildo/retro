@@ -51,13 +51,14 @@
     ]
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "cookies-js": "^1.2.3"
   },
   "devDependencies": {
     "@types/jest": "^21.1.2",
     "jest": "^21.2.1",
     "jest-localstorage-mock": "^2.0.1",
-    "scriptoni": "^0.7.6",
+    "scriptoni": "^0.10.0",
     "smooth-release": "^8.0.4",
     "ts-jest": "^21.1.2",
     "tslint": "^5.7.0",

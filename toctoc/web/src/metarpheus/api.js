@@ -1,8 +1,9 @@
 
 // DO NOT EDIT MANUALLY - metarpheus-generated
 /* eslint-disable */
-import * as t from 'tcomb';
-import * as m from './model'
+import t from 'tcomb';
+
+import * as m from './model';
 
 
 export default [
