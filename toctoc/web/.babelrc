@@ -1,7 +1,5 @@
 {
   "presets": [
-    ["buildo", {
-      "modules": false
-    }]
+    ["buildo", {}]
   ]
 }
