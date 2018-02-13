@@ -5,7 +5,7 @@ import axios, { AxiosError } from 'axios'
 import * as t from 'io-ts'
 import * as m from './model-ts'
 
-interface RouteConfig {
+export interface RouteConfig {
   apiEndpoint: string,
   timeout: number,
   unwrapApiResponse: (resp: any) => any

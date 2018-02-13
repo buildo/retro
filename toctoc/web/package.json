@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "test-watch": "jest --watch",
-    "build": "rm -rf lib && mkdir lib && tsc",
+    "build": "rm -rf lib && mkdir lib && tsc && npx babel src --out-dir lib",
     "lint": "scriptoni lint src test",
     "lint-fix": "scriptoni lint --fix src test",
     "preversion": "npm run lint && npm run test",

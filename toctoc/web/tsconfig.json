@@ -10,16 +10,22 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": false,
-    "allowJs": true,
     "strictNullChecks": true,
     "target": "es5",
     "moduleResolution": "node",
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "es6",
       "dom"
     ]
   },
+  "exclude": [
+    "./src/api.js",
+    "./src/model.js",
+    "./src/metarpheus/api.js",
+    "./src/metarpheus/model.js"
+  ],
   "include": [
     "./src/*",
     "typings"

@@ -1,7 +1,7 @@
 import { TocTocToken } from '../metarpheus/model-ts'
 
-type SessionSetter = (key: string, stringifiedValue: string) => void
-type SessionGetter = (key: string) => string | null
+export type SessionSetter = (key: string, stringifiedValue: string) => void
+export type SessionGetter = (key: string) => string | null
 
 const serializationKey = 'AUTH_TOKEN'
 
