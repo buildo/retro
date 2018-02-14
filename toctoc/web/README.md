@@ -1,5 +1,7 @@
 # toctoc
 
+Check the main `README.md` for instructions on how to release a new version.
+
 ## Install
 
 ```
