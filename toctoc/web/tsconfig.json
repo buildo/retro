@@ -10,16 +10,19 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": false,
-    "allowJs": true,
     "strictNullChecks": true,
     "target": "es5",
     "moduleResolution": "node",
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "es6",
       "dom"
     ]
   },
+  "exclude": [
+    "./src/**/*.js"
+  ],
   "include": [
     "./src/*",
     "typings"
