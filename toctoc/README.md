@@ -10,7 +10,7 @@ Refer to the [web](/web) and [backend](/backend) READMEs.
 
 `web` and `backend` are two different projects with two different release methods:
 
-* `backend` is release automatically by the CI
+* `backend` is released automatically by the CI
 * `web` must be release manually as follows:
   1. `npm version X.Y.Z` (to choose a version number, check the latest release tag and follow the standard `breaking` changes guidelines)
   2. npm publish
