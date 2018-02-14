@@ -1,6 +1,6 @@
 {
   "name": "buildo-toctoc",
-  "version": "0.0.2",
+  "version": "0.1.6",
   "description": "A library that handles authentication with toctoc in a React webapp using buildo stack",
   "main": "lib",
   "typings": "lib/index.d.ts",
