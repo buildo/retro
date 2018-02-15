@@ -12,7 +12,6 @@
     "lint-fix": "scriptoni lint --fix src test",
     "preversion": "npm run lint && npm run test",
     "prepublish": "npm run build",
-    "release-version": "smooth-release",
     "metarpheus": "scriptoni metarpheus-ts && scriptoni metarpheus",
     "metarpheus-diff": "scriptoni metarpheus-ts-diff && scriptoni metarpheus-diff"
   },
@@ -60,7 +59,6 @@
     "jest": "^21.2.1",
     "jest-localstorage-mock": "^2.0.1",
     "scriptoni": "^0.10.1",
-    "smooth-release": "^8.0.4",
     "ts-jest": "^21.1.2",
     "tslint": "^5.7.0",
     "tslint-config-standard": "^6.0.1",
