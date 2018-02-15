@@ -40,6 +40,7 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   override def afterAll() = {
+    db.run(schema.drop).futureValue
     db.close()
   }
 
