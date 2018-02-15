@@ -24,8 +24,7 @@ inThisBuild(
     ),
     homepage := Some(url("https://github.com/buildo/toctoc")),
     releaseEarlyWith := BintrayPublisher,
-    pgpPublicRing := file("/bintray-keys/buildopub.asc"),
-    pgpSecretRing := file("/bintray-keys/buildosec.asc"),
+    releaseEarlyNoGpg := true,
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/buildo/toctoc"),
