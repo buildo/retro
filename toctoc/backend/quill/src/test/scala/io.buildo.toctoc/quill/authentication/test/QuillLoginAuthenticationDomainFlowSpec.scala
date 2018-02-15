@@ -12,6 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import io.getquill._
 import io.getquill.{CamelCase, PostgresAsyncContext}
 import org.flywaydb.core.Flyway
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -32,7 +33,13 @@ class QuillLoginAuthenticationDomainFlowSpec
 
   override def beforeAll() = {
     val flyway = new Flyway()
-    flyway.setDataSource("jdbc:postgresql://localhost/toctoc", "postgres", "")
+    val config = ConfigFactory.load().getConfig("db")
+    val host = config.getString("host")
+    val port = config.getString("port")
+    val user = config.getString("user")
+    val password = config.getString("password")
+    val database = config.getString("database")
+    flyway.setDataSource(s"jdbc:postgresql://$host:$port/$database", user, password)
     flyway.clean()
     flyway.migrate()
     ()
