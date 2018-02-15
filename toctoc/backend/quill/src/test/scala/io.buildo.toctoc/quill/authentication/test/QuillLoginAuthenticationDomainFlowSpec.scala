@@ -116,6 +116,7 @@ class QuillLoginAuthenticationDomainFlowSpec
   }
 
   "single subject credentials unregistration" should "take effect" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
     authFlow.unregisterLogin(login).futureValue
     authFlow.exchangeForTokens(login).futureValue shouldBe 'left
   }
