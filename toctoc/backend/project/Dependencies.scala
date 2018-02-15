@@ -6,6 +6,7 @@ object Dependencies {
 
   val V = new {
     val slick = "3.2.1"
+    val quill = "2.3.2"
   }
 
   val slick = "com.typesafe.slick" %% "slick" % V.slick
@@ -17,7 +18,9 @@ object Dependencies {
   val cats = "org.typelevel" %% "cats-core" % "0.9.0"
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
   val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
-  val quillAsync = "io.getquill" %% "quill-async" % "2.3.2"
+  val quillAsync = "io.getquill" %% "quill-async" % V.quill
+  val quillAsyncPostgres = "io.getquill" %% "quill-async-postgres" % V.quill
+  val flywayCore = "org.flywaydb" % "flyway-core" % "5.0.7"
 
   lazy val coreDependencies = List(
     bCrypt,
@@ -36,7 +39,13 @@ object Dependencies {
 
   lazy val quillDependencies = List(
     quillAsync,
-  )
+  ) ++ List(
+    scalatest,
+    quillAsyncPostgres,
+    slf4jNop,
+    flywayCore,
+    postgresql,
+  ).map(_ % Test)
 
   lazy val wiroDependencies = List(
     wiroServer,

@@ -10,6 +10,7 @@ import io.getquill.context.async.{AsyncContext, SqlTypes}
 import io.getquill.context.sql.idiom.SqlIdiom
 import io.getquill.NamingStrategy
 import com.github.mauricio.async.db.Connection
+import org.joda.time.{DateTime => JodaDateTime}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,7 +35,7 @@ class QuillAccessTokenAuthenticationDomain[D <: SqlIdiom, N <: NamingStrategy, C
   private implicit val instantEncoder: Encoder[Instant] =
     encoder[Instant](SqlTypes.TIMESTAMP_WITH_TIMEZONE)
   private implicit val instantDecoder: Decoder[Instant] =
-    decoder[Instant]({ case i: Instant => i }, SqlTypes.TIMESTAMP_WITH_TIMEZONE)
+    decoder[Instant]({ case d: JodaDateTime => d.toDate.toInstant }, SqlTypes.TIMESTAMP_WITH_TIMEZONE)
 
   private implicit class InstantQuotes(left: Instant) {
     def >(right: Instant) = quote(infix"$left > $right".as[Boolean])
