@@ -63,5 +63,3 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=toctoc
-    volumes:
-      - /drone/src/github.com/buildo/toctoc/backend/quill/src/test/resources:/docker-entrypoint-initdb.d

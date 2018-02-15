@@ -20,6 +20,7 @@ object Dependencies {
   val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
   val quillAsync = "io.getquill" %% "quill-async" % V.quill
   val quillAsyncPostgres = "io.getquill" %% "quill-async-postgres" % V.quill
+  val flywayCore = "org.flywaydb" % "flyway-core" % "5.0.7"
 
   lazy val coreDependencies = List(
     bCrypt,
@@ -41,7 +42,9 @@ object Dependencies {
   ) ++ List(
     scalatest,
     quillAsyncPostgres,
-    slf4jNop
+    slf4jNop,
+    flywayCore,
+    postgresql,
   ).map(_ % Test)
 
   lazy val wiroDependencies = List(

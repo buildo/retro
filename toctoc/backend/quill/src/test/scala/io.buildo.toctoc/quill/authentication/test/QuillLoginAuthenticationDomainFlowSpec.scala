@@ -11,11 +11,13 @@ import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import io.getquill._
 import io.getquill.{CamelCase, PostgresAsyncContext}
+import org.flywaydb.core.Flyway
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class QuillLoginAuthenticationDomainFlowSpec
     extends FlatSpec
+    with BeforeAndAfterEach
     with BeforeAndAfterAll
     with ScalaFutures
     with EitherValues
@@ -28,10 +30,22 @@ class QuillLoginAuthenticationDomainFlowSpec
 
   val authFlow = new QuillTokenBasedAuthenticationFlow(ctx)
 
-  override def afterAll() = {
+  override def beforeAll() = {
+    val flyway = new Flyway()
+    flyway.setDataSource("jdbc:postgresql://localhost/toctoc", "postgres", "")
+    flyway.clean()
+    flyway.migrate()
+    ()
+  }
+
+  override def afterEach() = {
     import ctx._
     ctx.run(quote(querySchema("LoginAuthDomain").delete))
     ctx.run(quote(querySchema("AccessTokenAuthDomain").delete))
+    ()
+  }
+
+  override def afterAll() = {
     ctx.close()
   }
 
@@ -55,22 +69,27 @@ class QuillLoginAuthenticationDomainFlowSpec
   }
 
   "token obtained by login" should "be validated" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
     val token = authFlow.exchangeForTokens(login).futureValue.right.value
     authFlow.validateToken(token).futureValue.right.value shouldBe subject
   }
 
   "multiple login with same values" should "not be accepted in registration" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
     authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'left
   }
 
   "multiple login with different values" should "be accepted in registration" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
     authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
     val token2 = authFlow.exchangeForTokens(login2).futureValue.right.value
     authFlow.validateToken(token2).futureValue.right.value shouldBe subject2
   }
 
   "single token unregistration" should "unregister only the specific token" in {
-    val token = authFlow.exchangeForTokens(login2).futureValue.right.value
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
+    val token = authFlow.exchangeForTokens(login).futureValue.right.value
     val token2 = authFlow.exchangeForTokens(login2).futureValue.right.value
     authFlow.unregisterToken(token).futureValue
     authFlow.validateToken(token).futureValue shouldBe 'left
@@ -78,6 +97,8 @@ class QuillLoginAuthenticationDomainFlowSpec
   }
 
   "token unregistration" should "unregister all subject's tokens" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
     val token = authFlow.exchangeForTokens(login).futureValue.right.value
     val token2 = authFlow.exchangeForTokens(login).futureValue.right.value
     val token3 = authFlow.exchangeForTokens(login2).futureValue.right.value

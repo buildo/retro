@@ -4,7 +4,7 @@ create table loginauthdomain (
     username text not null,
     passwordhash text not null,
     primary key (id),
-    constraint loginauthdomain_ref_index unique (ref)
+    constraint loginauthdomain_username_index unique (username)
 );
 
 create table accesstokenauthdomain (

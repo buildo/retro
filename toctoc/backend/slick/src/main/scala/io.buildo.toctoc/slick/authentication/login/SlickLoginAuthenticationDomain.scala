@@ -25,7 +25,7 @@ class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext
 
     def * = (id, ref, username, passwordHash)
 
-    def uniqueRefIdx = index("unique_ref_idx", username, unique = true)
+    def uniqueUsernameIdx = index("unique_username_idx", username, unique = true)
   }
   val loginTable = TableQuery[LoginTable]
 
