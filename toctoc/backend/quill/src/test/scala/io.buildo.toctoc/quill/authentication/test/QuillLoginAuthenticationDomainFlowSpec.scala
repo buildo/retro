@@ -31,7 +31,7 @@ class QuillLoginAuthenticationDomainFlowSpec
 
   val authFlow = new QuillTokenBasedAuthenticationFlow(ctx)
 
-  override def beforeAll() = {
+  val flyway = {
     val flyway = new Flyway()
     val config = ConfigFactory.load().getConfig("db")
     val host = config.getString("host")
@@ -40,6 +40,10 @@ class QuillLoginAuthenticationDomainFlowSpec
     val password = config.getString("password")
     val database = config.getString("database")
     flyway.setDataSource(s"jdbc:postgresql://$host:$port/$database", user, password)
+    flyway
+  }
+
+  override def beforeAll() = {
     flyway.clean()
     flyway.migrate()
     ()
@@ -53,6 +57,7 @@ class QuillLoginAuthenticationDomainFlowSpec
   }
 
   override def afterAll() = {
+    flyway.clean()
     ctx.close()
   }
 

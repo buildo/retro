@@ -19,7 +19,8 @@ pipeline:
     image: hseeberger/scala-sbt
     commands:
       - cd backend
-      - sbt test
+      - sbt slick/test
+      - sbt quill/test
     environment:
       - DB_USER=postgres
       - DB_PASSWORD=

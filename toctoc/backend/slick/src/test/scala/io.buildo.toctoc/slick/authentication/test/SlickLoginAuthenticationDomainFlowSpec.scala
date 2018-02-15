@@ -15,6 +15,7 @@ import _root_.slick.jdbc.JdbcBackend.Database
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
+  with BeforeAndAfterEach
   with BeforeAndAfterAll
   with ScalaFutures
   with EitherValues
@@ -34,6 +35,10 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
     db.run(schema.create).futureValue
   }
 
+  override def afterEach() = {
+    db.run(schema.truncate).futureValue
+  }
+
   override def afterAll() = {
     db.run(schema.drop).futureValue
     db.close()
@@ -46,58 +51,66 @@ class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   val subject2 = UserSubject("test2")
 
   "unregistered login credentials" should "not be accepted when exchanging for token" in {
-    authFlow.exchangeForTokens(login).futureValue.left.get
+    authFlow.exchangeForTokens(login).futureValue shouldBe 'left
   }
 
   "registered login credentials" should "be accepted when exchanging for token" in {
-    authFlow.registerSubjectLogin(subject, login).futureValue.right.get
-    authFlow.exchangeForTokens(login).futureValue.right.get
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.exchangeForTokens(login).futureValue shouldBe 'right
   }
 
   "token obtained by login" should "be validated" in {
-    val token = authFlow.exchangeForTokens(login).futureValue.right.get
-    authFlow.validateToken(token).futureValue.right.value should be (subject)
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    val token = authFlow.exchangeForTokens(login).futureValue.right.value
+    authFlow.validateToken(token).futureValue.right.value shouldBe subject
   }
 
   "multiple login with same values" should "not be accepted in registration" in {
-    authFlow.registerSubjectLogin(subject, login).futureValue.left.get
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'left
   }
 
   "multiple login with different values" should "be accepted in registration" in {
-    authFlow.registerSubjectLogin(subject2, login2).futureValue.right.get
-    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
-    authFlow.validateToken(token2).futureValue.right.value should be (subject2)
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
+    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.value
+    authFlow.validateToken(token2).futureValue.right.value shouldBe subject2
   }
 
   "single token unregistration" should "unregister only the specific token" in {
-    val token = authFlow.exchangeForTokens(login2).futureValue.right.get
-    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.get
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
+    val token = authFlow.exchangeForTokens(login).futureValue.right.value
+    val token2 = authFlow.exchangeForTokens(login2).futureValue.right.value
     authFlow.unregisterToken(token).futureValue
-    authFlow.validateToken(token).futureValue.left.get
-    authFlow.validateToken(token2).futureValue.right.get
+    authFlow.validateToken(token).futureValue shouldBe 'left
+    authFlow.validateToken(token2).futureValue shouldBe 'right
   }
 
   "token unregistration" should "unregister all subject's tokens" in {
-    val token = authFlow.exchangeForTokens(login).futureValue.right.get
-    val token2 = authFlow.exchangeForTokens(login).futureValue.right.get
-    val token3 = authFlow.exchangeForTokens(login2).futureValue.right.get
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject2, login2).futureValue shouldBe 'right
+    val token = authFlow.exchangeForTokens(login).futureValue.right.value
+    val token2 = authFlow.exchangeForTokens(login).futureValue.right.value
+    val token3 = authFlow.exchangeForTokens(login2).futureValue.right.value
     authFlow.unregisterAllSubjectTokens(subject).futureValue
-    authFlow.validateToken(token).futureValue.left.get
-    authFlow.validateToken(token2).futureValue.left.get
-    authFlow.validateToken(token3).futureValue.right.get
+    authFlow.validateToken(token).futureValue shouldBe 'left
+    authFlow.validateToken(token2).futureValue shouldBe 'left
+    authFlow.validateToken(token3).futureValue shouldBe 'right
   }
 
-  "single subject credentials unregistration" should "take effect" in  {
+  "single subject credentials unregistration" should "take effect" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
     authFlow.unregisterLogin(login).futureValue
-    authFlow.exchangeForTokens(login).futureValue.left.get
+    authFlow.exchangeForTokens(login).futureValue shouldBe 'left
   }
 
-  "subject credentials unregistration" should "take effect" in  {
-    authFlow.registerSubjectLogin(subject, login).futureValue.right.get
-    authFlow.registerSubjectLogin(subject, login3).futureValue.right.get
+  "subject credentials unregistration" should "take effect" in {
+    authFlow.registerSubjectLogin(subject, login).futureValue shouldBe 'right
+    authFlow.registerSubjectLogin(subject, login3).futureValue shouldBe 'right
     authFlow.unregisterAllSubjectLogins(subject).futureValue
-    authFlow.exchangeForTokens(login).futureValue.left.get
-    authFlow.exchangeForTokens(login3).futureValue.left.get
+    authFlow.exchangeForTokens(login).futureValue shouldBe 'left
+    authFlow.exchangeForTokens(login3).futureValue shouldBe 'left
   }
 
 }
