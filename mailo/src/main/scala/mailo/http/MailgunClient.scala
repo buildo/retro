@@ -1,6 +1,8 @@
 package mailo
 package http
 
+import com.typesafe.scalalogging.LazyLogging
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, RawHeader}
@@ -26,7 +28,7 @@ class MailgunClient(implicit
   system: ActorSystem,
   materializer: ActorMaterializer,
   conf: Config = ConfigFactory.load()
-) extends MailClient {
+) extends MailClient with LazyLogging {
   import MailClientError._
   import mailo.MailRefinedContent._
   import mailo.MailResponse
@@ -68,6 +70,7 @@ class MailgunClient(implicit
         entity = entity
       )
       response <- Http().singleRequest(request)
+      _ = logger.debug(s"response from server: $response")
       result <- response.status.intValue match {
         case 200 => Unmarshal(response.entity).to[MailResponse] map (_.asRight[MailError])
         case 400 => Future(BadRequest.asLeft[MailResponse])
