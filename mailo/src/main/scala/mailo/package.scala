@@ -1,5 +1,7 @@
 package mailo
 
+import com.typesafe.scalalogging.LazyLogging
+
 import mailo.http.MailClient
 import mailo.data.MailData
 import mailo.parser.HTMLParser
@@ -55,7 +57,7 @@ class Mailo(
   )(implicit
     ec: ExecutionContext,
     conf: Config = ConfigFactory.load()
-  ) {
+  ) extends LazyLogging {
   import MailRefinedContent._
 
   implicit private[this] val scalaCache = ScalaCache(GuavaCache())
@@ -78,7 +80,9 @@ class Mailo(
       content <- EitherT(cachingWithTTL(templateName)(mailoConfig.cachingTTLSeconds.seconds) {
         mailData.get(templateName)
       })
+      _ = logger.debug(s"retrieved $templateName content")
       parsedContent <- EitherT.fromEither(HTMLParser.parse(content, params))
+      _ = logger.debug(s"template populated with params: $params")
       result <- EitherT(mailClient.send(
         to = to,
         from = from,
@@ -87,6 +91,7 @@ class Mailo(
         attachments = attachments,
         tags = tags
       ))
+      _ = logger.info(s"email sent with id: ${result.id}")
     } yield result
 
     result.value
