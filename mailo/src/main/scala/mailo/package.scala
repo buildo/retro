@@ -91,7 +91,7 @@ class Mailo(
         attachments = attachments,
         tags = tags
       ))
-      _ = logger.info(s"email sent with result: $result")
+      _ = logger.info(s"email sent with id: ${result.id}")
     } yield result
 
     result.value
