@@ -1,6 +1,6 @@
 package io.buildo
 
-import java.time.OffsetDateTime
+import java.time.{ OffsetDateTime, Instant }
 import java.time.format.DateTimeFormatterBuilder
 
 import io.circe.{ Decoder, Encoder }
@@ -16,6 +16,7 @@ trait TimeCirceSupport extends TimeInstances {
   //overrides default circe encoder/decoder
   implicit val decodeOffsetDateTime: Decoder[OffsetDateTime] = decodeOffsetDateTimeDefault
   implicit val encodeOffsetDateTime: Encoder[OffsetDateTime] = encodeOffsetDateTime(dateTimeFormatter)
+  implicit val encodeInstantWithMillis: Encoder[Instant] = Encoder.encodeString.contramap(dateTimeFormatter.format)
 }
 
 package object circeTimeCodecs extends TimeCirceSupport
