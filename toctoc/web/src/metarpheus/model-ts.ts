@@ -1,5 +1,5 @@
 // DO NOT EDIT MANUALLY - metarpheus-generated
-import * as t from 'io-ts';
+import * as t from 'io-ts'
 
 export interface Unit {};
 export const Unit = t.strict({}, 'Unit');

@@ -11,11 +11,15 @@ export interface RouteConfig {
   unwrapApiResponse: (resp: any) => any
 }
 
-import { failure } from 'io-ts/lib/PathReporter'
-export function unsafeValidate<S, A>(value: any, type: t.Type<S, A>): A {
-  return t.validate(value, type).fold(errors => {
-    throw new Error(failure(errors).join('\n'))
-  }, t.identity)
+import { PathReporter } from 'io-ts/lib/PathReporter'
+function valueOrThrow<T extends t.Type<any, any>>(iotsType: T, value: T['_I']): t.TypeOf<T> {
+  const validatedValue = iotsType.decode(value);
+
+  if (validatedValue.isLeft()) {
+    throw new Error(PathReporter.report(validatedValue).join('\n'));
+  }
+
+  return validatedValue.value;
 }
 
 const parseError = (err: AxiosError) => {
@@ -43,7 +47,7 @@ export default function getRoutes(config: RouteConfig) {
           'Content-Type': 'application/json'
         },
         timeout: config.timeout
-      }).then(res => unsafeValidate(config.unwrapApiResponse(res.data), m.TocTocToken), parseError) as any
+      }).then(res => valueOrThrow(m.TocTocToken, config.unwrapApiResponse(res.data)), parseError) as any
     },
 
     tokenAuthenticationController_refresh: function ({ refreshToken }: { refreshToken: m.RefreshToken }): Promise<m.TocTocToken> {
@@ -60,7 +64,7 @@ export default function getRoutes(config: RouteConfig) {
           'Content-Type': 'application/json'
         },
         timeout: config.timeout
-      }).then(res => unsafeValidate(config.unwrapApiResponse(res.data), m.TocTocToken), parseError) as any
+      }).then(res => valueOrThrow(m.TocTocToken, config.unwrapApiResponse(res.data)), parseError) as any
     },
 
     tokenAuthenticationController_logout: function ({ token }: { token: string }): Promise<m.Unit> {
@@ -78,7 +82,7 @@ export default function getRoutes(config: RouteConfig) {
           'Authorization': `Token token="${token}"`
         },
         timeout: config.timeout
-      }).then(res => unsafeValidate(config.unwrapApiResponse(res.data), m.Unit), parseError) as any
+      }).then(res => valueOrThrow(m.Unit, config.unwrapApiResponse(res.data)), parseError) as any
     }
   }
 }
