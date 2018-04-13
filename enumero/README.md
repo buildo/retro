@@ -43,6 +43,13 @@ To enable the macro paradise plugin (for the `@enum` annotation), also add
 ```scala
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ```
+## Import
+
+Add the import in your file to make the `@enum` annotation available
+
+```scala
+import io.buildo.enumero.annotations.enum
+```
 
 ## Supported syntaxes
 The `object` keyword is optional in the case declarations. So this:
