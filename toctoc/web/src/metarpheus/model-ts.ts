@@ -1,4 +1,7 @@
 // DO NOT EDIT MANUALLY - metarpheus-generated
+import * as t from 'io-ts'
+
+// DO NOT EDIT MANUALLY - metarpheus-generated
 import * as t from 'io-ts';
 
 export interface Unit {};
