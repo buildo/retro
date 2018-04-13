@@ -27,7 +27,12 @@ res1: String = close
 
 ## Install
 
-Add the buildo/maven Bintray resolver and the dependency to your `build.sbt`
+Add the buildo/maven Bintray resolver
+```scala
+resolvers += "buildo at bintray" at "https://dl.bintray.com/buildo/maven"
+```
+
+and the dependency to your `build.sbt`
 
 ```scala
 libraryDependencies += "io.buildo" %% "enumero" % "..."
