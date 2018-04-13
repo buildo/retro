@@ -27,7 +27,12 @@ res1: String = close
 
 ## Install
 
-Add the buildo/maven Bintray resolver and the dependency to your `build.sbt`
+Add the buildo/maven Bintray resolver
+```scala
+resolvers += "buildo at bintray" at "https://dl.bintray.com/buildo/maven"
+```
+
+and the dependency to your `build.sbt`
 
 ```scala
 libraryDependencies += "io.buildo" %% "enumero" % "..."
@@ -37,6 +42,13 @@ To enable the macro paradise plugin (for the `@enum` annotation), also add
 
 ```scala
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+```
+## Import
+
+Add the import in your file to make the `@enum` annotation available
+
+```scala
+import io.buildo.enumero.annotations.enum
 ```
 
 ## Supported syntaxes
