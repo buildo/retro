@@ -38,6 +38,11 @@ and the dependency to your `build.sbt`
 libraryDependencies += "io.buildo" %% "enumero" % "..."
 ```
 
+and if you use [circe](https://circe.github.io/circe/) don't forget to add
+```scala
+libraryDependencies += "io.buildo" %% "enumero-circe-support" % "..."
+```
+
 To enable the macro paradise plugin (for the `@enum` annotation), also add
 
 ```scala
@@ -49,6 +54,11 @@ Add the import in your file to make the `@enum` annotation available
 
 ```scala
 import io.buildo.enumero.annotations.enum
+```
+
+add this import to support encoding and decoding with [circe](https://circe.github.io/circe/)
+```scala
+import io.buildo.enumero.circe._
 ```
 
 ## Supported syntaxes
