@@ -25,7 +25,8 @@ trait MailClient {
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
-    tags: List[String]
+    tags: List[String],
+    headers: Map[String, String] = Map.empty
   )(implicit
     executionContext: ExecutionContext
   ): Future[Either[MailError, MailResponse]]

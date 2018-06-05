@@ -45,7 +45,8 @@ class MailgunClient(implicit
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
-    tags: List[String]
+    tags: List[String],
+    headers: Map[String, String] = Map.empty
   )(implicit
     executionContext: scala.concurrent.ExecutionContext
   ): Future[Either[MailError, MailResponse]] = {
@@ -61,7 +62,8 @@ class MailgunClient(implicit
         subject = subject,
         content = content,
         attachments = attachments,
-        tags = tags
+        tags = tags,
+        headers = headers
       )
       request = HttpRequest(
         method = HttpMethods.POST,
@@ -105,7 +107,8 @@ class MailgunClient(implicit
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
-    tags: List[String]
+    tags: List[String],
+    headers: Map[String, String]
   )(implicit
     executionCon: scala.concurrent.ExecutionContext
   ): Future[RequestEntity] = {
@@ -119,11 +122,15 @@ class MailgunClient(implicit
 
     val attachmentsForm = attachments map (attachment => attachmentForm(attachment.name, attachment.`type`, attachment.content, attachment.transferEncoding))
 
+    val headersForm = headers.map { case (k, v) =>
+      Multipart.FormData.BodyPart.Strict(s"h:$k", v)
+    }
+
     val multipartForm = Multipart.FormData(Source(List(
       Multipart.FormData.BodyPart.Strict("from", from),
       Multipart.FormData.BodyPart.Strict("to", to),
       Multipart.FormData.BodyPart.Strict("subject", subject)
-    ) ++ tagsForm ++ attachmentsForm :+ contentForm ))
+    ) ++ tagsForm ++ attachmentsForm ++ headersForm :+ contentForm ))
 
     Marshal(multipartForm).to[RequestEntity]
   }
