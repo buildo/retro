@@ -25,7 +25,7 @@ trait MailClient {
     to: String,
     from: String,
     cc: Option[String] = None,
-    ccn: Option[String] = None,
+    bcc: Option[String] = None,
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],

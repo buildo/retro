@@ -70,6 +70,8 @@ class Mailo(
   def send(
     to: String,
     from: String,
+    cc: Option[String] = None,
+    bcc: Option[String] = None,
     subject: String,
     templateName: String,
     params: Map[String, String],
@@ -86,6 +88,8 @@ class Mailo(
       result <- EitherT(mailClient.send(
         to = to,
         from = from,
+        cc = cc,
+        bcc = bcc,
         subject = subject,
         content = HTMLContent(parsedContent),
         attachments = attachments,
@@ -114,13 +118,15 @@ class S3MailgunMailo(implicit
   def send(
     to: String,
     from: String,
+    cc: Option[String] = None,
+    bcc: Option[String] = None,
     subject: String,
     templateName: String,
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
     tags: List[String] = Nil
   ): Future[Either[MailError, MailResponse]] =
-    mailgunS3Mailo.send(to, from, subject, templateName, params, attachments, tags)
+    mailgunS3Mailo.send(to, from, cc, bcc, subject, templateName, params, attachments, tags)
 }
 
 package object util {

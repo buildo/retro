@@ -88,6 +88,8 @@ And sent as:
 mailer.send(
    to = "recipient@mail.com",
    from = "Mailo sender@mail.com",
+   cc = Some("ccrecipient@mail.com"),
+   bcc = Some("bccrecipient@mail.com"),
    subject = "Test mail",
    templateName = "mail.html",
    params = Map("ciao" -> "CIAOOOONE"),
