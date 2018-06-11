@@ -76,7 +76,8 @@ class Mailo(
     templateName: String,
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
-    tags: List[String] = Nil
+    tags: List[String] = Nil,
+    headers: Map[String, String] = Map.empty
   ): Future[Either[MailError, MailResponse]] = {
     val result = for {
       content <- EitherT(cachingWithTTL(templateName)(mailoConfig.cachingTTLSeconds.seconds) {
@@ -93,7 +94,8 @@ class Mailo(
         subject = subject,
         content = HTMLContent(parsedContent),
         attachments = attachments,
-        tags = tags
+        tags = tags,
+        headers = headers
       ))
       _ = logger.info(s"email sent with id: ${result.id}")
     } yield result

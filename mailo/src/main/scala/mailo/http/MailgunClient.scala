@@ -13,15 +13,21 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, ExecutionContext}
+import javax.mail.Message.RecipientType
+import javax.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import cats.data.EitherT
 import cats.syntax.either._
+import cats.instances.future._
+import cats.instances.either._
 
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
 
+import scala.util.Try
 import util._
 
 class MailgunClient(
@@ -30,16 +36,63 @@ class MailgunClient(
   materializer: ActorMaterializer,
   conf: Config = ConfigFactory.load()
 ) extends MailClient
+    with MimeMailClient
     with LazyLogging {
   import MailClientError._
   import mailo.MailRefinedContent._
   import mailo.MailResponse
+  import mailo.MailError
 
   private[this] case class MailgunConfig(key: String, uri: String)
   private[this] val mailgunConfig = MailgunConfig(
     key = conf.getString("mailo.mailgun.key"),
     uri = conf.getString("mailo.mailgun.uri")
   )
+  private[this] val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
+
+
+  def sendMime(
+    message: MimeMessage,
+    tags: List[String] = List.empty,
+    attachments: List[Attachment] = List.empty,
+    headers: Map[String, String] = Map.empty
+  )(
+    implicit
+    executionContext: ExecutionContext
+  ): Future[Either[MailError, MailResponse]] = {
+    val inputs = for {
+      toRecipients <- message.getRecipients(RecipientType.TO) match {
+        case addresses if addresses.nonEmpty => addresses.asRight
+        case _ => InvalidInput("No recipients in MimeMessage").asLeft
+      }
+      ccRecipients <- message.getRecipients(RecipientType.CC).asRight
+      bccRecipients <- message.getRecipients(RecipientType.BCC).asRight
+      fromAddress <- Either.fromOption(Option(message.getFrom()), InvalidInput("No 'from' in MimeMessage"): MailError)
+      subject <- Either.fromOption(Option(message.getSubject()), InvalidInput("No 'subject' in MimeMessage"): MailError)
+    } yield {
+      val to = toRecipients.map(_.toString).mkString(",")
+      val mimeMessage = {
+        val out = new java.io.ByteArrayOutputStream
+        message.writeTo(out)
+        out.toString
+      }
+      (to, mimeMessage)
+    }
+
+    (for {
+      inputs <- EitherT.fromEither[Future](inputs)
+      (to, message) = inputs
+      entity <- EitherT.liftF(mimeEntity(to, message, tags, headers, attachments))
+      request = HttpRequest(
+        method = HttpMethods.POST,
+        uri = s"${mailgunConfig.uri}/messages.mime",
+        headers = List(auth),
+        entity = entity
+      )
+      res <- EitherT(sendRequest(request))
+    } yield res).value
+  }
+
 
   def send(
     to: String,
@@ -54,13 +107,8 @@ class MailgunClient(
   )(
     implicit
     executionContext: scala.concurrent.ExecutionContext
-  ): Future[Either[MailError, MailResponse]] = {
-    import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
-    import io.circe.generic.auto._
-
-    val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
-
-    val res = (for {
+  ): Future[Either[MailError, MailResponse]] =
+    for {
       entity <- entity(
         from = from,
         to = to,
@@ -78,6 +126,16 @@ class MailgunClient(
         headers = List(auth),
         entity = entity
       )
+      res <- sendRequest(request)
+    } yield res
+
+  private[this] def sendRequest(request: HttpRequest)(implicit
+    ec: ExecutionContext
+  ): Future[Either[MailError, MailResponse]] = {
+    import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
+    import io.circe.generic.auto._
+
+    (for {
       response <- Http().singleRequest(request)
       _ = logger.debug(s"response from server: $response")
       result <- response.status.intValue match {
@@ -94,8 +152,6 @@ class MailgunClient(
       case t: Throwable =>
         UnkownError(t.getStackTraceAsString).asLeft[MailResponse]
     }
-
-    res
   }
 
   private[this] def attachmentForm(
@@ -115,6 +171,46 @@ class MailgunClient(
     )
   }
 
+  private[this] def tagsForm(tags: List[String]) =
+    tags.map(Multipart.FormData.BodyPart.Strict("o:tag", _))
+
+  private[this] def headersForm(headers: Map[String, String]) =
+    headers.map { case (k, v) => Multipart.FormData.BodyPart.Strict(s"h:$k", v) }
+
+  private[this] def mimeEntity(
+    to: String,
+    message: String,
+    tags: List[String],
+    headers: Map[String, String],
+    attachments: List[Attachment]
+  )(implicit ec: ExecutionContext): Future[RequestEntity] = {
+
+    val attachmentsForm = attachments.map(
+      attachment =>
+        attachmentForm(
+          attachment.name,
+          attachment.`type`,
+          attachment.content,
+          attachment.transferEncoding
+      )
+    )
+
+    val multipartForm = Multipart.FormData(
+      Source(
+        List(
+          Multipart.FormData.BodyPart.Strict(
+            name = "message",
+            entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`, ByteString(message)),
+            additionalDispositionParams = Map("filename" -> "message")
+          ),
+          Multipart.FormData.BodyPart.Strict("to", to)
+        ) ++ tagsForm(tags) ++ headersForm(headers) ++ attachmentsForm
+      )
+    )
+
+    Marshal(multipartForm).to[RequestEntity]
+  }
+
   private[this] def entity(
     from: String,
     to: String,
@@ -130,7 +226,6 @@ class MailgunClient(
     executionCon: scala.concurrent.ExecutionContext
   ): Future[RequestEntity] = {
     import mailo.MailRefinedContent._
-    val tagsForm = tags.map(Multipart.FormData.BodyPart.Strict("o:tag", _))
 
     val contentForm = content match {
       case HTMLContent(html) => Multipart.FormData.BodyPart.Strict("html", html)
@@ -147,11 +242,6 @@ class MailgunClient(
       )
     )
 
-    val headersForm = headers.map {
-      case (k, v) =>
-        Multipart.FormData.BodyPart.Strict(s"h:$k", v)
-    }
-
     val multipartForm = Multipart.FormData(
       Source(
         List(
@@ -161,10 +251,11 @@ class MailgunClient(
         ) ++ List(
           cc.map(Multipart.FormData.BodyPart.Strict("cc", _)),
           bcc.map(Multipart.FormData.BodyPart.Strict("bcc", _))
-        ).flatten ++ tagsForm ++ attachmentsForm ++ headersForm :+ contentForm
+        ).flatten ++ tagsForm(tags) ++ attachmentsForm ++ headersForm(headers) :+ contentForm
       )
     )
 
     Marshal(multipartForm).to[RequestEntity]
   }
+
 }

@@ -10,12 +10,13 @@ val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
+val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
 
 val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   organization  := "io.buildo",
-  version       := "0.4.3",
+  version       := "0.4.4",
   scalaVersion  := "2.12.4",
   crossScalaVersions := Seq("2.11.12", "2.12.4"),
   scalacOptions := Seq(
@@ -47,7 +48,8 @@ lazy val mailo = (project in file(".")).
       akkaHttpCirce,
       scalaCacheGuava,
       scalaLogging,
-      logback
+      logback,
+      javaxMail,
     )
   )
 

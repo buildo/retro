@@ -14,6 +14,7 @@ object MailClientError {
       extends MailError("500, 502, 503, 504 Server Errors - something is wrong on the email server")
   case object UnknownCode extends MailError("Unknown response")
   case class UnkownError(msg: String) extends MailError(msg)
+  case class InvalidInput(msg: String) extends MailError(msg)
 }
 
 trait MailClient {
@@ -24,13 +25,28 @@ trait MailClient {
   def send(
     to: String,
     from: String,
-    cc: Option[String] = None,
-    bcc: Option[String] = None,
+    cc: Option[String],
+    bcc: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
     tags: List[String],
-    headers: Map[String, String] = Map.empty
+    headers: Map[String, String]
+  )(
+    implicit
+    executionContext: ExecutionContext
+  ): Future[Either[MailError, MailResponse]]
+}
+
+trait MimeMailClient {
+  import mailo.MailResponse
+  import javax.mail.internet.MimeMessage
+
+  def sendMime(
+    message: MimeMessage,
+    tags: List[String],
+    attachments: List[Attachment],
+    headers: Map[String, String]
   )(
     implicit
     executionContext: ExecutionContext
