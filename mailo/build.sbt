@@ -11,6 +11,7 @@ val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
 val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
+val mailin = "com.sendinblue" % "sendinblue" % "2.0"
 
 val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
