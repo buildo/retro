@@ -2,7 +2,6 @@
 # Created by https://www.gitignore.io/api/scala
 
 ### Scala ###
-*.conf
 *.class
 *.log
 
