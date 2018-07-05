@@ -9,26 +9,20 @@ import cats.syntax.traverse._
 import cats.instances.map._
 import cats.instances.either._
 import alleycats.std.all._
+import mailo.data.S3MailDataError._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
-import mailo.MailError
+import mailo.{MailError, MailRawContent}
 
 import scala.language.postfixOps
-
-object S3MailDataError {
-  case object ObjectNotFound extends MailError("S3 object not found")
-  case object BucketNotFound extends MailError("S3 bucket not found")
-  case class S3InternalError(message: String) extends MailError(message)
-}
+import scala.util.{Failure, Success, Try}
 
 class S3MailData(
   implicit
   ec: ExecutionContext,
   conf: com.typesafe.config.Config = ConfigFactory.load()
 ) extends MailData {
-  import mailo.MailRawContent
-  import S3MailDataError._
   type EitherMailError[A] = Either[MailError, A]
 
   private[S3MailData] case class S3Config(
@@ -73,27 +67,25 @@ class S3MailData(
   }
 
   private[this] def getObjects(folder: String): Either[MailError, Set[String]] = {
-    try {
-      bucket match {
-        case Some(b) => b.keys(folder).toSet.filter(_ != s"$folder/").asRight[MailError]
-        case None    => ObjectNotFound.asLeft[Set[String]]
-      }
-    } catch {
-      case e: Exception => S3InternalError(e.getMessage).asLeft[Set[String]]
+    Try(bucket match {
+      case Some(b) => b.keys(folder).toSet.filter(_ != s"$folder/").asRight[MailError]
+      case None    => ObjectNotFound.asLeft[Set[String]]
+    }) match {
+      case Success(result) => result
+      case Failure(e) => S3InternalError(e.getMessage).asLeft[Set[String]]
     }
   }
 
   private[this] def getObject(name: String): Either[MailError, String] =
-    try {
-      bucket match {
+     Try(bucket match {
         case Some(b) =>
           b.getObject(name) match {
             case Some(o) => convertStreamToString(o.content).asRight[MailError]
             case None    => ObjectNotFound.asLeft[String]
           }
         case None => BucketNotFound.asLeft[String]
-      }
-    } catch {
-      case e: Exception => S3InternalError(e.getMessage).asLeft[String]
-    }
+     }) match {
+       case Success(result) => result
+       case Failure(e) => S3InternalError(e.getMessage).asLeft[String]
+     }
 }
