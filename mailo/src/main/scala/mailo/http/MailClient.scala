@@ -20,7 +20,6 @@ object MailClientError {
 trait MailClient {
   import mailo.MailRefinedContent._
   import mailo.MailResponse
-  import MailClientError._
 
   def send(
     to: String,

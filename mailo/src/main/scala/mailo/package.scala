@@ -15,7 +15,7 @@ import akka.stream.ActorMaterializer
 import cats.data.EitherT
 import cats.instances.future._
 
-import com.typesafe.config.{ ConfigFactory, Config }
+import com.typesafe.config.{Config, ConfigFactory}
 
 import akka.http.scaladsl.model.ContentType
 
@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 import scalacache._
 import guava._
 
-import java.io.{ StringWriter, PrintWriter }
+import java.io.{PrintWriter, StringWriter}
 
 case class Attachment(
   name: String,
@@ -52,12 +52,13 @@ object MailRefinedContent {
 abstract class MailError(message: String) extends RuntimeException(message)
 
 class Mailo(
-    mailData: MailData,
-    mailClient: MailClient
-  )(implicit
-    ec: ExecutionContext,
-    conf: Config = ConfigFactory.load()
-  ) extends LazyLogging {
+  mailData: MailData,
+  mailClient: MailClient
+)(
+  implicit
+  ec: ExecutionContext,
+  conf: Config = ConfigFactory.load()
+) extends LazyLogging {
   import MailRefinedContent._
 
   implicit private[this] val scalaCache = ScalaCache(GuavaCache())
@@ -86,17 +87,19 @@ class Mailo(
       _ = logger.debug(s"retrieved $templateName content")
       parsedContent <- EitherT.fromEither(HTMLParser.parse(content, params))
       _ = logger.debug(s"template populated with params: $params")
-      result <- EitherT(mailClient.send(
-        to = to,
-        from = from,
-        cc = cc,
-        bcc = bcc,
-        subject = subject,
-        content = HTMLContent(parsedContent),
-        attachments = attachments,
-        tags = tags,
-        headers = headers
-      ))
+      result <- EitherT(
+        mailClient.send(
+          to = to,
+          from = from,
+          cc = cc,
+          bcc = bcc,
+          subject = subject,
+          content = HTMLContent(parsedContent),
+          attachments = attachments,
+          tags = tags,
+          headers = headers
+        )
+      )
       _ = logger.info(s"email sent with id: ${result.id}")
     } yield result
 
@@ -104,11 +107,12 @@ class Mailo(
   }
 }
 
-class S3MailgunMailo(implicit
+class S3MailgunMailo(
+  implicit
   system: ActorSystem,
   materializer: ActorMaterializer,
   ec: ExecutionContext
-){
+) {
   import data.S3MailData
   import http.MailgunClient
 
@@ -133,7 +137,7 @@ class S3MailgunMailo(implicit
 
 package object util {
   implicit class PimpThrowable(t: Throwable) {
-    def getStackTraceAsString = {
+    def getStackTraceAsString: String = {
       val sw = new StringWriter
       t.printStackTrace(new PrintWriter(sw))
       sw.toString
