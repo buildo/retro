@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `toctoc` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `toctoc`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: 127.0.0.1    Database: toctoc
@@ -26,12 +24,12 @@ DROP TABLE IF EXISTS `access_token_auth_domain`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `access_token_auth_domain` (
   `id` int(11) NOT NULL,
-  `ref` varchar(45) NOT NULL,
-  `token` varchar(45) NOT NULL,
-  `expires_at` datetime NOT NULL,
+  `ref` TEXT NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `token_UNIQUE` (`token`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,23 +49,21 @@ DROP TABLE IF EXISTS `login_auth_domain`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `login_auth_domain` (
-  `id` int(11) NOT NULL,
-  `ref` varchar(45) NOT NULL,
-  `username` varchar(45) NOT NULL,
-  `password_hash` varchar(45) NOT NULL,
+  `id` SERIAL NOT NULL,
+  `ref` TEXT NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password_hash` TEXT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `login_auth_domain`
 --
 
-LOCK TABLES `login_auth_domain` WRITE;
 /*!40000 ALTER TABLE `login_auth_domain` DISABLE KEYS */;
 /*!40000 ALTER TABLE `login_auth_domain` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

@@ -26,16 +26,16 @@ object Dependencies {
   lazy val coreDependencies = List(
     bCrypt,
     cats,
-    enumero
+    enumero,
   )
 
   lazy val slickDependencies = List(
     slick,
     postgresql,
-    slickHikari
+    slickHikari,
   ) ++ List(
     scalatest,
-    slf4jNop
+    slf4jNop,
   ).map(_ % Test)
 
   lazy val slickMySqlDependencies = List(
@@ -44,7 +44,7 @@ object Dependencies {
     slickHikari,
   ) ++ List(
     scalatest,
-    slf4jNop
+    slf4jNop,
   ).map(_ % Test)
 
   lazy val quillDependencies = List(
@@ -54,11 +54,11 @@ object Dependencies {
     quillAsyncPostgres,
     slf4jNop,
     flywayCore,
-    postgresql
+    postgresql,
   ).map(_ % Test)
 
   lazy val wiroDependencies = List(
     wiroServer,
-    cats
+    cats,
   )
 }
