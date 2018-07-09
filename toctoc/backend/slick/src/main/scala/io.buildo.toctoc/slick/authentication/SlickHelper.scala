@@ -8,7 +8,7 @@ import java.time.Instant
 import java.sql.Timestamp
 
 object SlickHelper {
-  implicit val boolColumnType = MappedColumnType.base[Instant, Timestamp](
+  implicit val timeStampColumnType = MappedColumnType.base[Instant, Timestamp](
     { i => Timestamp.from(i) },
     { t => t.toInstant() }
   )
