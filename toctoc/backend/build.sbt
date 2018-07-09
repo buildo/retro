@@ -42,8 +42,15 @@ lazy val core = project
 
 lazy val slick = project
   .settings(
-    name := "toctoc-slick",
+    name := "toctoc-slick-postgres",
     libraryDependencies ++= slickDependencies
+  )
+  .dependsOn(core)
+
+lazy val slickMySql = project
+  .settings(
+    name := "toctoc-slick-mysql",
+    libraryDependencies ++= slickMySqlDependencies
   )
   .dependsOn(core)
 
