@@ -67,3 +67,5 @@ lazy val wiro = project
     libraryDependencies ++= wiroDependencies
   )
   .dependsOn(core)
+
+parallelExecution in Test := false

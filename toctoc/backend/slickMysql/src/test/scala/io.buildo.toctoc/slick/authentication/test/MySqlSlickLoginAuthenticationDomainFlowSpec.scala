@@ -11,7 +11,10 @@ import _root_.slick.jdbc.JdbcBackend.Database
 import io.buildo.toctoc.slick.authentication.login.MySqlSlickLoginAuthenticationDomain
 import io.buildo.toctoc.slick.authentication.token.MySqlSlickAccessTokenAuthenticationDomain
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+
 
 class MySqlSlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   with BeforeAndAfterEach
@@ -39,7 +42,9 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   override def afterAll(): Unit = {
+    println("Dropping schema")
     db.run(schema.drop).futureValue
+    println("Ending tests")
     db.close()
   }
 
