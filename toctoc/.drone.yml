@@ -27,6 +27,7 @@ pipeline:
       - DB_PASSWORD=
       - DB_SERVER=database
       - DB_NAME=toctoc
+      - MYSQL_DB_URL=jdbc:mysql://MySqlDatabase:3306/toctoc?useSSL=false
 
   frontend-test:
     group: test
