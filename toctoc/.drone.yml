@@ -19,7 +19,7 @@ pipeline:
     image: hseeberger/scala-sbt
     commands:
       - cd backend
-      - sbt slick/test      
+      - sbt slick/test
       - sbt quill/test
       - sbt slickMySql/test
     environment:
