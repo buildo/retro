@@ -11,11 +11,13 @@ object Dependencies {
 
   val slick = "com.typesafe.slick" %% "slick" % V.slick
   val slickHikari = "com.typesafe.slick" %% "slick-hikaricp" % V.slick
-  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
+  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.25"
   val postgresql = "org.postgresql" % "postgresql" % "9.4.1212"
-  val enumero = "io.buildo" %% "enumero" % "1.1.0"
-  val wiroServer = "io.buildo" %% "wiro-http-server" % "0.5.2"
-  val cats = "org.typelevel" %% "cats-core" % "0.9.0"
+  val enumero = "io.buildo" %% "enumero" % "1.2.1"
+  //Note that wiro 0.6.12 references cats 1.1.0 and circe 0.9.0, that refers to cats 1.0.1, but the two versions of cats
+  //are binary compatible by docs: https://github.com/typelevel/cats/releases
+  val wiroServer = "io.buildo" %% "wiro-http-server" % "0.6.12"
+  val cats = "org.typelevel" %% "cats-core" % "1.1.0"
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
   val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
   val quillAsync = "io.getquill" %% "quill-async" % V.quill
