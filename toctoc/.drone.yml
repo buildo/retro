@@ -21,6 +21,7 @@ pipeline:
       - cd backend
       - sbt slick/test
       - sbt quill/test
+      - sbt slickMySql/test
     environment:
       - DB_USER=postgres
       - DB_PASSWORD=
@@ -59,6 +60,15 @@ pipeline:
 services:
   database:
     image: postgres
+    ports:
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=toctoc
+  MySqlDatabase:    
+    image: mysql:5.7    
+    ports:
+      - '3306:3306'
+    environment:      
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: toctoc
