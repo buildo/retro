@@ -21,6 +21,7 @@ object Dependencies {
   val quillAsync = "io.getquill" %% "quill-async" % V.quill
   val quillAsyncPostgres = "io.getquill" %% "quill-async-postgres" % V.quill
   val flywayCore = "org.flywaydb" % "flyway-core" % "5.0.7"
+  val mysql =  "mysql" % "mysql-connector-java" % "8.0.11"
 
   lazy val coreDependencies = List(
     bCrypt,
@@ -37,8 +38,17 @@ object Dependencies {
     slf4jNop,
   ).map(_ % Test)
 
+  lazy val slickMySqlDependencies = List(
+    slick,
+    mysql,
+    slickHikari,
+  ) ++ List(
+    scalatest,
+    slf4jNop,
+  ).map(_ % Test)
+
   lazy val quillDependencies = List(
-    quillAsync,
+    quillAsync
   ) ++ List(
     scalatest,
     quillAsyncPostgres,

@@ -47,6 +47,13 @@ lazy val slick = project
   )
   .dependsOn(core)
 
+lazy val slickMySql = project
+  .settings(
+    name := "toctoc-slick-mysql",
+    libraryDependencies ++= slickMySqlDependencies
+  )
+  .dependsOn(core)
+
 lazy val quill = project
   .settings(
     name := "toctoc-quill",
@@ -60,3 +67,5 @@ lazy val wiro = project
     libraryDependencies ++= wiroDependencies
   )
   .dependsOn(core)
+
+parallelExecution in Test := false

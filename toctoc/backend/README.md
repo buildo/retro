@@ -4,7 +4,8 @@ This is the backend-side of toctoc. It comes in different modules:
 
 - `toctoc-core`: defines the abstractions
 - `toctoc-wiro`: provides wiro-specific controllers
-- `toctoc-slick`: provides slick-specific implementations
+- `toctoc-slick`: provides slick-specific implementations for Postgres databases
+- `toctoc-slick-mysql`: provides slick-specific implementations for MySql databases
 - `toctoc-quill`: provides quill-specific implementations
 
 ## Quick start:
