@@ -42,9 +42,7 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends FlatSpec
   }
 
   override def afterAll(): Unit = {
-    println("Dropping schema")
     db.run(schema.drop).futureValue
-    println("Ending tests")
     db.close()
   }
 
