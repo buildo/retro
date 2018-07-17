@@ -131,6 +131,33 @@ class S3MailgunMailo(implicit
     mailgunS3Mailo.send(to, from, cc, bcc, subject, templateName, params, attachments, tags)
 }
 
+class S3SendinblueMailo(implicit
+  system: ActorSystem,
+  materializer: ActorMaterializer,
+  ec: ExecutionContext
+){
+  import data.S3MailData
+  import http.SendinblueClient
+
+  private[this] val s3 = new S3MailData()
+  private[this] val sendinblue = new SendinblueClient()
+
+  private[this] val sendinblueS3Mailo = new Mailo(s3, sendinblue)
+
+  def send(
+    to: String,
+    from: String,
+    cc: Option[String] = None,
+    bcc: Option[String] = None,
+    subject: String,
+    templateName: String,
+    params: Map[String, String],
+    attachments: List[Attachment] = Nil,
+    tags: List[String] = Nil
+  ): Future[Either[MailError, MailResponse]] =
+    sendinblueS3Mailo.send(to, from, cc, bcc, subject, templateName, params, attachments, tags)
+}
+
 package object util {
   implicit class PimpThrowable(t: Throwable) {
     def getStackTraceAsString = {

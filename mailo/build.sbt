@@ -51,6 +51,7 @@ lazy val mailo = (project in file(".")).
       scalaLogging,
       logback,
       javaxMail,
+      mailin,
     )
   )
 
