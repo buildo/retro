@@ -31,6 +31,8 @@ import scala.util.Try
 import util._
 import com.sendinblue.Sendinblue
 
+import io.circe._, io.circe.generic.auto._, io.circe.parser.decode
+
 class SendinblueClient(
   implicit
   system: ActorSystem,
@@ -49,6 +51,9 @@ class SendinblueClient(
     key = conf.getString("mailo.sendinblue.key")
   )
   private[this] val sendinblue = new Sendinblue("https://api.sendinblue.com/v2.0", sendinblueConfig.key)
+
+  case class SendinblueResponse(code: String, message: String, data: SendinblueResponseData)
+  case class SendinblueResponseData(`message-id`: Option[String])
 
 
   def sendMime(
@@ -90,10 +95,13 @@ class SendinblueClient(
         headers = headers
       )
       res <- Future(sendinblue.send_email(entity))
+      jsonRes = decode[SendinblueResponse](res)
     } yield {
-      println(res)
-      res match {
-        case _ => MailResponse("", res).asRight[MailError]
+      jsonRes match {
+        case Right(SendinblueResponse(code, message, SendinblueResponseData(Some(messageId)))) if code == "success" =>
+          MailResponse(messageId, message).asRight[MailError]
+        case _ =>
+          UnknownCode.asLeft[MailResponse]
       }
     }
 
@@ -116,7 +124,7 @@ class SendinblueClient(
     toMap.put(to, "")
     data.put("to", toMap)
 
-    data.put("from", Array(from))
+    data.put("from", from.split(" ").toList.reverse.toArray)
 
     data.put("subject", subject)
 

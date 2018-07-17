@@ -6,6 +6,7 @@ val alleyCatsCore = "org.typelevel" %% "alleycats-core" % "1.0.1"
 val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % "1.19.0"
 val circeCore = "io.circe" %% "circe-core" % "0.9.0"
 val circeGeneric = "io.circe" %% "circe-generic" % "0.9.0"
+val circeParser = "io.circe" %% "circe-parser" % "0.9.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
@@ -45,6 +46,7 @@ lazy val mailo = (project in file(".")).
       alleyCatsCore,
       circeCore,
       circeGeneric,
+      circeParser,
       typesafeConfig,
       akkaHttpCirce,
       scalaCacheGuava,
