@@ -1,8 +1,10 @@
 package mailo.http
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import mailo.{Attachment, MailError}
+import javax.mail.internet.MimeMessage
+import mailo.MailRefinedContent._
+import mailo.{Attachment, MailError, MailResponse}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object MailClientError {
   case object BadRequest extends MailError("400 Bad Request - Often missing a required parameter")
@@ -18,10 +20,6 @@ object MailClientError {
 }
 
 trait MailClient {
-  import mailo.MailRefinedContent._
-  import mailo.MailResponse
-  import MailClientError._
-
   def send(
     to: String,
     from: String,
@@ -39,9 +37,6 @@ trait MailClient {
 }
 
 trait MimeMailClient {
-  import mailo.MailResponse
-  import javax.mail.internet.MimeMessage
-
   def sendMime(
     message: MimeMessage,
     tags: List[String],

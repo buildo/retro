@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/scala
 
 ### Scala ###
-*.conf
+application.conf
 *.class
 *.log
 
@@ -24,3 +24,5 @@ project/plugins/project/
 
 # OSx
 .DS_Store
+
+.idea

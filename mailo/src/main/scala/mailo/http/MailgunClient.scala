@@ -13,7 +13,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import javax.mail.Message.RecipientType
 import javax.mail.internet.MimeMessage
 
@@ -22,12 +22,10 @@ import com.typesafe.config.{Config, ConfigFactory}
 import cats.data.EitherT
 import cats.syntax.either._
 import cats.instances.future._
-import cats.instances.either._
 
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
 
-import scala.util.Try
 import util._
 
 class MailgunClient(
@@ -40,8 +38,6 @@ class MailgunClient(
     with LazyLogging {
   import MailClientError._
   import mailo.MailRefinedContent._
-  import mailo.MailResponse
-  import mailo.MailError
 
   private[this] case class MailgunConfig(key: String, uri: String)
   private[this] val mailgunConfig = MailgunConfig(
@@ -49,7 +45,6 @@ class MailgunClient(
     uri = conf.getString("mailo.mailgun.uri")
   )
   private[this] val auth = Authorization(BasicHttpCredentials("api", mailgunConfig.key))
-
 
   def sendMime(
     message: MimeMessage,
@@ -63,12 +58,18 @@ class MailgunClient(
     val inputs = for {
       toRecipients <- message.getRecipients(RecipientType.TO) match {
         case addresses if addresses.nonEmpty => addresses.asRight
-        case _ => InvalidInput("No recipients in MimeMessage").asLeft
+        case _                               => InvalidInput("No recipients in MimeMessage").asLeft
       }
       ccRecipients <- message.getRecipients(RecipientType.CC).asRight
       bccRecipients <- message.getRecipients(RecipientType.BCC).asRight
-      fromAddress <- Either.fromOption(Option(message.getFrom()), InvalidInput("No 'from' in MimeMessage"): MailError)
-      subject <- Either.fromOption(Option(message.getSubject()), InvalidInput("No 'subject' in MimeMessage"): MailError)
+      fromAddress <- Either.fromOption(
+        Option(message.getFrom()),
+        InvalidInput("No 'from' in MimeMessage"): MailError
+      )
+      subject <- Either.fromOption(
+        Option(message.getSubject()),
+        InvalidInput("No 'subject' in MimeMessage"): MailError
+      )
     } yield {
       val to = toRecipients.map(_.toString).mkString(",")
       val mimeMessage = {
@@ -92,7 +93,6 @@ class MailgunClient(
       res <- EitherT(sendRequest(request))
     } yield res).value
   }
-
 
   def send(
     to: String,
@@ -129,7 +129,8 @@ class MailgunClient(
       res <- sendRequest(request)
     } yield res
 
-  private[this] def sendRequest(request: HttpRequest)(implicit
+  private[this] def sendRequest(request: HttpRequest)(
+    implicit
     ec: ExecutionContext
   ): Future[Either[MailError, MailResponse]] = {
     import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
@@ -141,12 +142,12 @@ class MailgunClient(
       result <- response.status.intValue match {
         case 200 =>
           Unmarshal(response.entity).to[MailResponse].map(_.asRight[MailError])
-        case 400 => Future(BadRequest.asLeft[MailResponse])
-        case 401 => Future(Unauthorized.asLeft[MailResponse])
-        case 402 => Future(RequestFailed.asLeft[MailResponse])
-        case 404 => Future(NotFound.asLeft[MailResponse])
+        case 400                   => Future(BadRequest.asLeft[MailResponse])
+        case 401                   => Future(Unauthorized.asLeft[MailResponse])
+        case 402                   => Future(RequestFailed.asLeft[MailResponse])
+        case 404                   => Future(NotFound.asLeft[MailResponse])
         case 500 | 502 | 503 | 504 => Future(ServerError.asLeft[MailResponse])
-        case _ => Future(UnknownCode.asLeft[MailResponse])
+        case _                     => Future(UnknownCode.asLeft[MailResponse])
       }
     } yield result).recover {
       case t: Throwable =>
@@ -166,7 +167,7 @@ class MailgunClient(
       additionalDispositionParams = Map("filename" -> name),
       additionalHeaders = transferEncoding match {
         case Some(e) => List(RawHeader("Content-Transfer-Encoding", e))
-        case None => Nil
+        case None    => Nil
       }
     )
   }
