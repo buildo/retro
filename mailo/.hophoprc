@@ -1,5 +1,5 @@
 branchPrefix: n
-branchSuffix: n
+branchSuffix: y
 validBranchPrefixes:
   - mailo
   - client
