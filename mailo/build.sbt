@@ -15,12 +15,39 @@ val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
 val mailin = "com.sendinblue" % "sendinblue" % "2.0"
 
 val commonSettings = Seq(
-  bintrayOrganization := Some("buildo"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+  bintrayOrganization := Some("buildo"),
   organization  := "io.buildo",
-  version       := "0.5.0",
   scalaVersion  := "2.12.4",
   crossScalaVersions := Seq("2.11.12", "2.12.4"),
+  releaseEarlyWith := BintrayPublisher,
+  releaseEarlyNoGpg := true,
+  releaseEarlyEnableSyncToMaven := false,
+  developers := List(
+    Developer("@danielegallingani",
+      "Daniele Gallingani",
+      "daniele@buildo.io",
+      url("https://buildo.io")),
+    Developer("@bytecodeguru",
+      "Giuseppe Moscarella",
+      "giuseppe.moscarella@buildo.io",
+      url("https://buildo.io")),
+    Developer("@gabro",
+      "Gabriele Petronella",
+      "gabriele@buildo.io",
+      url("https://buildo.io")),
+    Developer("@calippo",
+      "Claudio Caletti",
+      "claudio@buildo.io",
+      url("https://buildo.io"))
+  ),
+  homepage := Some(url("https://github.com/buildo/toctoc")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/buildo/toctoc"),
+      "scm:git:https://github.com/buildo/toctoc.git",
+      Some("scm:git:git@github.com:buildo/toctoc.git")
+    )),
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
     "-language:implicitConversions",
