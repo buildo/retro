@@ -19,12 +19,12 @@ class CacheSpec extends FlatSpec with Matchers with ScalaFutures with Eventually
       PatienceConfig(timeout = 20.seconds, interval = 5.seconds)
 
   implicit val scalaCache = ScalaCache(GuavaCache())
-  private[this] val s3 = new S3MailData()
 
   val templateName1 = "mail.html"
   val templateName2 = "mail-image.html"
 
   def action(templateName: String, ttl: Int) = cachingWithTTL(templateName)(ttl.seconds) {
+    val s3 = new S3MailData()
     s3.get(templateName)
   }
 

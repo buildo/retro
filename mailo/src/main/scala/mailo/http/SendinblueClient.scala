@@ -4,25 +4,22 @@ package http
 import com.typesafe.scalalogging.LazyLogging
 
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
-
-import scala.concurrent.{Future, ExecutionContext}
-import javax.mail.Message.RecipientType
-import javax.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 
 import cats.syntax.either._
 
-import akka.http.scaladsl.model.ContentType
-import akka.util.ByteString
-
-import scala.util.Try
-import util._
 import com.sendinblue.Sendinblue
 
 import io.circe._, io.circe.generic.auto._, io.circe.parser.decode
+
+import MailClientError._
+import MailRefinedContent._
+
+import scala.concurrent.{Future, ExecutionContext}
+
+import javax.mail.internet.MimeMessage
 
 class SendinblueClient(
   implicit
@@ -32,10 +29,6 @@ class SendinblueClient(
 ) extends MailClient
     with MimeMailClient
     with LazyLogging {
-  import MailClientError._
-  import mailo.MailRefinedContent._
-  import mailo.MailResponse
-  import mailo.MailError
 
   private[this] case class SendinblueConfig(key: String)
   private[this] val sendinblueConfig = SendinblueConfig(
@@ -45,7 +38,6 @@ class SendinblueClient(
 
   case class SendinblueResponse(code: String, message: String, data: SendinblueResponseData)
   case class SendinblueResponseData(`message-id`: Option[String])
-
 
   def sendMime(
     message: MimeMessage,
@@ -141,6 +133,4 @@ class SendinblueClient(
 
     data
   }
-
-
 }
