@@ -3,12 +3,6 @@ package http
 
 import com.typesafe.scalalogging.LazyLogging
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, RawHeader}
-import akka.http.scaladsl.marshalling._
-import akka.http.scaladsl.unmarshalling._
-
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
@@ -19,10 +13,7 @@ import javax.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-import cats.data.EitherT
 import cats.syntax.either._
-import cats.instances.future._
-import cats.instances.either._
 
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
@@ -65,7 +56,7 @@ class SendinblueClient(
     implicit
     executionContext: ExecutionContext
   ): Future[Either[MailError, MailResponse]] =
-    throw new Exception("unable to send mime messages in Sendinblue")
+    throw new UnsupportedOperationException("unable to send mime messages in Sendinblue")
 
 
   def send(
