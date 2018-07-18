@@ -1,0 +1,5 @@
+package mailo
+
+class Helpers {
+
+}
