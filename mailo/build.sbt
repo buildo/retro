@@ -41,12 +41,12 @@ val commonSettings = Seq(
       "claudio@buildo.io",
       url("https://buildo.io"))
   ),
-  homepage := Some(url("https://github.com/buildo/toctoc")),
+  homepage := Some(url("https://github.com/buildo/mailo")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/buildo/toctoc"),
-      "scm:git:https://github.com/buildo/toctoc.git",
-      Some("scm:git:git@github.com:buildo/toctoc.git")
+      url("https://github.com/buildo/mailo"),
+      "scm:git:https://github.com/buildo/mailo.git",
+      Some("scm:git:git@github.com:buildo/mailo.git")
     )),
   scalacOptions := Seq(
     "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
