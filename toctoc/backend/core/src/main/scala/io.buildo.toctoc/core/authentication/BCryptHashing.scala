@@ -6,8 +6,10 @@ import org.mindrot.jbcrypt.BCrypt
 
 import scala.util.Random
 
+import java.security.SecureRandom
+
 trait BCryptHashing {
-  private val random = new Random()
+  private val random = new Random(new SecureRandom)
   private val defaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   def randomString(n: Int, alphabet: String = defaultAlphabet): String =
     Stream.continually(random.nextInt(alphabet.size)).map(alphabet).take(n).mkString
