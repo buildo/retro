@@ -117,7 +117,7 @@ class SendinblueClient(
     headers.keys.foreach { k =>
       headersMap.put(k, headers(k))
     }
-    data.put("headers", headers)
+    data.put("headers", headersMap)
 
 
     val attachmentsMap = new java.util.HashMap[String, String]()
