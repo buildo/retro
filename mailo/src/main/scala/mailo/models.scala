@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.ContentType
 
 import io.buildo.enumero.annotations.enum
 
-@enum trait DeliverySemantic {
+@enum trait DeliveryGuarantee {
   object AtMostOnce
   object AtLeastOnce
 }
