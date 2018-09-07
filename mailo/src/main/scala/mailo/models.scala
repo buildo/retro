@@ -2,6 +2,13 @@ package mailo
 
 import akka.http.scaladsl.model.ContentType
 
+import io.buildo.enumero.annotations.enum
+
+@enum trait DeliveryGuarantee {
+  object AtMostOnce
+  object AtLeastOnce
+}
+
 case class Attachment(
   name: String,
   `type`: ContentType,
@@ -9,10 +16,12 @@ case class Attachment(
   transferEncoding: Option[String] = None
 )
 
+sealed trait MailResult
 case class MailResponse(
   id: String,
   message: String
-)
+) extends MailResult
+case object LocallyQueued extends MailResult
 
 case class MailRawContent(
   template: String,
@@ -27,3 +36,16 @@ object MailRefinedContent {
 }
 
 abstract class MailError(message: String) extends RuntimeException(message)
+
+case class Mail(
+  to: String,
+  from: String,
+  cc: Option[String] = None,
+  bcc: Option[String] = None,
+  subject: String,
+  templateName: String,
+  params: Map[String, String],
+  attachments: List[Attachment] = Nil,
+  tags: List[String] = Nil,
+  headers: Map[String, String] = Map.empty
+)
