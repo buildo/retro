@@ -10,8 +10,7 @@ import mailo.http.MailClient
 import mailo.persistence.{EmailPersistorActor, SendEmail}
 
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
 
 case class MailPersistenceError(message: String) extends MailError(message)
@@ -24,16 +23,14 @@ class AtLeastOnceMailo(
   ec: ExecutionContext,
   conf: Config = ConfigFactory.load(),
   system: ActorSystem = ActorSystem("mailo"),
+  enqueueTimeout: Timeout = Timeout(200 milliseconds)
 ) extends Mailo
     with LazyLogging {
-  implicit val timeout = Timeout(5 seconds)
-
   private[this] val persisto = system.actorOf(Props[EmailPersistorActor])
 
-  def send(mail: Mail) = {
-    ask(persisto, SendEmail(mail)).map {
-      case Success(result) => Right(LocallyQueued)
-      case Failure(error)  => Left(MailPersistenceError(error.getLocalizedMessage))
-    }
+  def send(mail: Mail): Future[Either[MailError, MailResult]] = {
+    ask(persisto, SendEmail(mail))
+      .map(_ => Right(LocallyQueued))
+      .recover { case error =>  Left(MailPersistenceError(error.getLocalizedMessage)) }
   }
 }
