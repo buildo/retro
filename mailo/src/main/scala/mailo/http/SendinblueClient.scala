@@ -10,9 +10,10 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import cats.syntax.either._
 
-import com.sendinblue.Sendinblue
-
-import io.circe._, io.circe.generic.auto._, io.circe.parser.decode
+import sendinblue._
+import sendinblue.auth._
+import sibModel._
+import sibApi.SmtpApi
 
 import MailClientError._
 import MailRefinedContent._
@@ -34,7 +35,10 @@ class SendinblueClient(
   private[this] val sendinblueConfig = SendinblueConfig(
     key = conf.getString("mailo.sendinblue.key")
   )
-  private[this] val sendinblue = new Sendinblue("https://api.sendinblue.com/v2.0", sendinblueConfig.key)
+  private[this] val client = Configuration.getDefaultApiClient()
+  private[this] val apiKey = client.getAuthentication("api-key").asInstanceOf[ApiKeyAuth]
+  apiKey.setApiKey(sendinblueConfig.key)
+  private[this] val sendinblue = new SmtpApi()
 
   case class SendinblueResponse(code: String, message: String, data: SendinblueResponseData)
   case class SendinblueResponseData(`message-id`: Option[String])
@@ -77,16 +81,12 @@ class SendinblueClient(
         tags = tags,
         headers = headers
       )
-      res <- Future(sendinblue.send_email(entity))
-      jsonRes = decode[SendinblueResponse](res)
-    } yield {
-      jsonRes match {
-        case Right(SendinblueResponse(code, message, SendinblueResponseData(Some(messageId)))) if code == "success" =>
-          MailResponse(messageId, message).asRight[MailError]
-        case _ =>
-          UnknownCode.asLeft[MailResponse]
+      res <- Future(sendinblue.sendTransacEmail(entity)).map { r =>
+        MailResponse(r.getMessageId(), "Email sent successfully.").asRight[MailError]
+      }.recover { case e =>
+        UnknownCode.asLeft[MailResponse]
       }
-    }
+    } yield res
 
   private[this] def entity(
     from: String,
@@ -98,39 +98,39 @@ class SendinblueClient(
     attachments: List[Attachment],
     tags: List[String],
     headers: Map[String, String]
-  )(implicit ec: ExecutionContext): Future[java.util.HashMap[String, Any]] = Future {
+  )(implicit ec: ExecutionContext): Future[SendSmtpEmail] = Future {
     import mailo.MailRefinedContent._
+    import collection.JavaConverters._
 
-    val data = new java.util.HashMap[String, Any]()
-
-    val toMap = new java.util.HashMap[String, String]()
-    toMap.put(to, "")
-    data.put("to", toMap)
-
-    data.put("from", from.split(" ").toList.reverse.toArray)
-
-    data.put("subject", subject)
-
-    val headersMap = new java.util.HashMap[String, String]()
-    if (tags.size > 0)
-      headersMap.put("X-Mailin-Tag", tags.mkString(", "))
-    headers.keys.foreach { k =>
-      headersMap.put(k, headers(k))
+    val (fromEmail, fromName) = {
+      val splits = from.split(" ").toList
+      (splits.last, splits.reverse.drop(1).reverse.mkString(" "))
     }
-    data.put("headers", headersMap)
-
-
-    val attachmentsMap = new java.util.HashMap[String, String]()
-    attachments.foreach { a =>
-      attachmentsMap.put(a.name, a.content)
+    val (html, text) = content match {
+      case HTMLContent(html) => (html, null)
+      case TEXTContent(text) => (null, text)
     }
-    data.put("attachment", attachmentsMap)
+    val email = new SendSmtpEmail()
 
-    content match {
-      case HTMLContent(html) => data.put("html", html)
-      case TEXTContent(text) => data.put("html", ""); data.put("text", text)
-    }
+    val sender = new SendSmtpEmailSender()
+    sender.setEmail(fromEmail)
+    sender.setName(fromName)
 
-    data
+    val toM = new SendSmtpEmailTo()
+    toM.setEmail(to)
+
+    email.setSender(sender)
+    email.setTo(List(toM).asJava)
+    email.setSubject(subject)
+    email.setTags(tags.asJava)
+    email.setHtmlContent(html)
+    email.setTextContent(text)
+    email.setAttachment(attachments.map { a =>
+      val aa = new SendSmtpEmailAttachment()
+      aa.setContent(java.util.Base64.getDecoder.decode(a.content))
+      aa.setName(a.name)
+      aa
+    }.asJava)
+    email
   }
 }
