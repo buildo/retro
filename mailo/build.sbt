@@ -17,9 +17,9 @@ val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
 val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
-val mailin = "com.sendinblue" % "sendinblue" % "2.0"
 val enumero = "io.buildo" %% "enumero" % "1.3.0"
 val levelDb = "org.fusesource.leveldbjni"   % "leveldbjni-all"   % "1.8"
+val mailin = "com.sendinblue" % "sib-api-v3-sdk" % "3.0.1"
 
 val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),

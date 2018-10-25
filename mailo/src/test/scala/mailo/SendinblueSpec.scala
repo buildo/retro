@@ -28,7 +28,7 @@ class SendinblueSpec extends FlatSpec with Matchers with ScalaFutures {
     (mailer
       .send(
         to = "mailo@buildo.io",
-        from = "Mailo mailo@buildo.io",
+        from = "Mailo test mailo@buildo.io",
         subject = "Test mail",
         templateName = "mail.html",
         params = Map("ciao" -> "CIAOOOONE"),
