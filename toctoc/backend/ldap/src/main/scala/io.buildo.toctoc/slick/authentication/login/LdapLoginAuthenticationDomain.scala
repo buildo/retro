@@ -17,7 +17,7 @@ class LdapLoginAuthenticationDomain(host: String, port: Int)(implicit ec: Execut
   extends LoginAuthenticationDomain
   with BCryptHashing {
 
-  private[this] lazy val loginConfig: Config = ConfigFactory.load.getConfig("ldapConfig")
+  private[this] lazy val loginConfig: Config = ConfigFactory.load.getConfig("toctocLDAPConfig")
 
   override def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = ???
 
