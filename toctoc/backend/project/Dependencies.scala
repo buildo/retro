@@ -24,6 +24,7 @@ object Dependencies {
   val quillAsyncPostgres = "io.getquill" %% "quill-async-postgres" % V.quill
   val flywayCore = "org.flywaydb" % "flyway-core" % "5.0.7"
   val mysql =  "mysql" % "mysql-connector-java" % "8.0.11"
+  val typesafe = "com.typesafe" % "config" % "1.3.3"
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % "4.0.8"
 
   lazy val coreDependencies = List(
