@@ -7,12 +7,17 @@ import core.authentication._
 import core.authentication.TokenBasedAuthentication._
 import com.unboundid.ldap.sdk.{LDAPConnection, LDAPException, ResultCode}
 
+import io.buildo.enumero.CaseEnumSerialization
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class LdapLoginAuthenticationDomain(host: String, port: Int)(implicit ec: ExecutionContext)
+class LdapLoginAuthenticationDomain(host: String, port: Int)(implicit ec: ExecutionContext, instance: CaseEnumSerialization[LDAPLoginType])
   extends LoginAuthenticationDomain
   with BCryptHashing {
 
+  private[this] lazy val loginConfig: Config = ConfigFactory.load.getConfig("ldapConfig")
 
   override def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = ???
 
@@ -21,12 +26,36 @@ class LdapLoginAuthenticationDomain(host: String, port: Int)(implicit ec: Execut
   override def unregister(c: Login): Future[Either[AuthenticationError, LoginDomain]] = ???
 
   override def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = Future {
+    println(loginConfig)
+    val loginType: LDAPLoginType = instance.caseFromString(loginConfig.getString("loginType")).getOrElse(throw new Exception("LDAP login type not supported!"))
+    val domain: String = loginConfig.getString("domain")
+
+    val username = loginType match {
+      case LDAPLoginType.UserPrincipalName => {
+        // username example: mariorossi@corp.banksealer.com
+        if (c.username.contains("@")) c.username
+        else s"${c.username}@${domain}"
+      }
+      case LDAPLoginType.DistinguishedName => {
+        // username example: CN=Mario MR. Rossi,CN=Users,DC=corp,DC=banksealer,DC=com
+        val customDomain = domain.split('.').map(el => s"DC=${el}").mkString(",")
+        val commonName = s"CN=${loginConfig.getString("distinguishNameConfig.commonName")}"
+        val customUsername = s"CN=${c.username}"
+        println(s"${customUsername},${commonName},${customDomain}")
+        s"${customUsername},${commonName},${customDomain}"
+      }
+      case LDAPLoginType.Legacy => {
+        // username example: CORP\mariorossi
+        s"${domain}\\${c.username}"
+      }
+    }
+
     val conn = new LDAPConnection()
     try {
       conn.connect(host, port)
-      conn.bind(c.username, c.password)
+      conn.bind(username, c.password)
 
-      Right((this, UserSubject(c.username)))
+      Right((this, UserSubject(username)))
     } catch {
       case e: LDAPException => fromResultCodeToLDAPError(e.getResultCode)
       case _: Exception => Left(AuthenticationError.LDAPGenericError)
