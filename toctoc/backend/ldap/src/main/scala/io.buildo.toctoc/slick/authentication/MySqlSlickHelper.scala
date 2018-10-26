@@ -1,5 +1,5 @@
 package io.buildo.toctoc
-package slick
+package ldap
 package authentication
 
 import _root_.slick.jdbc.MySQLProfile.api._

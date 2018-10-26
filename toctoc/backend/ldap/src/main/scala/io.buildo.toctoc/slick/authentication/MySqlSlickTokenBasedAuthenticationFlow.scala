@@ -1,5 +1,5 @@
 package io.buildo.toctoc
-package slick
+package ldap
 package authentication
 
 import core.authentication.TokenBasedAuthentication.TokenBasedAuthenticationFlow
