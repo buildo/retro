@@ -5,7 +5,7 @@ package login
 
 import io.buildo.enumero.annotations.enum
 
-@enum trait LDAPLoginType {
+@enum trait LdapLoginType {
   object DistinguishedName
   object UserPrincipalName
   object Legacy
