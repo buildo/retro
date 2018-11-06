@@ -4,22 +4,21 @@ package authentication
 package login
 
 import core.authentication._
-import core.authentication.TokenBasedAuthentication._
 import com.unboundid.ldap.sdk.{LDAPConnection, LDAPException, ResultCode}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class LdapLoginAuthenticationDomain(ldapConfig: LdapConfig)(implicit ec: ExecutionContext)
-  extends LoginAuthenticationDomain
+  extends AuthenticationDomain[LdapLogin]
   with BCryptHashing {
 
-  override def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] = ???
+  override def register(s: Subject, c: LdapLogin): Future[Either[AuthenticationError, LoginDomain]] = ???
 
   override def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]] = ???
 
-  override def unregister(c: Login): Future[Either[AuthenticationError, LoginDomain]] = ???
+  override def unregister(c: LdapLogin): Future[Either[AuthenticationError, LoginDomain]] = ???
 
-  override def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = Future {
+  override def authenticate(c: LdapLogin): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = Future {
 
     val username = buildUsername(c.username, ldapConfig)
     val host = ldapConfig.host
@@ -30,7 +29,7 @@ class LdapLoginAuthenticationDomain(ldapConfig: LdapConfig)(implicit ec: Executi
       conn.connect(host, port)
       conn.bind(username, c.password)
 
-      Right((this, UserSubject(username)))
+      Right((this, LdapSubject(username)))
     } catch {
       case e: LDAPException => Left(fromResultCodeToLDAPError(e.getResultCode))
       case _: Exception => Left(AuthenticationError.LDAPGenericError)
