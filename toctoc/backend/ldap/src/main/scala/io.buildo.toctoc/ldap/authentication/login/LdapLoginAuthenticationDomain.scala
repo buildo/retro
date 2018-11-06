@@ -9,8 +9,7 @@ import com.unboundid.ldap.sdk.{LDAPConnection, LDAPException, ResultCode}
 import scala.concurrent.{ExecutionContext, Future}
 
 class LdapLoginAuthenticationDomain(ldapConfig: LdapConfig)(implicit ec: ExecutionContext)
-  extends AuthenticationDomain[LdapLogin]
-  with BCryptHashing {
+  extends AuthenticationDomain[LdapLogin] {
 
   override def register(s: Subject, c: LdapLogin): Future[Either[AuthenticationError, LoginDomain]] = ???
 
