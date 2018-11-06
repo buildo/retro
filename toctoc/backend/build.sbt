@@ -68,4 +68,11 @@ lazy val wiro = project
   )
   .dependsOn(core)
 
+lazy val ldap = project
+  .settings(
+    name := "toctoc-ldap",
+    libraryDependencies ++= ldapDependencies
+  )
+  .dependsOn(core)
+
 parallelExecution in Test := false
