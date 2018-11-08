@@ -29,7 +29,7 @@ class LdapLoginAuthenticationDomain(ldapConfig: LdapConfig)(implicit ec: Executi
       conn.connect(host, port)
       conn.bind(username, c.password)
 
-      Right((this, UserSubject(username)))
+      Right((this, UserSubject(c.username)))
     } catch {
       case e: LDAPException => Left(fromResultCodeToLDAPError(e.getResultCode))
       case _: Exception => Left(AuthenticationError.LDAPGenericError)
