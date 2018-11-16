@@ -14,7 +14,7 @@ trait CustomContentTypeCodecs {
     final def apply(c: HCursor): Decoder.Result[ContentType] =
       for {
         contentType <- c.downField("contentType").as[String]
-        result <- ContentType.parse(contentType).left.map(_ => DecodingFailure("Falied decoding content type", Nil))
+        result <- ContentType.parse(contentType).left.map(_ => DecodingFailure("Failed decoding content type", Nil))
       } yield result
   }
 }
