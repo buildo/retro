@@ -10,7 +10,7 @@ case object CleanQueue
 case class SendEmail(email: Mail)
 case class EmailEvent(content: String)
 
-class EmailPersistorActor extends PersistentActor
+class EmailPersistanceActor extends PersistentActor
     with ActorLogging with CustomContentTypeCodecs {
   override def persistenceId = "emails-persistence"
 

@@ -2,7 +2,7 @@ package mailo.data
 
 import awscala.s3.{Bucket, S3}
 import awscala.Credentials
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.amazonaws.regions.RegionUtils
 import cats.syntax.either._
 import cats.syntax.traverse._

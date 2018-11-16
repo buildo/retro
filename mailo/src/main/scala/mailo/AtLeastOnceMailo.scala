@@ -7,7 +7,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import mailo.data.MailData
 import mailo.http.MailClient
-import mailo.persistence.{EmailPersistorActor, SendEmail}
+import mailo.persistence.{EmailPersistanceActor, SendEmail}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -26,10 +26,10 @@ class AtLeastOnceMailo(
   enqueueTimeout: Timeout = Timeout(200 milliseconds)
 ) extends Mailo
     with LazyLogging {
-  private[this] val persisto = system.actorOf(Props[EmailPersistorActor])
+  private[this] val emailPersistanceActor = system.actorOf(Props[EmailPersistanceActor])
 
   def send(mail: Mail): Future[Either[MailError, MailResult]] = {
-    ask(persisto, SendEmail(mail))
+    ask(emailPersistanceActor, SendEmail(mail))
       .map(_ => Right(LocallyQueued))
       .recover { case error =>  Left(MailPersistenceError(error.getLocalizedMessage)) }
   }
