@@ -1,5 +1,7 @@
 package mailo
 
+import java.util.concurrent.TimeUnit
+
 import akka.actor.{ActorSystem, Props}
 import akka.util.Timeout
 import akka.pattern.ask
@@ -10,14 +12,14 @@ import mailo.http.MailClient
 import mailo.persistence.{EmailPersistanceActor, SendEmail}
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
-case class MailPersistenceError(message: String) extends MailError(message)
+case class MailPersistenceError(override val message: String) extends MailError(message)
 
 class AtLeastOnceMailo(
-  val mailData: MailData,
-  val mailClient: MailClient,
+  val data: MailData,
+  val client: MailClient,
 )(
   implicit
   ec: ExecutionContext,
