@@ -28,11 +28,11 @@ class AtLeastOnceMailo(
   enqueueTimeout: Timeout = Timeout(200 milliseconds)
 ) extends Mailo
     with LazyLogging {
-  private[this] val emailPersistanceActor = system.actorOf(Props[EmailPersistanceActor])
+  private[this] val emailSender = new EmailSender(data, client)
+  private[this] val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender))
 
   def send(mail: Mail): Future[Either[MailError, MailResult]] = {
     ask(emailPersistanceActor, SendEmail(mail))
       .map(_ => Right(LocallyQueued))
-      .recover { case error =>  Left(MailPersistenceError(error.getLocalizedMessage)) }
   }
 }

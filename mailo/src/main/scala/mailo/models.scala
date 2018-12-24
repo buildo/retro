@@ -35,7 +35,7 @@ object MailRefinedContent {
   case class TEXTContent(override val content: String) extends MailRefinedContent(content)
 }
 
-abstract class MailError(message: String) extends RuntimeException(message)
+abstract class MailError(val message: String) extends RuntimeException(message)
 
 case class Mail(
   to: String,
