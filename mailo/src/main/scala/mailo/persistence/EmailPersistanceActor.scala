@@ -61,6 +61,10 @@ class EmailPersistanceActor(
                 deadLettersHandler ! EmailApplicativeErrorEvent(event, error.getMessage)
             }
             deleteMessages(lastSequenceNr)
+            result match {
+              case Right(_) => ()
+              case Left(error) => log.error(error.getMessage)
+            }
           case Failure(reason) =>
             deadLettersHandler ! EmailCommunicationErrorEvent(command, reason.getMessage)
             deleteMessages(lastSequenceNr)
