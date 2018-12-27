@@ -1,6 +1,6 @@
 val akkaVersion = "2.5.18"
 
-val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % Test
 val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
 val akkaHttp = "com.typesafe.akka" %% "akka-http" % "10.1.3"
 val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
@@ -15,11 +15,13 @@ val circeParser = "io.circe" %% "circe-parser" % "0.9.0"
 val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
-val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
+val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % Test
 val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
 val enumero = "io.buildo" %% "enumero" % "1.3.0"
 val levelDb = "org.fusesource.leveldbjni"   % "leveldbjni-all"   % "1.8"
 val mailin = "com.sendinblue" % "sib-api-v3-sdk" % "3.0.1"
+val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.1" % Test
+val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test
 
 val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -62,7 +64,8 @@ val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.bintrayRepo("buildo", "maven"),
-    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
+    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/",
+    "dnvriend" at "http://dl.bintray.com/dnvriend/maven"
   ),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
   fork in run := true,
@@ -93,7 +96,9 @@ lazy val mailo = (project in file(".")).
       javaxMail,
       mailin,
       enumero,
-      levelDb
+      levelDb,
+      akkaPersistenceInMemory,
+      akkaTestkit
     )
   )
 
