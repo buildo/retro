@@ -65,7 +65,8 @@ val commonSettings = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
   ),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-  fork in run := true
+  fork in run := true,
+  fork in Test := true
 )
 
 lazy val mailo = (project in file(".")).
