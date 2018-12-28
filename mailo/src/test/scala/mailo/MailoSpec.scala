@@ -110,6 +110,6 @@ trait AppSpec {
   private[this] implicit val system = ActorSystem()
   private[this] implicit val materializer = ActorMaterializer()
 
-  val mailer = Mailo(new S3MailData, new MailgunClient, DeliveryGuarantee.AtLeastOnce)
+  val mailer = Mailo(new S3MailData, new MailgunClient, DeliveryGuarantee.AtMostOnce)
 }
 
