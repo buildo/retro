@@ -7,6 +7,7 @@ import io.buildo.enumero.annotations.enum
 @enum trait AuthenticationError {
   // toctoc error
   object InvalidCredential
+  object Forbidden
   // LDAP errors
   object LDAPOperationsError
   object LDAPProtocolError
