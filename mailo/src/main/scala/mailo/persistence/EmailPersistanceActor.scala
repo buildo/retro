@@ -34,12 +34,15 @@ class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
   override def persistenceId = "emails-persistence"
 
   def send(email: Mail) = emailSender.send(email)
+  def sendDeadEmail(event: EmailEvent, error: Exception) =
+     context.system.eventStream.publish(EmailErrorEvent(event, error.getMessage))
 
   val receiveRecover: Receive = {
-    case EmailEvent(json) =>
-      //TODO this should be sent to a dead letters queue
-      val email = decode[Mail](json).getOrElse(throw new Exception("Cannot decode the persisted email... this is very wrong"))
-      send(email)
+    case e@EmailEvent(json) =>
+      decode[Mail](json) match {
+        case Right(email) => send(email)
+        case Left(error) => sendDeadEmail(e, error)
+      }
   }
 
   val receiveCommand: Receive = {
@@ -53,7 +56,7 @@ class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
               case Right(_) => ()
                 context.system.eventStream.publish(event)
               case Left(error) =>
-                context.system.eventStream.publish(EmailErrorEvent(event, error.getMessage))
+                sendDeadEmail(event, error)
             }
             deleteMessages(lastSequenceNr)
           case Failure(reason) =>
