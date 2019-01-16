@@ -8,8 +8,7 @@ lazy val commonSettings = Seq(
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
   releaseCrossBuild := true,
-  addCompilerPlugin(
-    "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
+  addCompilerPlugin(("org.scalamacros" % "paradise" % "2.1.0").cross(CrossVersion.full)),
   homepage := Some(url("https://buildo.github.io/enumero")),
   scmInfo := Some(
     ScmInfo(

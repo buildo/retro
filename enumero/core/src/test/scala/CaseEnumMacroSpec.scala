@@ -1,6 +1,6 @@
 import io.buildo.enumero.annotations.{enum, indexedEnum}
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class CaseEnumMacroSpec extends WordSpec with Matchers {
   @enum trait Planet {
@@ -19,7 +19,7 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
       Planet.Earth shouldBe a[Product]
       Planet.Earth shouldBe a[Serializable]
       Planet.Earth shouldBe a[Planet]
-      Planet.Mercury should not be a [Planet.Earth.type]
+      Planet.Mercury should not be a[Planet.Earth.type]
       Planet.Earth shouldBe Planet.Earth
     }
 
@@ -27,7 +27,7 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
       Beer.Lager shouldBe a[Product]
       Beer.Lager shouldBe a[Serializable]
       Beer.Lager shouldBe a[Beer]
-      Beer.Ale should not be a [Beer.Lager.type]
+      Beer.Ale should not be a[Beer.Lager.type]
       Beer.Lager shouldBe Beer.Lager
     }
 
@@ -54,8 +54,8 @@ class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
   @indexedEnum trait Planet {
     type Index = Int
     Mercury { 1 }
-    Venus   { 2 }
-    Earth   { 3 }
+    Venus { 2 }
+    Earth { 3 }
   }
 
   @indexedEnum trait Beer {
@@ -70,7 +70,7 @@ class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
       Planet.Earth shouldBe a[Product]
       Planet.Earth shouldBe a[Serializable]
       Planet.Earth shouldBe a[Planet]
-      Planet.Mercury should not be a [Planet.Earth.type]
+      Planet.Mercury should not be a[Planet.Earth.type]
       Planet.Earth shouldBe Planet.Earth
       Planet.Earth.index shouldBe 3
     }
@@ -80,7 +80,7 @@ class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
       Beer.Lager shouldBe a[Product]
       Beer.Lager shouldBe a[Serializable]
       Beer.Lager shouldBe a[Beer]
-      Beer.Ale should not be a [Beer.Lager.type]
+      Beer.Ale should not be a[Beer.Lager.type]
       Beer.Lager shouldBe Beer.Lager
       Beer.Ale.index shouldBe 2
     }

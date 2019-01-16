@@ -43,6 +43,6 @@ class CirceSupportSpec extends WordSpec with Matchers {
       }
     """)
       .getOrElse(Json.Null)
-      .as[Map[Planet, Int]] shouldBe a [Left[_, DecodingFailure]]
+      .as[Map[Planet, Int]] shouldBe a[Left[_, DecodingFailure]]
   }
 }
