@@ -1,5 +1,6 @@
 package mailo
 
+import akka.actor.{ActorSystem}
 import com.typesafe.config.{Config, ConfigFactory}
 import mailo.data.MailData
 import mailo.http.MailClient
