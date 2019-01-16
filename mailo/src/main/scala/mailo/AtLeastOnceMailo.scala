@@ -30,7 +30,6 @@ class AtLeastOnceMailo(
     with LazyLogging {
   private[this] val emailSender = new EmailSender(data, client)
   private[this] val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender))
-  system.actorOf(DeadEmailsHandlerActor.props())
 
   def send(mail: Mail): Future[Either[MailError, MailResult]] = {
     ask(emailPersistanceActor, SendEmail(mail))

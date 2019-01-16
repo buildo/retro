@@ -18,7 +18,8 @@ object Mailo {
   )(
     implicit
     ec: ExecutionContext,
-    conf: Config = ConfigFactory.load()
+    conf: Config = ConfigFactory.load(),
+    system: ActorSystem = ActorSystem("mailo")
   ) = deliverySemantic match {
     case DeliveryGuarantee.AtMostOnce => new AtMostOnceMailo(mailData, mailClient)
     case DeliveryGuarantee.AtLeastOnce => new AtLeastOnceMailo(mailData, mailClient)
