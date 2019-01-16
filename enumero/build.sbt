@@ -58,7 +58,7 @@ lazy val circeSupport = project
     name := "enumero-circe-support",
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % "0.9.0",
-      "io.circe" %% "circe-parser" % "0.9.0",
+      "io.circe" %% "circe-parser" % "0.9.0" % Test,
       "org.scalatest" %% "scalatest" % "3.0.1" % Test
     )
   )
