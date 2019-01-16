@@ -9,7 +9,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import mailo.data.MailData
 import mailo.http.MailClient
-import mailo.persistence.{EmailPersistanceActor, DeadEmailsHandlerActor, SendEmail}
+import mailo.persistence.{EmailPersistanceActor, LoggingActor, SendEmail}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,8 +29,8 @@ class AtLeastOnceMailo(
 ) extends Mailo
     with LazyLogging {
   private[this] val emailSender = new EmailSender(data, client)
-  private[this] val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender))
-  system.actorOf(DeadEmailsHandlerActor.props(emailPersistanceActor))
+  private[this] val loggingActor = system.actorOf(LoggingActor.props())
+  private[this] val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender, loggingActor))
 
   def send(mail: Mail): Future[Either[MailError, MailResult]] = {
     ask(emailPersistanceActor, SendEmail(mail))

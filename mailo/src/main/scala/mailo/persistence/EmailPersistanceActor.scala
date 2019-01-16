@@ -19,16 +19,19 @@ case class EmailApplicativeErrorEvent(emailEvent: EmailEvent, errorMessage: Stri
 case class EmailCommunicationErrorEvent(emailCommand: SendEmail, errorMessage: String)
 
 object EmailPersistanceActor {
-  def props(emailSender: mailo.Mailo) =
-    Props(new EmailPersistanceActor(emailSender))
+  def props(emailSender: mailo.Mailo, deadLettersHandler: ActorRef) =
+    Props(new EmailPersistanceActor(emailSender, deadLettersHandler: ActorRef))
 }
 
-object DeadEmailsHandlerActor {
-  def props(senderActor: ActorRef) =
-    Props(new DeadEmailsHandlerActor(senderActor))
+object LoggingActor {
+  def props() =
+    Props(new LoggingActor())
 }
 
-class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
+class EmailPersistanceActor(
+  emailSender: mailo.Mailo,
+  deadLettersHandler: ActorRef
+) extends PersistentActor
     with ActorLogging with CustomContentTypeCodecs with AtLeastOnceDelivery {
   import context.dispatcher
 
@@ -41,7 +44,7 @@ class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
     case e@EmailEvent(json) =>
       decode[Mail](json) match {
         case Right(email) => send(email)
-        case Left(error) => eventStream.publish(EmailApplicativeErrorEvent(e, error.getMessage))
+        case Left(error) => deadLettersHandler ! EmailApplicativeErrorEvent(e, error.getMessage)
       }
   }
 
@@ -54,13 +57,13 @@ class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
           case Success(result) =>
             result match {
               case Right(_) => ()
-                context.system.eventStream.publish(event)
+                eventStream.publish(event)
               case Left(error) =>
-                eventStream.publish(EmailApplicativeErrorEvent(event, error.getMessage))
+                deadLettersHandler ! EmailApplicativeErrorEvent(event, error.getMessage)
             }
             deleteMessages(lastSequenceNr)
           case Failure(reason) =>
-            eventStream.publish(EmailCommunicationErrorEvent(command, reason.getMessage))
+            deadLettersHandler ! EmailCommunicationErrorEvent(command, reason.getMessage)
             deleteMessages(lastSequenceNr)
         }
       }
@@ -69,17 +72,11 @@ class EmailPersistanceActor(emailSender: mailo.Mailo) extends PersistentActor
   val logSnapshotResult: Receive = SnapshotHelper.logSnapshotResult
 }
 
-class DeadEmailsHandlerActor(senderActor: ActorRef) extends Actor with ActorLogging with CustomContentTypeCodecs {
-  val eventStream = context.system.eventStream
-  override def preStart =
-    eventStream.subscribe(self, classOf[EmailApplicativeErrorEvent]) &&
-    eventStream.subscribe(self, classOf[EmailCommunicationErrorEvent])
-
+class LoggingActor() extends Actor with ActorLogging with CustomContentTypeCodecs {
   def receive = {
     case EmailApplicativeErrorEvent(event, errorMessage) =>
       log.error(s"%{event} failed with error: ${errorMessage}")
     case EmailCommunicationErrorEvent(sendEmail, errorMessage) =>
       log.error(s"${sendEmail} failed with error ${errorMessage}, rescheduling the message")
-      senderActor ! sendEmail
   }
 }
