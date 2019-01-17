@@ -1,6 +1,5 @@
 package io.buildo.enumero
 
-import io.circe.{KeyDecoder, KeyEncoder}
 import io.circe._
 
 trait CirceSupport {

@@ -1,6 +1,8 @@
 import io.buildo.enumero._
 import io.buildo.enumero.circe._
-import io.circe._, io.circe.syntax._, io.circe.parser._
+import io.circe.{DecodingFailure, Json}
+import io.circe.syntax._
+import io.circe.parser._
 
 import org.scalatest.{Matchers, WordSpec}
 
@@ -18,20 +20,22 @@ class CirceSupportSpec extends WordSpec with Matchers {
     Planet.Earth -> 0
   )
 
-  val json = planetMap.asJson
-
-  "CirceSupport handles encoding of a map with CaseEnum keys" in {
-    json shouldBe parse("""
+  val planetMapJson: Json = parse("""
       {
         "Mercury": 12,
         "Venus": 812763,
         "Earth": 0
       }
     """).getOrElse(Json.Null)
+
+  "CirceSupport handles encoding of a map with CaseEnum keys" in {
+    val encodedJson = planetMap.asJson
+
+    encodedJson shouldBe planetMapJson
   }
 
   "CirceSupport handles dencoding of a json with CaseEnum keys" in {
-    json.as[Map[Planet, Int]].getOrElse(Json.Null) shouldBe planetMap
+    planetMapJson.as[Map[Planet, Int]].getOrElse(Json.Null) shouldBe planetMap
   }
 
   "CirceSupport handles dencoding of a json with wrong CaseEnum keys" in {
