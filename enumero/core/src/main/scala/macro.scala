@@ -108,11 +108,11 @@ object EnumMacro {
 class indexedEnum extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro IndexedEnumMacro.impl
 }
- 
+
 object IndexedEnumMacro {
   def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
- 
+
     def modifiedClass(classDecl: ClassDef) = {
       val (enumName, body) = try {
         val q"trait $enumName { ..$body }" = classDecl

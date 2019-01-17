@@ -1,14 +1,14 @@
 enablePlugins(GitVersioning)
 
 lazy val commonSettings = Seq(
-  organization  := "io.buildo",
+  organization := "io.buildo",
   scalaVersion := "2.12.3",
   crossScalaVersions := Seq("2.11.11", "2.12.3"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
   releaseCrossBuild := true,
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
+  addCompilerPlugin(("org.scalamacros" % "paradise" % "2.1.0").cross(CrossVersion.full)),
   homepage := Some(url("https://buildo.github.io/enumero")),
   scmInfo := Some(
     ScmInfo(
@@ -32,7 +32,8 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
   .aggregate(core, circeSupport)
@@ -46,8 +47,8 @@ lazy val core = project
     libraryDependencies ++= Seq(
       scalaOrganization.value % "scala-reflect" % scalaVersion.value
     ) ++ Seq(
-      "org.scalatest"  %% "scalatest"     % "3.0.1",
-      "org.mockito"    %  "mockito-all"   % "1.9.5"
+      "org.scalatest" %% "scalatest" % "3.0.1",
+      "org.mockito" % "mockito-all" % "1.9.5"
     ).map(_ % Test)
   )
 
@@ -56,7 +57,9 @@ lazy val circeSupport = project
   .settings(
     name := "enumero-circe-support",
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.9.0"
+      "io.circe" %% "circe-core" % "0.9.0",
+      "io.circe" %% "circe-parser" % "0.9.0" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test
     )
   )
   .dependsOn(core)

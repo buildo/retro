@@ -1,6 +1,6 @@
 import io.buildo.enumero._
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class CaseEnumIndexSpec extends WordSpec with Matchers {
   sealed trait Planet extends IndexedCaseEnum { type Index = Int }
@@ -14,10 +14,7 @@ class CaseEnumIndexSpec extends WordSpec with Matchers {
     "construct a sensible CaseEnumIndex" in {
       val converter = CaseEnumIndex.caseEnumIndex[Planet]
 
-      val pairs = List(
-        Planet.Mercury -> 1,
-        Planet.Venus -> 2,
-        Planet.Earth -> 3)
+      val pairs = List(Planet.Mercury -> 1, Planet.Venus -> 2, Planet.Earth -> 3)
 
       for ((co, index) <- pairs) {
         converter.caseToIndex(co).shouldBe(index)
@@ -34,7 +31,8 @@ class CaseEnumIndexSpec extends WordSpec with Matchers {
       }
 
       implicit def fakeBinaryPickler[T <: IndexedCaseEnum { type Index = Int }](
-        implicit instance: CaseEnumIndex[T]) = new FakeBinaryPickler[T] {
+        implicit instance: CaseEnumIndex[T]
+      ) = new FakeBinaryPickler[T] {
 
         def pickle(c: T)(picklerState: { def writeInt(int: Int) }): Unit = {
           picklerState.writeInt(instance.caseToIndex(c))

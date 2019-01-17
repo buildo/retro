@@ -4,28 +4,29 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
 /**
- * Marker trait for ADTs representing enumerations
- *
- * The convention requires the following structure for the enumeration:
- * ```
- * sealed trait EnumName extends CaseEnum
- * object EnumName {
- *   case object Element1 extends EnumName
- *   case object Element2 extends EnumName
- * }
- * ```
- */
+  * Marker trait for ADTs representing enumerations
+  *
+  * The convention requires the following structure for the enumeration:
+  * ```
+  * sealed trait EnumName extends CaseEnum
+  * object EnumName {
+  *   case object Element1 extends EnumName
+  *   case object Element2 extends EnumName
+  * }
+  * ```
+  */
 trait CaseEnum extends Product with Serializable
 
 /**
- * Typeclass with conversions to and from strings for ADTs representing enumerations
- */
+  * Typeclass with conversions to and from strings for ADTs representing enumerations
+  */
 trait CaseEnumSerialization[T <: CaseEnum] {
   def caseToString(value: T): String
+
   /**
-   * @return Some(T) if the string corresponds to one of the enumeration elements,
-   *         None otherwise
-   */
+    * @return Some(T) if the string corresponds to one of the enumeration elements,
+    *         None otherwise
+    */
   def caseFromString(str: String): Option[T]
   val name: String
   val values: Set[T]
@@ -33,8 +34,7 @@ trait CaseEnumSerialization[T <: CaseEnum] {
 
 // Companion object to provide typeclass instances for all CaseEnums
 object CaseEnumSerialization {
-  def apply[T <: CaseEnum](
-      implicit instance: CaseEnumSerialization[T]): CaseEnumSerialization[T] =
+  def apply[T <: CaseEnum](implicit instance: CaseEnumSerialization[T]): CaseEnumSerialization[T] =
     instance
 
   implicit def caseEnumSerialization[T <: CaseEnum]: CaseEnumSerialization[T] =
@@ -43,7 +43,7 @@ object CaseEnumSerialization {
 
 // Macro implementation for CaseEnumSerialization typeclass instance
 object CaseEnumMacro {
-  def caseEnumSerializationMacro[T <: CaseEnum : c.WeakTypeTag](c: Context): c.Tree = {
+  def caseEnumSerializationMacro[T <: CaseEnum: c.WeakTypeTag](c: Context): c.Tree = {
     import c.universe._
     val tpe = weakTypeOf[T]
     val typeName = tpe.typeSymbol
@@ -72,4 +72,3 @@ object CaseEnumMacro {
     """
   }
 }
-
