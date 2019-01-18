@@ -34,6 +34,7 @@ class AtLeastOnceMailo(
 
   def send(mail: Mail): Future[Either[MailError, MailResult]] = {
     ask(emailPersistanceActor, SendEmail(mail))
-      .map(_ => Right(LocallyQueued))
+      .mapTo[MailResult]
+      .map(Right(_))
   }
 }

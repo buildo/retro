@@ -12,7 +12,6 @@ import io.circe.parser._
 import mailo.data.MailData
 import mailo.http.MailClient
 
-case object Ack
 case class SendEmail(email: Mail)
 case class EmailEvent(content: String)
 case class EmailApplicativeErrorEvent(emailEvent: EmailEvent, errorMessage: String)
@@ -52,7 +51,7 @@ class EmailPersistanceActor(
     case command@SendEmail(email) =>
       log.info("received command {}", command.toString)
       persist(EmailEvent(email.asJson.noSpaces)) { event =>
-        sender() ! Ack
+        sender() ! mailo.Queued
         send(email).onComplete {
           case Success(result) =>
             result match {
@@ -77,6 +76,6 @@ class LoggingActor() extends Actor with ActorLogging with CustomContentTypeCodec
     case EmailApplicativeErrorEvent(event, errorMessage) =>
       log.error(s"%{event} failed with error: ${errorMessage}")
     case EmailCommunicationErrorEvent(sendEmail, errorMessage) =>
-      log.error(s"${sendEmail} failed with error ${errorMessage}, rescheduling the message")
+      log.error(s"${sendEmail} failed with error ${errorMessage},")
   }
 }

@@ -21,7 +21,7 @@ case class MailResponse(
   id: String,
   message: String
 ) extends MailResult
-case object LocallyQueued extends MailResult
+case object Queued extends MailResult
 
 case class MailRawContent(
   template: String,
