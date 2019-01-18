@@ -1,40 +1,40 @@
 package mailo
 
+import java.util.concurrent.TimeUnit
+
 import akka.actor.{ActorSystem, Props}
 import akka.util.Timeout
+import akka.pattern.ask
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import mailo.data.MailData
 import mailo.http.MailClient
+import mailo.persistence.{EmailPersistanceActor, LoggingActor, SendEmail}
+
 import scala.concurrent.duration._
-
-import scala.util.{Failure, Success}
-
 import scala.concurrent.{ExecutionContext, Future}
-
 import scala.language.postfixOps
 
-case class MailPersistenceError(message: String) extends MailError(message)
+case class MailPersistenceError(override val message: String) extends MailError(message)
 
 class AtLeastOnceMailo(
-  val mailData: MailData,
-  val mailClient: MailClient,
+  val data: MailData,
+  val client: MailClient,
 )(
   implicit
   ec: ExecutionContext,
   conf: Config = ConfigFactory.load(),
   system: ActorSystem = ActorSystem("mailo"),
+  enqueueTimeout: Timeout = Timeout(200 milliseconds)
 ) extends Mailo
     with LazyLogging {
-  implicit val timeout = Timeout(5 seconds)
+  private[this] val emailSender = new EmailSender(data, client)
+  private[this] val loggingActor = system.actorOf(LoggingActor.props())
+  private[this] val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender, loggingActor))
 
-  //return type of actor ask pattern
-  def ask: Future[Any] = ???
-
-  def send(mail: Mail) = {
-    ask.map {
-      case Success(result) => Right(LocallyQueued)
-      case Failure(error)  => Left(MailPersistenceError(error.getLocalizedMessage))
-    }
+  def send(mail: Mail): Future[Either[MailError, MailResult]] = {
+    ask(emailPersistanceActor, SendEmail(mail))
+      .mapTo[MailResult]
+      .map(Right(_))
   }
 }

@@ -21,7 +21,7 @@ case class MailResponse(
   id: String,
   message: String
 ) extends MailResult
-case object LocallyQueued extends MailResult
+case object Queued extends MailResult
 
 case class MailRawContent(
   template: String,
@@ -35,7 +35,7 @@ object MailRefinedContent {
   case class TEXTContent(override val content: String) extends MailRefinedContent(content)
 }
 
-abstract class MailError(message: String) extends RuntimeException(message)
+abstract class MailError(val message: String) extends RuntimeException(message)
 
 case class Mail(
   to: String,

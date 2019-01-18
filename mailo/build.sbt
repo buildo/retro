@@ -1,10 +1,10 @@
-val akkaVersion = "2.5.14"
+val akkaVersion = "2.5.18"
 
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
 val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
 val akkaHttp = "com.typesafe.akka" %% "akka-http" % "10.1.3"
 val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
-val akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion
+val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
 val s3 =  "com.github.seratch" %% "awscala" % "0.5.+"
 val catsCore = "org.typelevel" %% "cats-core" % "1.0.1"
 val alleyCatsCore = "org.typelevel" %% "alleycats-core" % "1.0.1"
@@ -25,7 +25,7 @@ val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
   organization  := "io.buildo",
-  scalaVersion  := "2.12.4",
+  scalaVersion  := "2.12.8",
   releaseEarlyWith := BintrayPublisher,
   releaseEarlyNoGpg := true,
   releaseEarlyEnableSyncToMaven := false,
@@ -65,7 +65,8 @@ val commonSettings = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
   ),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-  fork in run := true
+  fork in run := true,
+  fork in Test := true
 )
 
 lazy val mailo = (project in file(".")).
@@ -77,7 +78,7 @@ lazy val mailo = (project in file(".")).
       akkaStream,
       akkaHttp,
       akkaPersistence,
-      akkaPersistenceQuery,
+      akkaRemote,
       s3,
       catsCore,
       alleyCatsCore,
@@ -97,5 +98,5 @@ lazy val mailo = (project in file(".")).
   )
 
 mappings in (Compile, packageBin) ~= { _.filter { n =>
-  !((n._1.getName.endsWith(".conf")) || n._1.getName.endsWith(".conf.example")) }
+  !(n._1.getName.endsWith(".conf.example")) }
 }
