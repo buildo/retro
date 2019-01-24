@@ -8,10 +8,10 @@ import cats.syntax.either._
 
 import mailo.http.MailClient
 import mailo.data.MailData
-import mailo.persistence.{EmailPersistanceActor, SendEmail, Ack}
+import mailo.persistence.{EmailPersistanceActor, SendEmail, LoggingActor}
 
 import org.scalatest.{Matchers, BeforeAndAfterAll, Suite, WordSpecLike, FeatureSpec}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{ScalaFutures, Eventually}
 import org.scalatest.time.{Span, Seconds}
 
 import scala.collection.mutable.Queue
@@ -31,8 +31,11 @@ class MockedClient(val state: Queue[SimpleMail]) extends MailClient {
     tags: List[String],
     headers: Map[String, String]
   )(implicit executionContext: ExecutionContext): Future[Either[MailError, MailResponse]] = Future.successful {
-    state.enqueue(SimpleMail(subject))
-    Right(MailResponse("1", "ok"))
+    //State needs to be updated by one at the time
+    synchronized {
+      state.enqueue(SimpleMail(subject))
+      Right(MailResponse(subject, "ok"))
+    }
   }
 }
 
@@ -50,6 +53,7 @@ class PersistenceSpec
   with Matchers
   with BeforeAndAfterAll
   with ScalaFutures {
+  import Eventually._
 
   implicit def executionContext: ExecutionContext = system.dispatcher
  
@@ -64,7 +68,8 @@ class PersistenceSpec
     "properly deliver email messages" in {
       val state = new Queue[SimpleMail]()
       val emailSender = new EmailSender(new MockedData, new MockedClient(state))
-      val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender))
+      val loggingActor = system.actorOf(LoggingActor.props())
+      val emailPersistanceActor = system.actorOf(EmailPersistanceActor.props(emailSender, loggingActor))
 
       val mail1 = Mail(
         to = "mailo@buildo.io",
@@ -78,17 +83,15 @@ class PersistenceSpec
       val mail2 = mail1.copy(subject = "2")
 
       emailPersistanceActor ! SendEmail(mail1)
-      expectMsg(Ack)
+      expectMsg(Queued)
 
-      emailPersistanceActor ! PoisonPill
-      val emailPersistanceActorRessurrect = system.actorOf(EmailPersistanceActor.props(emailSender))
+      emailPersistanceActor ! SendEmail(mail2)
+      expectMsg(Queued)
 
-      emailPersistanceActorRessurrect ! SendEmail(mail2)
-      expectMsg(Ack)
-
-      val size = state.size
-      info(s"enqueued ${size.toString} messages")
-      size should (be(2) or be(3)) //can be 3 in case PoisonPill kills the actor too fast
+      eventually(timeout(Span(5, Seconds))) {
+        state.size should be(2)
+        info(s"${state.size} messages sent")
+      }
     }
   }
 }
