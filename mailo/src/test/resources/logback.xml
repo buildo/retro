@@ -1,0 +1,3 @@
+<configuration>
+    <!-- this file is intentionally empty, the non-presence of this file breaks up logging filters-->
+</configuration>
