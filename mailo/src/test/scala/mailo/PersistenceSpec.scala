@@ -127,7 +127,7 @@ class PersistenceSpec
       }
     }
 
-    "not explode" in {
+    "should deliver the correct amount of messages" in {
       val state = new ConcurrentLinkedQueue[SimpleMail]()
       val emailSender = new EmailSender(new MockedData, new MockedClientWithDelay(state))
       val loggingActor = system.actorOf(LoggingActor.props())
@@ -165,8 +165,10 @@ class PersistenceSpec
       Thread sleep 200
       task.cancel()
 
-      queuedEmails should be(state.size)
-      info(s"queued $queuedEmails emails, received ${state.size}")
+      val receivedEmails = state.size
+
+      queuedEmails should be <= (receivedEmails)
+      info(s"queued $queuedEmails emails, received ${receivedEmails}")
     }
   }
 }
