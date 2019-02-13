@@ -34,7 +34,8 @@ object ScalaSettingPlugin extends AutoPlugin {
       "-Ywarn-value-discard",
       "-Ywarn-unused",
       "-Ywarn-unused-import",
-      "-Yrangepos"
+      "-Yrangepos",
+      "-Ypartial-unification"
     ) ++ crossFlags(scalaVersion.value),
     resolvers += Resolver.jcenterRepo
   )
