@@ -127,7 +127,7 @@ class PersistenceSpec
       }
     }
 
-    "should deliver the correct amount of messages" in {
+    "should deliver all the queued messages" in {
       val state = new ConcurrentLinkedQueue[SimpleMail]()
       val emailSender = new EmailSender(new MockedData, new MockedClientWithDelay(state))
       val loggingActor = system.actorOf(LoggingActor.props())
@@ -145,6 +145,7 @@ class PersistenceSpec
       )
 
       var queuedEmails = 0
+      var failedEmails = 0
       info("start")
 
       val task = system.scheduler.schedule(0.seconds, 1.milliseconds,
@@ -152,8 +153,8 @@ class PersistenceSpec
           def run(): Unit = {
             ask(emailPersistanceActor, SendEmail(mail))
               .onComplete {
-                case scala.util.Success(result) => queuedEmails +=1
-                case scala.util.Failure(error) => ()
+                case scala.util.Success(result) => queuedEmails += 1
+                case scala.util.Failure(error) => failedEmails += 1
               }
         }
       })
@@ -165,10 +166,11 @@ class PersistenceSpec
       Thread sleep 200
       task.cancel()
 
+      Thread sleep 100
       val receivedEmails = state.size
 
       queuedEmails should be <= (receivedEmails)
-      info(s"queued $queuedEmails emails, received ${receivedEmails}")
+      info(s"queued $queuedEmails emails, received ${receivedEmails}, failed (not queued) $failedEmails")
     }
   }
 }
