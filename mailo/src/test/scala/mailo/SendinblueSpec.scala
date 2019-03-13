@@ -51,7 +51,7 @@ class SendinblueSpec extends FlatSpec with Matchers with ScalaFutures {
       )
       .futureValue
       .swap
-      .getOrElse(fail)) should be(http.MailClientError.UnknownCode)
+      .getOrElse(fail)) should be (http.MailClientError.UnknownError("{\"code\":\"missing_parameter\",\"message\":\"sender name is missing\"}"))
   }
 
  "email" should "not explode sending attachments" in {
