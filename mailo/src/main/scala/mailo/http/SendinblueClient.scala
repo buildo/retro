@@ -83,8 +83,11 @@ class SendinblueClient(
       )
       res <- Future(sendinblue.sendTransacEmail(entity)).map { r =>
         MailResponse(r.getMessageId(), "Email sent successfully.").asRight[MailError]
-      }.recover { case e =>
-        UnknownCode.asLeft[MailResponse]
+      }.recover {
+        case e: ApiException =>
+          UnknownError(e.getResponseBody()).asLeft[MailResponse]
+        case e: Throwable =>
+          UnknownError(e.toString()).asLeft[MailResponse]
       }
     } yield res
 
@@ -125,12 +128,14 @@ class SendinblueClient(
     email.setTags(tags.asJava)
     email.setHtmlContent(html)
     email.setTextContent(text)
-    email.setAttachment(attachments.map { a =>
-      val aa = new SendSmtpEmailAttachment()
-      aa.setContent(java.util.Base64.getDecoder.decode(a.content))
-      aa.setName(a.name)
-      aa
-    }.asJava)
+    if (attachments.size > 0) {
+      email.setAttachment(attachments.map { a =>
+        val aa = new SendSmtpEmailAttachment()
+        aa.setContent(java.util.Base64.getDecoder.decode(a.content))
+        aa.setName(a.name)
+        aa
+      }.asJava)
+    }
     email
   }
 }

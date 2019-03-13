@@ -15,7 +15,7 @@ object MailClientError {
   case object ServerError
       extends MailError("500, 502, 503, 504 Server Errors - something is wrong on the email server")
   case object UnknownCode extends MailError("Unknown response")
-  case class UnkownError(msg: String) extends MailError(msg)
+  case class UnknownError(msg: String) extends MailError(msg)
   case class InvalidInput(msg: String) extends MailError(msg)
 }
 

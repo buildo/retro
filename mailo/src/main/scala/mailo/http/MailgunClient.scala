@@ -151,7 +151,7 @@ class MailgunClient(
       }
     } yield result).recover {
       case t: Throwable =>
-        UnkownError(t.getStackTraceAsString).asLeft[MailResponse]
+        UnknownError(t.getStackTraceAsString).asLeft[MailResponse]
     }
   }
 
