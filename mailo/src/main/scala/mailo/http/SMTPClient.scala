@@ -10,6 +10,7 @@ import mailo.{Attachment, MailError, MailRefinedContent, MailResponse}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util._
 import javax.mail._
+import mailo.MailRefinedContent.{HTMLContent, TEXTContent}
 import mailo.http.MailClientError.{BadRequest, UnknownError}
 
 class SMTPClient(implicit conf: Config = ConfigFactory.load()) extends MailClient with MimeMailClient with LazyLogging{
@@ -56,12 +57,18 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load()) extends MailClien
     props.put("mail.smtp.port", port)
     props.put("mail.smtp.auth", "false")
     val session = Session.getInstance(props, null)
-    val msg = new MimeMessage(session)
-    msg.setFrom(from)
-    msg.setRecipients(Message.RecipientType.TO, recipients)
-    msg.setSubject(subject)
-    msg.setSentDate(java.util.Date.from(java.time.Instant.now))
-    msg.setText(content.content)
+    val msg = new MimeMessage(session){
+      setFrom(from)
+      setRecipients(Message.RecipientType.TO, recipients)
+      setSubject(subject)
+      setSentDate(java.util.Date.from(java.time.Instant.now))
+    }
+
+    content match {
+      case HTMLContent(html) => msg.setContent(html, "text/html; charset=utf-8")
+      case TEXTContent(text) => msg.setText(text)
+    }
+
     headers.foreach(h => msg.addHeader(h._1, h._2))
     internalSend(msg, to, attachments, tags)
   }
