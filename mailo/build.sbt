@@ -16,12 +16,13 @@ val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 val scalaCacheGuava = "com.github.cb372" %% "scalacache-guava" % "0.9.3"
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.3" % Test
-val javaxMail = "javax.mail" % "javax.mail-api" % "1.6.1"
 val enumero = "io.buildo" %% "enumero" % "1.3.0"
 val levelDb = "org.fusesource.leveldbjni"   % "leveldbjni-all"   % "1.8"
 val mailin = "com.sendinblue" % "sib-api-v3-sdk" % "3.0.1"
 val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.1" % Test
 val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test
+val jakartaMail = "com.sun.mail" % "jakarta.mail" % "1.6.3"
+
 
 val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -93,12 +94,12 @@ lazy val mailo = (project in file(".")).
       scalaCacheGuava,
       scalaLogging,
       logback,
-      javaxMail,
       mailin,
       enumero,
       levelDb,
       akkaPersistenceInMemory,
-      akkaTestkit
+      akkaTestkit,
+      jakartaMail
     )
   )
 
