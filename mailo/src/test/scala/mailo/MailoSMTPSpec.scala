@@ -12,7 +12,7 @@ class MailoSMTPSpec extends FlatSpec with AppSpecSmtpClient with Matchers with S
   implicit val defaultPatience =
       PatienceConfig(timeout = Span(20, Seconds), interval = Span(5, Seconds))
 
-  "email" should "be correctly sent" in {
+  ignore should "be correctly sent" in {
     val a = mailer.send(Mail(
       to = "receiver@buildo.io",
       from = "sender@buildo.io",
@@ -23,7 +23,7 @@ class MailoSMTPSpec extends FlatSpec with AppSpecSmtpClient with Matchers with S
     )).futureValue.isRight should be (true)
   }
 
-  "email with wrong recipient" should "correctly fail" in {
+  ignore should "correctly fail" in {
     mailer.send(Mail(
       to = "postmaster@sandbox119020d8ef954c02bac2ee6db24d635b.mailgun.",
       from = "Mailo mailo@buildo.io",
@@ -34,7 +34,7 @@ class MailoSMTPSpec extends FlatSpec with AppSpecSmtpClient with Matchers with S
     )).futureValue.swap.getOrElse(fail) should be (http.MailClientError.BadRequest)
   }
 
-  "too few parameter error" should "be returned" in {
+  ignore should "be returned" in {
     mailer.send(Mail(
       to = "mailo@buildo.io",
       from = "Mailo mailo@buildo.io",
