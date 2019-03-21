@@ -26,7 +26,6 @@ project/plugins/project/
 .DS_Store
 
 # IDEs
-.idea
 .bloop
 .metals
 .idea
