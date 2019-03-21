@@ -7,7 +7,7 @@ build:
   mailo:
     image: hseeberger/scala-sbt
     commands:
-      - sbt test -Dsbt.ivy.home=/drone/.ivy
+      - sbt test
 
   publish:
     image: hseeberger/scala-sbt
