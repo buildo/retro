@@ -25,4 +25,7 @@ project/plugins/project/
 # OSx
 .DS_Store
 
+# IDEs
+.bloop
+.metals
 .idea
