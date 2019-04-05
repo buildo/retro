@@ -3,7 +3,7 @@ import Dependencies._
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := Seq(scala211, scala212),
+    crossScalaVersions := Seq(scala212),
     resolvers += Resolver.bintrayRepo("buildo", "maven"),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     addCompilerPlugin(

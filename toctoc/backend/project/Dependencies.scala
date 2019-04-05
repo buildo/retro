@@ -1,7 +1,6 @@
 import sbt._
 
 object Dependencies {
-  val scala211 = "2.11.12"
   val scala212 = "2.12.8"
 
   val V = new {
