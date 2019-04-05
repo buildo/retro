@@ -19,15 +19,15 @@ pipeline:
     image: hseeberger/scala-sbt
     commands:
       - cd backend
-      - sbt slick/test
+      - sbt slickPostgreSql/test
       - sbt quill/test
       - sbt slickMySql/test
     environment:
       - DB_USER=postgres
       - DB_PASSWORD=
-      - DB_SERVER=database
+      - DB_SERVER=postgres
       - DB_NAME=toctoc
-      - MYSQL_DB_URL=jdbc:mysql://MySqlDatabase:3306/toctoc?useSSL=false
+      - MYSQL_DB_URL=jdbc:mysql://mysql:3306/toctoc?useSSL=false
 
   frontend-test:
     group: test
@@ -59,17 +59,17 @@ pipeline:
       - /tmp/cache:/cache
 
 services:
-  database:
+  postgres:
     image: postgres:10
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=toctoc
-  MySqlDatabase:    
-    image: mysql:5.7    
+  mysql:
+    image: mysql:5.7
     ports:
       - '3306:3306'
-    environment:      
+    environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: toctoc
