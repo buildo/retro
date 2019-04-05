@@ -13,11 +13,13 @@ import _root_.slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext)
-  extends LoginAuthenticationDomain
-  with BCryptHashing {
+class PostgreSqlSlickLoginAuthenticationDomain(db: Database)(
+    implicit ec: ExecutionContext
+) extends LoginAuthenticationDomain
+    with BCryptHashing {
 
-  class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, "login_auth_domain") {
+  class LoginTable(tag: Tag)
+      extends Table[(Int, String, String, String)](tag, "login_auth_domain") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def username = column[String]("username")
@@ -25,18 +27,24 @@ class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext
 
     def * = (id, ref, username, passwordHash)
 
-    def uniqueUsernameIdx = index("unique_username_idx", username, unique = true)
+    def uniqueUsernameIdx =
+      index("unique_username_idx", username, unique = true)
   }
   val loginTable = TableQuery[LoginTable]
 
-  def register(s: Subject, c: Login): Future[Either[AuthenticationError, LoginDomain]] =
-    db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password)))) map { case _ =>
-      Right(this)
+  def register(
+      s: Subject,
+      c: Login
+  ): Future[Either[AuthenticationError, LoginDomain]] =
+    db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password)))) map {
+      case _ =>
+        Right(this)
     } recover { case _ => Left(AuthenticationError.InvalidCredential) }
 
   def unregister(s: Subject): Future[Either[AuthenticationError, LoginDomain]] =
-    db.run(loginTable.filter(_.ref === s.ref).delete) map { case _ =>
-      Right(this)
+    db.run(loginTable.filter(_.ref === s.ref).delete) map {
+      case _ =>
+        Right(this)
     }
 
   def unregister(c: Login): Future[Either[AuthenticationError, LoginDomain]] =
@@ -46,7 +54,9 @@ class SlickLoginAuthenticationDomain(db: Database)(implicit ec: ExecutionContext
       res <- EitherT(unregister(s))
     } yield res).value
 
-  def authenticate(c: Login): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = {
+  def authenticate(
+      c: Login
+  ): Future[Either[AuthenticationError, (LoginDomain, Subject)]] = {
     db.run(loginTable.filter(_.username === c.username).result) map {
       case l if l.size > 0 =>
         l.find(el => checkPassword(c.password, el._4)) match {

@@ -4,8 +4,8 @@ package authentication
 package test
 
 import core.authentication.TokenBasedAuthentication._
-import login.SlickLoginAuthenticationDomain
-import token.SlickAccessTokenAuthenticationDomain
+import login.PostgreSqlSlickLoginAuthenticationDomain
+import token.PostgreSqlSlickAccessTokenAuthenticationDomain
 
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
@@ -14,22 +14,24 @@ import _root_.slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SlickLoginAuthenticationDomainFlowSpec extends FlatSpec
-  with BeforeAndAfterEach
-  with BeforeAndAfterAll
-  with ScalaFutures
-  with EitherValues
-  with Matchers {
+class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
+    extends FlatSpec
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with ScalaFutures
+    with EitherValues
+    with Matchers {
 
   val db = Database.forConfig("db")
-  val loginAuthDomain = new SlickLoginAuthenticationDomain(db)(global)
-  val accessTokenAuthDomain = new SlickAccessTokenAuthenticationDomain(db)(global)
+  val loginAuthDomain = new PostgreSqlSlickLoginAuthenticationDomain(db)(global)
+  val accessTokenAuthDomain =
+    new PostgreSqlSlickAccessTokenAuthenticationDomain(db)(global)
 
   val loginTable = loginAuthDomain.loginTable
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
   val schema = loginTable.schema ++ accessTokenTable.schema
 
-  val authFlow = new SlickTokenBasedAuthenticationFlow(db)
+  val authFlow = new PostgreSqlSlickTokenBasedAuthenticationFlow(db)
 
   override def beforeAll() = {
     db.run(schema.create).futureValue
