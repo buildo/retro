@@ -9,10 +9,7 @@ import java.sql.Timestamp
 
 object MySqlSlickHelper {
   implicit val timeStampColumnType = MappedColumnType.base[Instant, Timestamp](
-    { i =>
-      Timestamp.from(i)
-    }, { t =>
-      t.toInstant
-    }
+    i => Timestamp.from(i),
+    t => t.toInstant,
   )
 }
