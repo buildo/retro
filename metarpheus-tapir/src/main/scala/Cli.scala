@@ -6,7 +6,7 @@ case class CliConfig(
   `package`: String = "tapiro",
 )
 
-object Boot {
+object Cli {
   def main(args: Array[String]): Unit = {
     val builder = OParser.builder[CliConfig]
     val parser = {
@@ -28,7 +28,7 @@ object Boot {
 
     OParser.parse(parser, args, CliConfig()) match {
       case Some(c) =>
-        Util.createFile(c.from, c.to, c.`package`)
+        Util.createEndpointsFile(c.from, c.to, c.`package`)
       case _ =>
         println("Couldn't read the configurations")
     }
