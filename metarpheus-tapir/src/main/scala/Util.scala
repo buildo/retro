@@ -1,13 +1,13 @@
 import io.buildo.metarpheus.core.{Metarpheus, Config}
-import io.buildo.metarpheus.core.intermediate.{API, RouteSegment, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.{API, RouteSegment, Type => MetarpheusType, Route}
 import java.io.PrintWriter
 import scopt.OParser
 import scala.meta._
 
 case class CliConfig(
-  from: String = "./",
+  from: String = "/Users/cale/tmp",
   to: String = "./Endpoints.scala",
-  deps: Option[String] = None
+  `package`: String = "tapiro",
 )
 
 object Boot {
@@ -24,16 +24,15 @@ object Boot {
         opt[String]('t', "to")
           .action((x, c) => c.copy(to = x))
           .text("to is a string property"),
-        opt[Option[String]]('d', "deps")
-          .action((x, c) => c.copy(deps = x))
-          .text("deps is an option string property"),
+        opt[String]('p', "package")
+          .action((x, c) => c.copy(`package` = x))
+          .text("package is a string property"),
       )
     }
 
     OParser.parse(parser, args, CliConfig()) match {
       case Some(c) =>
-        val deps = c.deps.map(d => q"import ${meta.Term.Name(d)}._")
-        Util.createFile(c.from, c.to, deps)
+        Util.createFile(c.from, c.to, c.`package`)
       case _ =>
         println("Couldn't read the configurations")
     }
@@ -42,16 +41,16 @@ object Boot {
 
 object Util {
   import Formatter.format
-  import RoutesWrapper.wrapRoutes
-  import EndpointConverter.routeToEndpoint
+  import EndpointConverter.{routeToEndpoint, wrapRoutes, implicits}
 
-  def createFile(from: String, to: String, deps: Option[meta.Import]) = {
+  def createFile(from: String, to: String, `package`: String) = {
     val metarpheusResult: API = Metarpheus.run(List(from), Config(Set.empty))
     val routes = metarpheusResult.routes
-    val name = if (routes.isEmpty) "Endpoints"
-      else s"${routes.head.name.head.capitalize}Endpoints"
+    val name = Type.Name(if (routes.isEmpty) "Endpoints"
+      else s"${routes.head.name.head.capitalize}Endpoints")
+    val packageTerm = Term.Name(`package`)
 
-    val content = format(wrapRoutes(name, deps, routes.map(routeToEndpoint)))
+    val content = format(wrapRoutes(name, implicits(routes), packageTerm, routes.map(routeToEndpoint)))
     try {
       val writer = new PrintWriter(to)
       writer.write(content)
@@ -61,21 +60,4 @@ object Util {
       case e: Exception => println(e.getLocalizedMessage())
     }
   }
-}
-
-object RoutesWrapper {
-  val wrapRoutes = (name: String, models: Option[meta.Import], objects: List[meta.Defn.Val]) =>
-    models match {
-      case Some(models) =>q"""object ${Term.Name(name)} {
-  import tapir._
-  $models
-
- ..$objects }
-"""
-      case None => q"""object ${Term.Name(name)} {
-  import tapir._
-
- ..$objects }
-"""
-    }
 }

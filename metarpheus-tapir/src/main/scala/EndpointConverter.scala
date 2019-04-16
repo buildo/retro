@@ -2,11 +2,40 @@ import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment, RouteParam, 
 import scala.meta._
 
 object EndpointConverter {
+  val wrapRoutes = (
+    name: Type.Name,
+    implicits: List[Term.Param],
+    `package`: Term.Name,
+    objects: List[Defn.Val]
+  ) => {
+    q"""package ${`package`} {
+  import tapir._
+  import tapir.Codec.JsonCodec
+
+  class $name(..$implicits) {
+   ..$objects
+  }
+}
+"""
+  }
+
+  val typeToParam = (tpe: MetarpheusType) => {
+    val name = typeNameString(tpe)
+    val paramName = Term.Name(s"${name.head.toLower}${name.tail}")
+    param"implicit ${paramName}: JsonCodec[${typeName(tpe)}]"
+  }
+
   val typeName = (`type`: MetarpheusType) => Type.Name(typeNameString(`type`))
 
   val typeNameString = (`type`: MetarpheusType) => `type` match {
     case MetarpheusType.Apply(name, _) => name
     case MetarpheusType.Name(name) => name
+  }
+
+  val implicits: List[Route] => List[Term.Param] = (routes: List[Route]) => {
+    routes.map {
+      route => List(route.returns) ++ route.body.map(_.tpe)
+    }.flatten.distinct.map(typeToParam)
   }
 
   val endpointType = (route: Route) => {
@@ -28,20 +57,19 @@ object EndpointConverter {
        List(Lit.String(route.name.tail.mkString)))
     withOutput(
       withError(
-        withBody(
-          route.params.foldLeft(basicEndpoint){(acc, param) => withParam(acc, param)}, route.body
-        )
+        route.method match {
+          case "get" => route.params.foldLeft(basicEndpoint){(acc, param) => withParam(acc, param)}
+          case "post" => route.params.foldLeft(basicEndpoint){(acc, param) => withBody(acc, param.tpe)}
+          case _ => throw new Exception("method not supported")
+        }
       ), route.returns
     )
   }
 
-  val withBody = (endpoint: meta.Term, body: Option[Route.Body]) => {
-    body match {
-      case None => endpoint
-      case Some(body) => Term.Apply(Term.Select(endpoint,
-        Term.Name("in")), List(Term.ApplyType(Term.Name("jsonBody"),
-          List(Type.Name(typeNameString(body.tpe))))))
-    }
+  val withBody = (endpoint: meta.Term, tpe: MetarpheusType) => {
+    Term.Apply(Term.Select(endpoint,
+      Term.Name("in")), List(Term.ApplyType(Term.Name("jsonBody"),
+        List(Type.Name(typeNameString(tpe))))))
   }
 
   val withError = (endpoints: meta.Term) =>

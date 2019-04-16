@@ -3,7 +3,7 @@ import org.scalafmt.config._
 import org.scalafmt.rewrite._
 
 object Formatter {
-  val format = (input: meta.Defn.Object) => {Scalafmt
+  val format = (input: meta.Pkg) => {Scalafmt
     .format(
       input.syntax,
       ScalafmtConfig.default
