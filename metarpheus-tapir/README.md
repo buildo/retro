@@ -12,7 +12,7 @@ Run `sbt assembly`
 ## Example
 
 Given:
-```
+```scala
 package testo
 
 import scala.annotation.StaticAnnotation
@@ -35,7 +35,7 @@ trait Controller[F[_]] {
 
 Generates:
 
-```
+```scala
 package testo
 import tapir._
 import tapir.Codec.JsonCodec
@@ -64,7 +64,7 @@ class ControllerEndpoints(
 
 Endpoints can be used as follows:
 
-```
+```scala
 val endpoints = new ControllerEndpoints()
 val controller = new ControllerImpl[IO]()
 
