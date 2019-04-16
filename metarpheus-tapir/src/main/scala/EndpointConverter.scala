@@ -19,7 +19,7 @@ object EndpointConverter {
 """
   }
 
-  val typeToParam = (tpe: MetarpheusType) => {
+  val typeToImplicitParam = (tpe: MetarpheusType) => {
     val name = typeNameString(tpe)
     val paramName = Term.Name(s"${name.head.toLower}${name.tail}")
     param"implicit ${paramName}: JsonCodec[${typeName(tpe)}]"
@@ -35,7 +35,7 @@ object EndpointConverter {
   val implicits: List[Route] => List[Term.Param] = (routes: List[Route]) => {
     routes.map {
       route => List(route.returns) ++ route.body.map(_.tpe)
-    }.flatten.distinct.map(typeToParam)
+    }.flatten.distinct.map(typeToImplicitParam)
   }
 
   val endpointType = (route: Route) => {
