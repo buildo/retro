@@ -15,6 +15,6 @@ scalacOptions := Seq(
   "-deprecation",
   "-encoding",
   "utf8",
-  "-feature"
+  "-feature",
 )
 libraryDependencies ++= dependencies
