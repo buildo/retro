@@ -1,23 +1,30 @@
-import io.buildo.metarpheus.core.{Metarpheus, Config}
+import io.buildo.metarpheus.core.{Config, Metarpheus}
 import io.buildo.metarpheus.core.intermediate.{API, RouteSegment, Type => MetarpheusType, Route}
 import java.io.PrintWriter
 import scala.meta._
 
 object Util {
   import Formatter.format
-  import EndpointConverter.{routeToEndpoint, wrapRoutes, implicits}
+  import Meta.{codecsImplicits, endpointsClass, routeToTapirEndpoint}
 
-  def createFile(from: String, to: String, `package`: String) = {
-    val metarpheusResult: API = Metarpheus.run(List(from), Config(Set.empty))
-    val routes = metarpheusResult.routes
-    val name = Type.Name(if (routes.isEmpty) "Endpoints"
-      else s"${routes.head.name.head.capitalize}Endpoints")
-    val packageTerm = Term.Name(`package`)
-
-    val content = format(wrapRoutes(name, implicits(routes), packageTerm, routes.map(routeToEndpoint)))
+  def createEndpointsFile(from: String, to: String, `package`: String) = {
+    val routes = Metarpheus.run(List(from), Config(Set.empty)).routes
+    val className = Type.Name(
+      if (routes.isEmpty) "Endpoints"
+      else s"${routes.head.name.head.capitalize}Endpoints",
+    )
+    val packageName = Term.Name(`package`)
+    val endpoints = format(
+      endpointsClass(
+        packageName,
+        className,
+        codecsImplicits(routes),
+        routes.map(routeToTapirEndpoint),
+      ),
+    )
     try {
       val writer = new PrintWriter(to)
-      writer.write(content)
+      writer.write(endpoints)
       writer.close()
       println(s"generated file $to 🤖")
     } catch {
