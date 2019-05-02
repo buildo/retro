@@ -2,13 +2,25 @@ enablePlugins(GitVersioning)
 
 lazy val commonSettings = Seq(
   organization := "io.buildo",
-  scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.11.11", "2.12.3"),
+  scalaVersion := "2.12.8",
+  crossScalaVersions := Seq("2.12.8", "2.13.0-RC1"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayOrganization := Some("buildo"),
   bintrayVcsUrl := Some("git@github.com:buildo/enumero"),
   releaseCrossBuild := true,
-  addCompilerPlugin(("org.scalamacros" % "paradise" % "2.1.0").cross(CrossVersion.full)),
+  scalacOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 13 => "-Ymacro-annotations" :: Nil
+      case _                       => Nil
+    }
+  },
+  libraryDependencies ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 13 => Nil
+      case _ =>
+        compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
+    }
+  },
   homepage := Some(url("https://buildo.github.io/enumero")),
   scmInfo := Some(
     ScmInfo(
@@ -27,8 +39,8 @@ lazy val commonSettings = Seq(
 )
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish := (()),
+  publishLocal := (()),
   publishArtifact := false
 )
 
@@ -47,7 +59,7 @@ lazy val core = project
     libraryDependencies ++= Seq(
       scalaOrganization.value % "scala-reflect" % scalaVersion.value
     ) ++ Seq(
-      "org.scalatest" %% "scalatest" % "3.0.1",
+      "org.scalatest" %% "scalatest" % "3.1.0-SNAP9",
       "org.mockito" % "mockito-all" % "1.9.5"
     ).map(_ % Test)
   )
@@ -57,9 +69,9 @@ lazy val circeSupport = project
   .settings(
     name := "enumero-circe-support",
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.9.0",
-      "io.circe" %% "circe-parser" % "0.9.0" % Test,
-      "org.scalatest" %% "scalatest" % "3.0.1" % Test
+      "io.circe" %% "circe-core" % "0.12.0-M1",
+      "io.circe" %% "circe-parser" % "0.12.0-M1" % Test,
+      "org.scalatest" %% "scalatest" % "3.1.0-SNAP9" % Test
     )
   )
   .dependsOn(core)
