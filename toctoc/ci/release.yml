@@ -17,5 +17,10 @@ params:
   SONATYPE_PASSWORD:
 
 run:
-  path: sbt
-  args: ci-release
+  dir: toctoc
+  path: sh
+  args:
+    - -ce
+    - |
+      apk --no-progress add --update gnupg
+      sbt ci-release
