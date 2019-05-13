@@ -22,9 +22,6 @@ inThisBuild(
       Developer("@gabro", "Gabriele Petronella", "gabriele@buildo.io", url("https://buildo.io")),
     ),
     homepage := Some(url("https://github.com/buildo/toctoc")),
-    releaseEarlyWith := BintrayPublisher,
-    releaseEarlyNoGpg := true,
-    releaseEarlyEnableSyncToMaven := false,
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/buildo/toctoc"),

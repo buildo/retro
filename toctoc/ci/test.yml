@@ -1,0 +1,18 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: quay.io/buildo/dcind
+
+inputs:
+  - name: toctoc
+  - name: postgres
+  - name: mysql
+  - name: scala-sbt
+
+caches:
+  - path: .ivy2
+
+run:
+  path: toctoc/ci/test.sh
