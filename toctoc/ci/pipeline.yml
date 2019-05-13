@@ -47,8 +47,14 @@ jobs:
     resource: master
     trigger: true
   - get: postgres
+    params:
+      save: true
   - get: mysql
+    params:
+      save: true
   - get: scala-sbt
+    params:
+      save: true
   - task: test
     file: toctoc/ci/test.yml
     privileged: true
