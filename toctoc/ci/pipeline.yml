@@ -1,0 +1,102 @@
+resource_types:
+- name: pull-request
+  type: docker-image
+  source:
+    repository: teliaoss/github-pr-resource
+
+resources:
+- type: git
+  name: master
+  icon: github-circle
+  source:
+    uri: https://github.com/buildo/toctoc.git
+    branch: master
+
+- type: pull-request
+  name: pr
+  icon: source-pull
+  source:
+    repository: buildo/toctoc
+    access_token: ((github-token))
+
+- name: postgres
+  type: docker-image
+  icon: docker
+  source:
+    repository: postgres
+    tag: "10.1-alpine"
+
+- name: mysql
+  type: docker-image
+  icon: docker
+  source:
+    repository: mysql
+    tag: "5.7"
+
+- name: scala-sbt
+  type: docker-image
+  icon: docker
+  source:
+    repository: buildo/scala-sbt-alpine
+    tag: 8u201_2.12.8_1.2.8
+
+jobs:
+- name: test
+  plan:
+  - get: toctoc
+    resource: master
+    trigger: true
+  - get: postgres
+  - get: mysql
+  - get: scala-sbt
+  - task: test
+    file: toctoc/ci/test.yml
+    privileged: true
+
+- name: test-pr
+  plan:
+  - get: toctoc
+    resource: pr
+    trigger: true
+  - put: pr
+    params:
+      path: toctoc
+      status: pending
+  - get: postgres
+    params:
+      save: true
+  - get: mysql
+    params:
+      save: true
+  - get: scala-sbt
+    params:
+      save: true
+  - task: test
+    file: toctoc/ci/test.yml
+    privileged: true
+    on_failure:
+      put: pr
+      params:
+        path: toctoc
+        status: failure
+    on_success:
+      put: pr
+      params:
+        path: toctoc
+        status: success
+
+- name: release
+  plan:
+  - get: toctoc
+    resource: master
+    trigger: true
+    passed:
+      - test
+  - task: release on Sonatype
+    file: toctoc/ci/release.yml
+    params:
+      PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
+      PGP_SECRET: ((sonatype_pgp_secret_key))
+      SONATYPE_USERNAME: ((sonatype_username))
+      SONATYPE_PASSWORD: ((sonatype_password))
+

@@ -1,8 +1,0 @@
-*.log
-*.log*
-node_modules
-lib/*
-*.tags*
-.eslintcache
-yarn.lock
-package-lock.json
