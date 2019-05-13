@@ -17,7 +17,6 @@ val V = new {
 
 libraryDependencies ++= List(
   "io.buildo" %% "toctoc-core" % V.toctoc,
-  "io.buildo" %% "toctoc-wiro" % V.toctoc,
   "io.buildo" %% "toctoc-slick" % V.toctoc,
 )
 ```

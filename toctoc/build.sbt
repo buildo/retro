@@ -68,3 +68,16 @@ lazy val ldap = project
     libraryDependencies ++= ldapDependencies,
   )
   .dependsOn(core)
+
+lazy val docs = project
+  .in(file("toctoc-docs"))
+  .settings(
+    skip.in(publish) := true,
+    moduleName := "toctoc-docs",
+    mdocVariables := Map(
+      "VERSION" -> version.value,
+      "STABLE_VERSION" -> version.value.replaceFirst("\\+.*", ""),
+    ),
+  )
+  .dependsOn(core)
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)
