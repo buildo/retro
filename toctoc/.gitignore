@@ -27,3 +27,6 @@ project/plugins/project/
 
 #IntelliJ IDE
 .idea/
+
+node_modules
+build

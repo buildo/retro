@@ -29,8 +29,11 @@ inThisBuild(
         Some("scm:git:git@github.com:buildo/toctoc.git"),
       ),
     ),
+    parallelExecution in Test := false,
   ),
 )
+
+skip.in(publish) := true
 
 lazy val core = project
   .settings(
@@ -66,4 +69,15 @@ lazy val ldap = project
   )
   .dependsOn(core)
 
-parallelExecution in Test := false
+lazy val docs = project
+  .in(file("toctoc-docs"))
+  .settings(
+    skip.in(publish) := true,
+    moduleName := "toctoc-docs",
+    mdocVariables := Map(
+      "VERSION" -> version.value,
+      "STABLE_VERSION" -> version.value.replaceFirst("\\+.*", ""),
+    ),
+  )
+  .dependsOn(core)
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)

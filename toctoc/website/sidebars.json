@@ -1,0 +1,10 @@
+{
+  "docs": {
+    "Setup": ["installation"],
+    "Concepts": [
+      "concepts/functional-model",
+      "concepts/login",
+      "concepts/token"
+    ]
+  }
+}
