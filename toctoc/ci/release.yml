@@ -10,7 +10,7 @@ inputs:
   - name: toctoc
 
 params:
-  GITHUB_TOKEN:
+  GITHUB_DEPLOY_KEY:
   PGP_PASSPHRASE:
   PGP_SECRET:
   SONATYPE_USERNAME:
@@ -23,4 +23,4 @@ run:
     - -ce
     - |
       apk --no-progress add --update gnupg git
-      sbt ci-release
+      sbt "; ci-release; docs/docusaurusPublishGhpages"
