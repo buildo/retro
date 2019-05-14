@@ -22,5 +22,5 @@ run:
   args:
     - -ce
     - |
-      apk --no-progress add --update gnupg
+      apk --no-progress add --update gnupg git
       sbt ci-release
