@@ -29,8 +29,11 @@ inThisBuild(
         Some("scm:git:git@github.com:buildo/toctoc.git"),
       ),
     ),
+    parallelExecution in Test := false,
   ),
 )
+
+skip.in(publish) := true
 
 lazy val core = project
   .settings(
@@ -65,5 +68,3 @@ lazy val ldap = project
     libraryDependencies ++= ldapDependencies,
   )
   .dependsOn(core)
-
-parallelExecution in Test := false
