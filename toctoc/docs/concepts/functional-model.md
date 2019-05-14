@@ -29,7 +29,9 @@ In particular an authentication domain can be represented by a set
 Any fundamental authentication operation should be expressed in the context of
 authentication domains, to be able to explicitly represent side effects.
 
-## Authenticate
+## Operations
+
+### Authenticate
 
 The authenticate operation checks whether a given credential `c` identifies a
 subject `s`. This operation could possibly modify a given authentication domain:
@@ -39,7 +41,7 @@ for example, in the OTP use case, a credential must be used only once.
 Fa: D x C ⟶ D x S
 ```
 
-## Register
+### Register
 
 The register operation adds a new association `(c, s)`. This means that the
 subject `s` can be identified by the credential `c`.
@@ -48,7 +50,7 @@ subject `s` can be identified by the credential `c`.
 Fr: D x C x S ⟶ D
 ```
 
-## Unregister
+### Unregister
 
 The unregister operation removes any associations `(c, s)` for any given subject
 `s`. This means that `s` will not be identifiable in the authentication domain.
@@ -65,7 +67,7 @@ identifiable by `c` in the authentication domain.
 Fu': D x C ⟶ D
 ```
 
-## Exchange
+### Exchange
 
 The exchange operations allows to use multiple authentication domains and
 different credential types to implement complex authentication workflows. The
