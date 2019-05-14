@@ -30,7 +30,7 @@ libraryDependencies ++= List(
 
 We publish a snapshot version on every merge on master.
 
-The latest snapshot version is `@VERSION@` and you use it to try the latest
+The latest snapshot version is `@VERSION@` and you can use it to try the latest
 unreleased features. For example:
 
 ```scala
