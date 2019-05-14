@@ -25,3 +25,21 @@ libraryDependencies ++= List(
   "io.buildo" %% "toctoc-slick-postgresql" % V.toctoc
 )
 ```
+
+## Snapshot versions
+
+We publish a snapshot version on every merge on master.
+
+The latest snapshot version is `@VERSION@` and you use it to try the latest
+unreleased features. For example:
+
+```scala
+val V = new {
+  val toctoc = "@VERSION@"
+}
+
+libraryDependencies ++= List(
+  "io.buildo" %% "toctoc-core" % V.toctoc,
+  "io.buildo" %% "toctoc-slick-postgresql" % V.toctoc
+)
+```
