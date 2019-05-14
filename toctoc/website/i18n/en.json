@@ -43,9 +43,7 @@
         "title": "Installation"
       }
     },
-    "links": {
-      "Docs": "Docs"
-    },
+    "links": {},
     "categories": {
       "Setup": "Setup",
       "Concepts": "Concepts",

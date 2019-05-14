@@ -5,7 +5,6 @@
       "concepts/functional-model",
       "concepts/login",
       "concepts/token"
-    ],
-    "Guide": ["guide/signup-flow", "guide/login-flow", "guide/reset-password"]
+    ]
   }
 }

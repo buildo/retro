@@ -20,7 +20,7 @@ const siteConfig = {
   organizationName: "buildo",
 
   // For no header links in the top nav bar -> headerLinks: [],
-  headerLinks: [{ doc: "installation", label: "Docs" }],
+  headerLinks: [],
 
   /* path to images for header/footer */
   headerIcon: "img/favicon.png",
@@ -29,7 +29,7 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: "#14a08f",
+    primaryColor: "#f3c65b",
     secondaryColor: "#0e7064"
   },
 
@@ -45,18 +45,21 @@ const siteConfig = {
 
   // On page navigation for the current documentation page.
   onPageNav: "separate",
+
   // No .html extensions for paths.
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
   ogImage: "img/undraw_online.svg",
-  twitterImage: "img/undraw_tweetstorm.svg"
+  twitterImage: "img/undraw_tweetstorm.svg",
 
   // Show documentation's last contributor's name.
-  // enableUpdateBy: true,
+  enableUpdateBy: true,
 
   // Show documentation's last update time.
-  // enableUpdateTime: true,
+  enableUpdateTime: true,
+
+  editUrl: "https://github.com/buildo/toctoc/edit/master/docs/"
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
