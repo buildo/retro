@@ -3,8 +3,8 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.8_1.2.8
+    repository: hseeberger/scala-sbt
+    tag: 8u181_2.12.8_1.2.8
 
 inputs:
   - name: toctoc
@@ -18,10 +18,24 @@ params:
 
 run:
   dir: toctoc
-  path: sh
+  path: bash
   args:
     - -ce
     - |
-      export GIT_USER=nemobot@buildo.io
-      apk --no-progress add --update gnupg git yarn autoconf automake g++ libc6-compat bash libjpeg-turbo-dev libpng-dev make nasm
-      sbt "; ci-release; docs/docusaurusPublishGhpages"
+      mkdir -p $HOME/.ssh
+      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      git config --global user.name "nemobot"
+      git config --global user.email "nemobot@buildo.io"
+      git config --global push.default simple
+      echo "$GITHUB_DEPLOY_KEY" > $HOME/.ssh/id_rsa
+      chmod 600 $HOME/.ssh/id_rsa
+      eval "$(ssh-agent -s)"
+      ssh-add $HOME/.ssh/id_rsa
+      curl -sL https://deb.nodesource.com/setup_10.x | bash -
+      apt-get install -y nodejs
+      curl -o- -L https://yarnpkg.com/install.sh | bash
+      source $HOME/.bashrc
+      sbt "; ci-release; docs/mdoc"
+      cd website
+      yarn install
+      USE_SSH=true yarn publish-gh-pages
