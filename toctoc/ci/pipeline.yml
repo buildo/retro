@@ -98,7 +98,7 @@ jobs:
     trigger: true
     passed:
       - test
-  - task: release on Sonatype
+  - task: release on Sonatype and publish website
     file: toctoc/ci/release.yml
     params:
       GITHUB_DEPLOY_KEY: ((private_key))
