@@ -22,5 +22,6 @@ run:
   args:
     - -ce
     - |
-      apk --no-progress add --update gnupg git
+      export GIT_USER=nemobot@buildo.io
+      apk --no-progress add --update gnupg git yarn autoconf automake g++ libc6-compat bash libjpeg-turbo-dev libpng-dev make nasm
       sbt "; ci-release; docs/docusaurusPublishGhpages"
