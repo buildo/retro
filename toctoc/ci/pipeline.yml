@@ -101,7 +101,7 @@ jobs:
   - task: release on Sonatype and publish website
     file: toctoc/ci/release.yml
     params:
-      GITHUB_DEPLOY_KEY: ((private_key))
+      GITHUB_DEPLOY_KEY: ((private-key))
       PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
       PGP_SECRET: ((sonatype_pgp_secret_key))
       SONATYPE_USERNAME: ((sonatype_username))
