@@ -3,20 +3,23 @@ package core
 package authentication
 
 import cats.data.EitherT
-import cats.implicits._
+import cats.Monad
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
-trait AuthenticationDomain[C <: Credential] {
-  def authenticate(c: C): Future[Either[AuthenticationError, (AuthenticationDomain[C], Subject)]]
-  def register(s: Subject, c: C): Future[Either[AuthenticationError, AuthenticationDomain[C]]]
-  def unregister(s: Subject): Future[Either[AuthenticationError, AuthenticationDomain[C]]]
-  def unregister(c: C): Future[Either[AuthenticationError, AuthenticationDomain[C]]]
+trait AuthenticationDomain[F[_], C <: Credential] {
+  def authenticate(c: C): F[Either[AuthenticationError, (AuthenticationDomain[F, C], Subject)]]
+  def register(s: Subject, c: C): F[Either[AuthenticationError, AuthenticationDomain[F, C]]]
+  def unregister(s: Subject): F[Either[AuthenticationError, AuthenticationDomain[F, C]]]
+  def unregister(c: C): F[Either[AuthenticationError, AuthenticationDomain[F, C]]]
 }
 
 object AuthenticationDomain {
-  def exchangeCredentials[C<: Credential, C2 <: Credential](ac: AuthenticationDomain[C], at: AuthenticationDomain[C2])(c: C, t: C2): Future[Either[AuthenticationError, (AuthenticationDomain[C], AuthenticationDomain[C2])]] =
+  def exchangeCredentials[F[_]: Monad, C <: Credential, C2 <: Credential](
+    ac: AuthenticationDomain[F, C],
+    at: AuthenticationDomain[F, C2],
+  )(
+    c: C,
+    t: C2,
+  ): F[Either[AuthenticationError, (AuthenticationDomain[F, C], AuthenticationDomain[F, C2])]] =
     (for {
       res <- EitherT(ac.authenticate(c))
       (nac, s) = res
