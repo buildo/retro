@@ -6,6 +6,8 @@ object Dependencies {
   val V = new {
     val slick = "3.3.0"
     val quill = "3.1.0"
+    val catsEffect = "1.3.0"
+    val monixCatnap = "3.0.0-RC2"
   }
 
   val slick = "com.typesafe.slick" %% "slick" % V.slick
@@ -17,13 +19,15 @@ object Dependencies {
   //are binary compatible by docs: https://github.com/typelevel/cats/releases
   val wiroServer = "io.buildo" %% "wiro-http-server" % "0.7.1"
   val cats = "org.typelevel" %% "cats-core" % "1.6.0"
+  val catsEffect = "org.typelevel" %% "cats-effect" % V.catsEffect
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
   val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
   val quillAsync = "io.getquill" %% "quill-async" % V.quill
   val quillAsyncPostgres = "io.getquill" %% "quill-async-postgres" % V.quill
   val flywayCore = "org.flywaydb" % "flyway-core" % "5.2.4"
-  val mysql =  "mysql" % "mysql-connector-java" % "8.0.15"
+  val mysql = "mysql" % "mysql-connector-java" % "8.0.15"
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % "4.0.10"
+  val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
 
   lazy val coreDependencies = List(
     bCrypt,
@@ -35,6 +39,8 @@ object Dependencies {
     slick,
     postgresql,
     slickHikari,
+    catsEffect,
+    monixCatnap,
   ) ++ List(
     scalatest,
     slf4jNop,

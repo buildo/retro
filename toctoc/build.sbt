@@ -30,6 +30,7 @@ inThisBuild(
       ),
     ),
     parallelExecution in Test := false,
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.0").cross(CrossVersion.binary)),
   ),
 )
 
