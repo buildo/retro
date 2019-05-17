@@ -77,5 +77,6 @@ object Dependencies {
     mysql,
     slick,
     slf4jNop,
+    catsEffect,
   )
 }
