@@ -56,13 +56,6 @@ lazy val slickMySql = project
   )
   .dependsOn(core)
 
-lazy val quill = project
-  .settings(
-    name := "toctoc-quill",
-    libraryDependencies ++= quillDependencies,
-  )
-  .dependsOn(core)
-
 lazy val ldap = project
   .settings(
     name := "toctoc-ldap",
