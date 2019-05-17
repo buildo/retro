@@ -50,13 +50,15 @@ object Dependencies {
     slick,
     mysql,
     slickHikari,
+    catsEffect,
+    monixCatnap,
   ) ++ List(
     scalatest,
     slf4jNop,
   ).map(_ % Test)
 
   lazy val quillDependencies = List(
-    quillAsync
+    quillAsync,
   ) ++ List(
     scalatest,
     quillAsyncPostgres,
@@ -74,6 +76,6 @@ object Dependencies {
     ldap,
     mysql,
     slick,
-    slf4jNop
+    slf4jNop,
   )
 }
