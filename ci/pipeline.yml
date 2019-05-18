@@ -84,6 +84,8 @@ jobs:
   - get: backend
     resource: master
     trigger: true
+    passed:
+      - sbt-buildo
   - task: release on Sonatype
     file: backend/ci/release.yml
     params:
