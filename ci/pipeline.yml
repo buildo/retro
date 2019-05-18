@@ -37,31 +37,22 @@ resources:
 #     repository: mysql
 #     tag: "5.7"
 
-- name: scala-sbt
-  type: docker-image
-  icon: docker
-  source:
-    repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.8_1.2.8
+# - name: scala-sbt
+#   type: docker-image
+#   icon: docker
+#   source:
+#     repository: buildo/scala-sbt-alpine
+#     tag: 8u201_2.12.8_1.2.8
 
 jobs:
-- name: test
+
+- name: sbt-buildo
   plan:
   - get: backend
     resource: master
     trigger: true
-  # - get: postgres
-  #   params:
-  #     save: true
-  # - get: mysql
-  #   params:
-  #     save: true
-  - get: scala-sbt
-    params:
-      save: true
-  # - task: test
-  #   file: toctoc/ci/test.yml
-  #   privileged: true
+  - task: compile
+    file: backend/sbt-buildo/ci/compile.yml
 
 - name: sbt-buildo-pr
   plan:
@@ -73,9 +64,6 @@ jobs:
       path: backend
       status: pending
       context: sbt-buildo
-  - get: scala-sbt
-    params:
-      save: true
   - task: compile
     file: backend/sbt-buildo/ci/compile.yml
     on_failure:
@@ -91,19 +79,16 @@ jobs:
         status: success
         context: sbt-buildo
 
-# - name: release
-#   plan:
-#   - get: toctoc
-#     resource: master
-#     trigger: true
-#     passed:
-#       - test
-#   - task: release on Sonatype and publish website
-#     file: toctoc/ci/release.yml
-#     params:
-#       GITHUB_DEPLOY_KEY: ((private-key))
-#       PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
-#       PGP_SECRET: ((sonatype_pgp_secret_key))
-#       SONATYPE_USERNAME: ((sonatype_username))
-#       SONATYPE_PASSWORD: ((sonatype_password))
+- name: release
+  plan:
+  - get: backend
+    resource: master
+    trigger: true
+  - task: release on Sonatype
+    file: backend/ci/release.yml
+    params:
+      PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
+      PGP_SECRET: ((sonatype_pgp_secret_key))
+      SONATYPE_USERNAME: ((sonatype_username))
+      SONATYPE_PASSWORD: ((sonatype_password))
 
