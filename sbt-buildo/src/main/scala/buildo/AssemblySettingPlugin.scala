@@ -13,7 +13,7 @@ object AssemblySettingPlugin extends AutoPlugin {
 
   lazy val baseSettings: Seq[Setting[_]] = Seq(
     test in assembly := {},
-    assemblyJarName in assembly:= s"${name.value}.jar",
+    assemblyJarName in assembly := s"${name.value}.jar",
     assemblyMergeStrategy in assembly := {
       case PathList("application.conf") => MergeStrategy.discard
       case x =>

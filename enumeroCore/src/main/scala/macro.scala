@@ -5,33 +5,33 @@ import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
 import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 /**
- * Macro annotation that transforms a trait with only bare,
- * empty objects as members to an ADT following the CaseEnum
- * convention (see the CaseEnum trait).
- *
- * e.g.
- * ```
- * @enum trait Planet {
- *   object Earth
- *   object Venus
- *   object Mercury
- * }
- * ```
- *
- * is transformed to
- *
- * ```
- * sealed abstract trait Planet extends CaseEnum
- * object Planet {
- *   case object Earth extends Planet
- *   case object Venus extends Planet
- *   case object Mercury extends Planet
- * }
- * ```
- */
+  * Macro annotation that transforms a trait with only bare,
+  * empty objects as members to an ADT following the CaseEnum
+  * convention (see the CaseEnum trait).
+  *
+  * e.g.
+  * ```
+  * @enum trait Planet {
+  *   object Earth
+  *   object Venus
+  *   object Mercury
+  * }
+  * ```
+  *
+  * is transformed to
+  *
+  * ```
+  * sealed abstract trait Planet extends CaseEnum
+  * object Planet {
+  *   case object Earth extends Planet
+  *   case object Venus extends Planet
+  *   case object Mercury extends Planet
+  * }
+  * ```
+  */
 @compileTimeOnly("Enable macro paradise to expand macro annotations.")
 class enum extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro EnumMacro.impl
@@ -39,7 +39,7 @@ class enum extends StaticAnnotation {
 
 object EnumMacro {
   def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    import c.universe.{ Try => _, _ }
+    import c.universe.{Try => _, _}
 
     def modifiedClass(classDecl: ClassDef) =
       Try {
@@ -71,39 +71,39 @@ object EnumMacro {
 
     annottees.map(_.tree) match {
       case (classDecl: ClassDef) :: Nil => modifiedClass(classDecl)
-      case _ => c.abort(c.enclosingPosition, "Invalid annottee")
+      case _                            => c.abort(c.enclosingPosition, "Invalid annottee")
     }
   }
 }
 
 /**
- * Macro annotation that transforms a trait enclosing a single type
- * alias and a set of objects to an ADT following the IndexedCaseEnum
- * convention (see the IndexedCaseEnum trait).
- *
- * e.g.
- * ```
- * @indexedEnum trait Planet {
- *   type Index = Int
- *   object Earth   { 1 }
- *   object Venus   { 2 }
- *   object Mercury { 3 }
- * }
- * ```
- *
- * is transformed to
- *
- * ```
- * sealed abstract trait Planet extends IndexedEnum {
- *   type Index = Int
- * }
- * object Planet {
- *   case object Earth extends Planet { val index = 1 }
- *   case object Venus extends Planet { val index = 2 }
- *   case object Mercury extends Planet { val index = 3 }
- * }
- * ```
- */
+  * Macro annotation that transforms a trait enclosing a single type
+  * alias and a set of objects to an ADT following the IndexedCaseEnum
+  * convention (see the IndexedCaseEnum trait).
+  *
+  * e.g.
+  * ```
+  * @indexedEnum trait Planet {
+  *   type Index = Int
+  *   object Earth   { 1 }
+  *   object Venus   { 2 }
+  *   object Mercury { 3 }
+  * }
+  * ```
+  *
+  * is transformed to
+  *
+  * ```
+  * sealed abstract trait Planet extends IndexedEnum {
+  *   type Index = Int
+  * }
+  * object Planet {
+  *   case object Earth extends Planet { val index = 1 }
+  *   case object Venus extends Planet { val index = 2 }
+  *   case object Mercury extends Planet { val index = 3 }
+  * }
+  * ```
+  */
 @compileTimeOnly("Enable macro paradise to expand macro annotations.")
 class indexedEnum extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro IndexedEnumMacro.impl
@@ -136,7 +136,7 @@ object IndexedEnumMacro {
       }
       val indexType = typeAliasTree match {
         case q"type Index = $ttype" => ttype
-        case _ => c.abort(c.enclosingPosition, "Invalid type alias declaration")
+        case _                      => c.abort(c.enclosingPosition, "Invalid type alias declaration")
       }
       c.Expr(q"""
         sealed abstract trait $enumName extends _root_.io.buildo.enumero.IndexedCaseEnum {
@@ -150,7 +150,7 @@ object IndexedEnumMacro {
 
     annottees.map(_.tree) match {
       case (classDecl: ClassDef) :: Nil => modifiedClass(classDecl)
-      case _ => c.abort(c.enclosingPosition, "Invalid annottee")
+      case _                            => c.abort(c.enclosingPosition, "Invalid annottee")
     }
   }
 }

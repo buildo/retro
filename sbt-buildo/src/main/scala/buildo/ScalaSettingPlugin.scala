@@ -19,13 +19,14 @@ object ScalaSettingPlugin extends AutoPlugin {
       case Some((2, 11)) => Seq("-Yinline-warnings", "-Ypartial-unification", "-Xfuture")
       case Some((2, 12)) => Seq("-opt-warnings", "-Ypartial-unification", "-Xfuture")
       case Some((2, 13)) => Seq("-Ymacro-annotations")
-      case _ => Nil
+      case _             => Nil
     }
 
   lazy val baseSettings: Seq[Def.Setting[_]] = Seq(
     cancelable in Global := true,
     scalacOptions ++= Seq(
-      "-encoding", "utf8",
+      "-encoding",
+      "utf8",
       "-deprecation",
       "-feature",
       "-unchecked",
@@ -37,9 +38,15 @@ object ScalaSettingPlugin extends AutoPlugin {
       "-Ywarn-value-discard",
       "-Ywarn-unused",
       "-Ywarn-unused-import",
-      "-Yrangepos",
+      "-Yrangepos"
     ) ++ crossFlags(scalaVersion.value),
-    resolvers += Resolver.jcenterRepo
+    resolvers += Resolver.jcenterRepo,
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n >= 13 => Nil
+        case _ =>
+          compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
+      }
+    }
   )
 }
-
