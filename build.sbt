@@ -54,6 +54,7 @@ lazy val mailo = project
   .settings(
     name := "mailo",
     libraryDependencies ++= mailoDependencies,
+    resolvers += Resolver.bintrayRepo("dnvriend", "maven"),
     dynverTagPrefix := "mailo-",
     mappings in (Compile, packageBin) ~= {
       _.filter { n =>
