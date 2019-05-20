@@ -30,19 +30,22 @@ lazy val `sbt-buildo` = project
   .settings(
     sbtPlugin := true,
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
-    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9")
+    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9"),
+    dynverTagPrefix := "sbt-buildo-"
   )
 
 lazy val enumeroCore = project
   .settings(
     name := "enumero", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroDependencies,
-    libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value
+    libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value,
+    dynverTagPrefix := "enumero-"
   )
 
 lazy val enumeroCirce = project
   .settings(
     name := "enumero-circe-support", // TODO(gabro): name consistency
-    libraryDependencies ++= enumeroCirceDependencies
+    libraryDependencies ++= enumeroCirceDependencies,
+    dynverTagPrefix := "enumero-"
   )
   .dependsOn(enumeroCore)
