@@ -1,0 +1,6 @@
+branchPrefix: n
+branchSuffix: y
+validBranchPrefixes:
+  - mailo
+  - client
+  - template

@@ -1,0 +1,18 @@
+@startuml mailodeps
+
+skinparam monochrome true
+
+[mailo] as m
+[S3 templates] as s3data
+[local templates] as local
+[data] as data
+[client] as client
+[mailgun client] as mclient
+
+m -(0- data
+data <-- s3data : extends
+data <-- local : extends
+m -(0- client
+client <-- mclient : extends
+
+@enduml

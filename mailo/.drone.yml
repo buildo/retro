@@ -1,0 +1,26 @@
+build:
+  decrypt-configs:
+    image: jordi/openssl
+    commands:
+      - openssl cast5-cbc -d -in src/test/resources/application.conf.cast5 -pass pass:$$TEST_CREDENTIALS_PASS -out src/test/resources/application.conf
+
+  mailo:
+    image: hseeberger/scala-sbt
+    commands:
+      - sbt test
+
+  publish:
+    image: hseeberger/scala-sbt
+    environment:
+      BINTRAY_USER: $$BINTRAY_USER
+      BINTRAY_PASS: $$BINTRAY_PASS
+    commands:
+      - sbt +releaseEarly
+    when:
+      event: [ push, tag ]
+      status: success
+
+
+cache:
+  mount:
+    - /drone/.ivy

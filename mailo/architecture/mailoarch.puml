@@ -1,0 +1,27 @@
+@startuml mailoarch
+
+skinparam monochrome true
+
+cloud S3
+
+[mailo] as m
+[S3 data] as data
+[mailgun client] as client
+
+queue queue
+m -(0- data
+S3 --> data
+m -(0- client
+
+cloud "mailgun ESP" as Mailgun
+queue -> Mailgun
+client --> queue
+
+[maildeath] as death
+
+cloud slack
+
+Mailgun -> death
+death -> slack
+
+@enduml
