@@ -34,7 +34,6 @@ object CiReleasePlugin extends AutoPlugin {
   }
 
   override def buildSettings: Seq[Def.Setting[_]] = List(
-    dynverSonatypeSnapshots := true,
     pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
   )
 
@@ -67,6 +66,7 @@ object CiReleasePlugin extends AutoPlugin {
   )
 
   override def projectSettings: Seq[Def.Setting[_]] = List(
+    dynverSonatypeSnapshots := true,
     publishConfiguration :=
       publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration :=
