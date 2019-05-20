@@ -5,17 +5,22 @@
 
 - Store your email templates where you like.
 - Send your email with the ESP you like.
-- Compose your template using HTML partials (convenient for footers and headers).
-  - Allowed chars in the names of the partials are given by the following regex `a-zA-Z0-9_.-`
+- Compose your template using HTML partials (convenient for footers and
+  headers).
+  - Allowed chars in the names of the partials are given by the following regex
+    `a-zA-Z0-9_.-`
 - Conveniently collect errors.
 
 # Install
+
 ```scala
 libraryDependencies += "io.buildo" %% "mailo" % "<MAILO_VERSION>"
 ```
 
 # How to use
+
 How to get mailo instance.
+
 ```scala
 import akka.stream.ActorMaterializer
 import akka.actor.ActorSystem
@@ -36,6 +41,7 @@ val mailo = new Mailo(s3, mailgun)
 ```
 
 How to send an email.
+
 ```scala
 mailo.send(
   to = "recipient@mail.com",
@@ -49,23 +55,23 @@ mailo.send(
 
 # Templates
 
-Use double curly breakets for parameters `{{parameter}}`, remember to include parameters in `params` argument.
+Use double curly breakets for parameters `{{parameter}}`, remember to include
+parameters in `params` argument.
 
-Use double square breakets for partials `[[partial.html]]`. Mailo looks for partials in `partials` folder.
-
-
+Use double square breakets for partials `[[partial.html]]`. Mailo looks for
+partials in `partials` folder.
 
 Complete example:
+
 ```html
-[[header.html]]
-Hello {{personFirstName}} {{personLastName}}
-[[footer.html]]
+[[header.html]] Hello {{personFirstName}} {{personLastName}} [[footer.html]]
 ```
 
 # How to send attachments
 
-Mailo provide a case class `Attachment` that is used to send attachments in emails.
-`Attachment` case class is defined as:
+Mailo provide a case class `Attachment` that is used to send attachments in
+emails. `Attachment` case class is defined as:
+
 ```scala
 import akka.http.scaladsl.model.ContentType
 case class Attachment(
@@ -84,6 +90,7 @@ val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plai
 ```
 
 And sent as:
+
 ```scala
 mailer.send(
    to = "recipient@mail.com",
@@ -99,7 +106,9 @@ mailer.send(
 ```
 
 # Content-Transfer-Encoding
-You can specify add a Content-Transfer-Encoding header in the attachments as follows.
+
+You can specify add a Content-Transfer-Encoding header in the attachments as
+follows.
 
 ```scala
 val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`application/pdf`, transferEncoding = Some("base64"))
@@ -107,5 +116,5 @@ val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`
 
 # Templates caching
 
-Since version `0.1.5` templates are cached.
-You can set caching TTL (time to live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.
+Since version `0.1.5` templates are cached. You can set caching TTL (time to
+live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.

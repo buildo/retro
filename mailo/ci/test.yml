@@ -1,0 +1,16 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: buildo/scala-sbt-alpine
+    tag: 8u201_2.12.8_1.2.8
+
+inputs:
+  - name: backend
+
+run:
+  dir: backend
+  path: sbt
+  args:
+    - mailo/test

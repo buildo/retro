@@ -1,4 +1,0 @@
-secretfile filter=git-crypt diff=git-crypt
-*.key filter=git-crypt diff=git-crypt
-application.conf filter=git-crypt diff=git-crypt
-secrets.yml filter=git-crypt diff=git-crypt

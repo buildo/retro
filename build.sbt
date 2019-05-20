@@ -49,3 +49,16 @@ lazy val enumeroCirce = project
     dynverTagPrefix := "enumero-"
   )
   .dependsOn(enumeroCore)
+
+lazy val mailo = project
+  .settings(
+    name := "mailo",
+    libraryDependencies ++= mailoDependencies,
+    dynverTagPrefix := "mailo-",
+    mappings in (Compile, packageBin) ~= {
+      _.filter { n =>
+        !(n._1.getName.endsWith(".conf.example"))
+      }
+    }
+  )
+  .dependsOn(enumeroCore)

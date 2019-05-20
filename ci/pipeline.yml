@@ -35,6 +35,17 @@ resources:
       - enumeroCore
       - enumeroCirce
 
+- type: pull-request
+  name: mailo-pr
+  icon: source-pull
+  source:
+    repository: buildo/backend
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - mailo
+
 # - name: postgres
 #   type: docker-image
 #   icon: docker
@@ -73,6 +84,14 @@ jobs:
     trigger: true
   - task: test
     file: backend/enumeroCore/ci/test.yml
+
+- name: mailo
+  plan:
+  - get: backend
+    resource: master
+    trigger: true
+  - task: test
+    file: backend/mailo/ci/test.yml
 
 - name: sbt-buildo-pr
   plan:
@@ -124,6 +143,31 @@ jobs:
         status: success
         context: enumero
 
+- name: mailo-pr
+  plan:
+  - get: backend
+    resource: mailo-pr
+    trigger: true
+  - put: mailo-pr
+    params:
+      path: backend
+      status: pending
+      context: mailo
+  - task: test
+    file: backend/mailo/ci/test.yml
+    on_failure:
+      put: mailo-pr
+      params:
+        path: backend
+        status: failure
+        context: mailo
+    on_success:
+      put: mailo-pr
+      params:
+        path: backend
+        status: success
+        context: mailo
+
 - name: release
   plan:
   - get: backend
@@ -132,6 +176,7 @@ jobs:
     passed:
       - sbt-buildo
       - enumero
+      - mailo
   - task: release on Sonatype
     file: backend/ci/release.yml
     params:
