@@ -47,8 +47,12 @@ object DynVerPlugin extends AutoPlugin {
       val out = dynverGitDescribeOutput.value
       val date = dynverCurrentDate.value
       val separator = dynverSeparator.value
-      if (dynverSonatypeSnapshots.value) out.sonatypeVersionWithSep(date, separator)
-      else out.versionWithSep(date, separator)
+      if (dynverSonatypeSnapshots.value) {
+        out match {
+          case Some(_) => out.sonatypeVersionWithSep(date, separator)
+          case None    => out.sonatypeVersionWithSep(date, separator) + "-SNAPSHOT"
+        }
+      } else out.versionWithSep(date, separator)
     },
     isSnapshot := dynverGitDescribeOutput.value.isSnapshot,
     isVersionStable := dynverGitDescribeOutput.value.isVersionStable,
