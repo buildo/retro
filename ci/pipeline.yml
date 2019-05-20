@@ -23,6 +23,18 @@ resources:
       - project
       - sbt-buildo
 
+- type: pull-request
+  name: enumero-pr
+  icon: source-pull
+  source:
+    repository: buildo/backend
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - enumeroCore
+      - enumeroCirce
+
 # - name: postgres
 #   type: docker-image
 #   icon: docker
@@ -54,6 +66,14 @@ jobs:
   - task: compile
     file: backend/sbt-buildo/ci/compile.yml
 
+- name: enumero
+  plan:
+  - get: backend
+    resource: master
+    trigger: true
+  - task: compile
+    file: backend/enumeroCore/ci/test.yml
+
 - name: sbt-buildo-pr
   plan:
   - get: backend
@@ -79,6 +99,31 @@ jobs:
         status: success
         context: sbt-buildo
 
+- name: enumero-pr
+  plan:
+  - get: backend
+    resource: enumero-pr
+    trigger: true
+  - put: enumero-pr
+    params:
+      path: backend
+      status: pending
+      context: enumero
+  - task: compile
+    file: backend/enumeroCore/ci/compile.yml
+    on_failure:
+      put: enumero-pr
+      params:
+        path: backend
+        status: failure
+        context: enumero
+    on_success:
+      put: enumero-pr
+      params:
+        path: backend
+        status: success
+        context: enumero
+
 - name: release
   plan:
   - get: backend
@@ -86,6 +131,7 @@ jobs:
     trigger: true
     passed:
       - sbt-buildo
+      - enumero
   - task: release on Sonatype
     file: backend/ci/release.yml
     params:
