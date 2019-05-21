@@ -18,15 +18,15 @@ import java.time.Instant
 
 class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
-  tableName: String = "access_token_auth_domain"
+  tableName: String = "access_token_auth_domain",
 )(
-  implicit F: Sync[F]
+  implicit F: Sync[F],
 ) extends AccessTokenAuthenticationDomain[F] {
 
   class AccessTokenTable(tag: Tag)
       extends Table[(Int, String, String, Instant)](
         tag,
-        tableName
+        tableName,
       ) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
@@ -41,7 +41,7 @@ class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Futu
 
   override def register(
     s: Subject,
-    c: AccessToken
+    c: AccessToken,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] = {
     F.delay {
       db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
@@ -49,28 +49,28 @@ class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Futu
   }
 
   override def unregister(
-    s: Subject
+    s: Subject,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
       db.run(accessTokenTable.filter(_.ref === s.ref).delete)
     }.futureLift.as(this.asRight)
 
   override def unregister(
-    c: AccessToken
+    c: AccessToken,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
       db.run(accessTokenTable.filter(_.token === c.value).delete)
     }.futureLift.as(this.asRight)
 
   override def authenticate(
-    c: AccessToken
+    c: AccessToken,
   ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
     F.delay {
       db.run(
         accessTokenTable
           .filter(t => t.token === c.value && t.expiresAt > Instant.now())
           .result
-          .headOption
+          .headOption,
       )
     }.futureLift.map {
       case None =>

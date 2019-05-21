@@ -18,9 +18,9 @@ import scala.concurrent.Future
 
 class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
-  tableName: String = "login_auth_domain"
+  tableName: String = "login_auth_domain",
 )(
-  implicit F: Sync[F]
+  implicit F: Sync[F],
 ) extends LoginAuthenticationDomain[F]
     with BCryptHashing {
 
@@ -39,7 +39,7 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
 
   override def register(
     s: Subject,
-    c: Login
+    c: Login,
   ): F[Either[AuthenticationError, LoginDomain[F]]] =
     F.delay {
       db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
@@ -63,7 +63,7 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     } yield res).value
 
   override def authenticate(
-    c: Login
+    c: Login,
   ): F[Either[AuthenticationError, (LoginDomain[F], Subject)]] = {
     F.delay {
       db.run(loginTable.filter(_.username === c.username).result)

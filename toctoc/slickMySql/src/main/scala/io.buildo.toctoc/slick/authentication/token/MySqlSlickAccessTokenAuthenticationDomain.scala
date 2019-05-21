@@ -18,9 +18,9 @@ import java.time.Instant
 
 class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
-  tableName: String = "access_token_auth_domain"
+  tableName: String = "access_token_auth_domain",
 )(
-  implicit F: Sync[F]
+  implicit F: Sync[F],
 ) extends AccessTokenAuthenticationDomain[F] {
 
   class AccessTokenTable(tag: Tag) extends Table[(Int, String, String, Instant)](tag, tableName) {
@@ -37,7 +37,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
 
   override def register(
     s: Subject,
-    c: AccessToken
+    c: AccessToken,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
       db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
@@ -54,14 +54,14 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     }.futureLift.as(this.asRight)
 
   def authenticate(
-    c: AccessToken
+    c: AccessToken,
   ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
     F.delay {
       db.run(
         accessTokenTable
           .filter(t => t.token === c.value && t.expiresAt > Instant.now())
           .result
-          .headOption
+          .headOption,
       )
     }.futureLift.map {
       case None =>
