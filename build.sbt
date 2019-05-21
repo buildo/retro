@@ -76,7 +76,7 @@ lazy val toctocCore = project
   )
   .dependsOn(enumeroCore)
 
-lazy val toctocSlickPostgres = project
+lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
   .settings(
     name := "toctoc-slick-postgresql",
