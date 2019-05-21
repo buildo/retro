@@ -15,4 +15,4 @@ caches:
   - path: .ivy2
 
 run:
-  path: backend/toctocCore/ci/test.sh
+  path: backend/toctoc/ci/test.sh
