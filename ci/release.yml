@@ -17,6 +17,9 @@ params:
 
 run:
   dir: backend
-  path: sbt
+  path: bash
   args:
-    - ci-release
+    - -ce
+    - |
+      git fetch
+      sbt ci-release
