@@ -18,14 +18,14 @@ docker load -i scala-sbt/image
 docker tag "$(cat scala-sbt/image-id)" "$(cat scala-sbt/repository):$(cat scala-sbt/tag)"
 
 # Run the tests container and its dependencies
-export PROJECT_PATH="$PWD/toctoc"
+export PROJECT_PATH="$PWD/backend"
 export IVY_PATH="$PWD/.ivy2"
-docker-compose -f toctoc/ci/docker-compose.yml up -d
+docker-compose -f backend/toctoc/ci/docker-compose.yml up -d
 
 # Run the tests inside the tests container
 docker exec -it tests bash -c 'cd /project && sbt ";toctocSlickPostgreSql/test; toctocSlickMySql/test"'
 
 # Cleanup
-docker-compose -f toctoc/ci/docker-compose.yml down
+docker-compose -f backend/toctoc/ci/docker-compose.yml down
 docker volume rm $(docker volume ls -q)
 
