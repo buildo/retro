@@ -25,7 +25,7 @@ object CiReleasePlugin extends AutoPlugin {
 
   def tag(prefix: String): Option[String] = {
     val refPath = Paths.get(".git", "ref")
-    Try(new String(Files.readAllBytes(refPath))).toOption.filter(_.startsWith(s"$prefix-v"))
+    Try(new String(Files.readAllBytes(refPath))).toOption.filter(_.startsWith(s"${prefix}v"))
   }
 
   def setupGpg(): Unit = {
