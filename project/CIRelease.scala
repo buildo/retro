@@ -23,9 +23,9 @@ object CiReleasePlugin extends AutoPlugin {
   override def requires =
     JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin && Sonatype
 
-  def tag: Option[String] = {
+  def tag(prefix: String): Option[String] = {
     val refPath = Paths.get(".git", "ref")
-    Try(new String(Files.readAllBytes(refPath))).toOption
+    Try(new String(Files.readAllBytes(refPath))).toOption.filter(_.startsWith(s"$prefix-v"))
   }
 
   def setupGpg(): Unit = {
@@ -39,11 +39,20 @@ object CiReleasePlugin extends AutoPlugin {
 
   override def globalSettings: Seq[Def.Setting[_]] = List(
     publishArtifact.in(Test) := false,
-    publishMavenStyle := true,
+    publishMavenStyle := true
+  )
+
+  override def projectSettings: Seq[Def.Setting[_]] = List(
+    dynverSonatypeSnapshots := true,
+    publishConfiguration :=
+      publishConfiguration.value.withOverwrite(true),
+    publishLocalConfiguration :=
+      publishLocalConfiguration.value.withOverwrite(true),
+    publishTo := sonatypePublishTo.value,
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
       setupGpg()
-      tag match {
+      tag(dynverTagPrefix.value) match {
         case None =>
           if (isSnapshotVersion(currentState)) {
             println(s"No tag push, publishing SNAPSHOT")
@@ -63,15 +72,6 @@ object CiReleasePlugin extends AutoPlugin {
             currentState
       }
     }
-  )
-
-  override def projectSettings: Seq[Def.Setting[_]] = List(
-    dynverSonatypeSnapshots := true,
-    publishConfiguration :=
-      publishConfiguration.value.withOverwrite(true),
-    publishLocalConfiguration :=
-      publishLocalConfiguration.value.withOverwrite(true),
-    publishTo := sonatypePublishTo.value
   )
 
   def isSnapshotVersion(state: State): Boolean = {

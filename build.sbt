@@ -80,7 +80,8 @@ lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
   .settings(
     name := "toctoc-slick-postgresql",
-    libraryDependencies ++= toctocSlickPostgresDependencies
+    libraryDependencies ++= toctocSlickPostgresDependencies,
+    dynverTagPrefix := "toctoc-"
   )
   .dependsOn(toctocCore)
 
@@ -88,7 +89,8 @@ lazy val toctocSlickMySql = project
   .in(file("toctoc/slickMySql"))
   .settings(
     name := "toctoc-slick-mysql",
-    libraryDependencies ++= toctocSlickMySqlDependencies
+    libraryDependencies ++= toctocSlickMySqlDependencies,
+    dynverTagPrefix := "toctoc-"
   )
   .dependsOn(toctocCore)
 
@@ -96,6 +98,7 @@ lazy val toctocLdap = project
   .in(file("toctoc/ldap"))
   .settings(
     name := "toctoc-ldap",
-    libraryDependencies ++= toctocLdapDependencies
+    libraryDependencies ++= toctocLdapDependencies,
+    dynverTagPrefix := "toctoc-"
   )
   .dependsOn(toctocCore)
