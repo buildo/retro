@@ -5,23 +5,25 @@ package token
 
 import core.authentication._
 import core.authentication.TokenBasedAuthentication._
-import PostgreSqlSlickHelper._
 
+import cats.implicits._
+import cats.effect.Sync
+import monix.catnap.FutureLift
+import monix.catnap.syntax._
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import scala.concurrent.{ExecutionContext, Future}
-
+import scala.concurrent.Future
 import java.time.Instant
 
-class PostgreSqlSlickAccessTokenAuthenticationDomain(db: Database)(
-    implicit ec: ExecutionContext
-) extends AccessTokenAuthenticationDomain {
+class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](db: Database)(
+  implicit F: Sync[F],
+) extends AccessTokenAuthenticationDomain[F] {
 
   class AccessTokenTable(tag: Tag)
       extends Table[(Int, String, String, Instant)](
         tag,
-        "access_token_auth_domain"
+        "access_token_auth_domain",
       ) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
@@ -34,47 +36,46 @@ class PostgreSqlSlickAccessTokenAuthenticationDomain(db: Database)(
   }
   val accessTokenTable = TableQuery[AccessTokenTable]
 
-  def register(
-      s: Subject,
-      c: AccessToken
-  ): Future[Either[AuthenticationError, AccessTokenDomain]] = {
-    db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt))) map {
-      case _ =>
-        Right(this)
-    }
+  override def register(
+    s: Subject,
+    c: AccessToken,
+  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] = {
+    F.delay {
+      db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
+    }.futureLift.as(this.asRight)
   }
 
-  def unregister(
-      s: Subject
-  ): Future[Either[AuthenticationError, AccessTokenDomain]] =
-    db.run(accessTokenTable.filter(_.ref === s.ref).delete) map {
-      case _ =>
-        Right(this)
-    }
+  override def unregister(
+    s: Subject,
+  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
+    F.delay {
+      db.run(accessTokenTable.filter(_.ref === s.ref).delete)
+    }.futureLift.as(this.asRight)
 
-  def unregister(
-      c: AccessToken
-  ): Future[Either[AuthenticationError, AccessTokenDomain]] =
-    db.run(accessTokenTable.filter(_.token === c.value).delete) map {
-      case _ =>
-        Right(this)
-    }
+  override def unregister(
+    c: AccessToken,
+  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
+    F.delay {
+      db.run(accessTokenTable.filter(_.token === c.value).delete)
+    }.futureLift.as(this.asRight)
 
-  def authenticate(
-      c: AccessToken
-  ): Future[Either[AuthenticationError, (AccessTokenDomain, Subject)]] = {
-    db.run(
-      accessTokenTable
-        .filter(t => t.token === c.value && t.expiresAt > Instant.now())
-        .result
-        .headOption
-    ) map {
+  override def authenticate(
+    c: AccessToken,
+  ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
+    F.delay {
+      db.run(
+        accessTokenTable
+          .filter(t => t.token === c.value && t.expiresAt > Instant.now())
+          .result
+          .headOption,
+      )
+    }.futureLift.map {
       case None =>
-        Left(AuthenticationError.InvalidCredential)
+        AuthenticationError.InvalidCredential.asLeft
       case Some((_, ref, _, _)) =>
-        Right((this, UserSubject(ref)))
+        (this, UserSubject(ref)).asRight
       case _ =>
-        Left(AuthenticationError.InvalidCredential)
+        AuthenticationError.InvalidCredential.asLeft
     }
   }
 }

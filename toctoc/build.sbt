@@ -30,6 +30,7 @@ inThisBuild(
       ),
     ),
     parallelExecution in Test := false,
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.0").cross(CrossVersion.binary)),
   ),
 )
 
@@ -44,7 +45,7 @@ lazy val core = project
 lazy val slickPostgreSql = project
   .settings(
     name := "toctoc-slick-postgresql",
-    libraryDependencies ++= slickDependencies,
+    libraryDependencies ++= slickPostgresDependencies,
   )
   .dependsOn(core)
 
@@ -52,13 +53,6 @@ lazy val slickMySql = project
   .settings(
     name := "toctoc-slick-mysql",
     libraryDependencies ++= slickMySqlDependencies,
-  )
-  .dependsOn(core)
-
-lazy val quill = project
-  .settings(
-    name := "toctoc-quill",
-    libraryDependencies ++= quillDependencies,
   )
   .dependsOn(core)
 
