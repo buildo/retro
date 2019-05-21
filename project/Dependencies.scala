@@ -13,6 +13,8 @@ object Dependencies {
     val akkaHttpCirce = "1.25.2"
     val awscala = "0.5.+"
     val cats = "1.6.0"
+    val catsEffect = "1.3.0"
+    val monixCatnap = "3.0.0-RC2"
     val config = "1.3.0"
     val scalacacheGuava = "0.9.3"
     val scalaLogging = "3.8.0"
@@ -20,6 +22,13 @@ object Dependencies {
     val leveldb = "1.8"
     val mailin = "3.0.1"
     val jakartaMail = "1.6.3"
+    val slick = "3.3.0"
+    val postgresql = "42.2.5"
+    val mysql = "8.0.15"
+    val ldap = "4.0.10"
+    val flyway = "5.2.4"
+    val bcrypt = "0.4"
+    val slf4j = "1.7.25"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -33,6 +42,7 @@ object Dependencies {
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.akka
   val awscala = "com.github.seratch" %% "awscala" % V.awscala
   val catsCore = "org.typelevel" %% "cats-core" % V.cats
+  val catsEffect = "org.typelevel" %% "cats-effect" % V.catsEffect
   val alleyCatsCore = "org.typelevel" %% "alleycats-core" % V.cats
   val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % V.akkaHttpCirce
   val typesafeConfig = "com.typesafe" % "config" % V.config
@@ -44,6 +54,15 @@ object Dependencies {
   val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistence
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % V.akka
   val jakartaMail = "com.sun.mail" % "jakarta.mail" % V.jakartaMail
+  val slick = "com.typesafe.slick" %% "slick" % V.slick
+  val slickHikari = "com.typesafe.slick" %% "slick-hikaricp" % V.slick
+  val postgresql = "org.postgresql" % "postgresql" % V.postgresql
+  val bcrypt = "org.mindrot" % "jbcrypt" % V.bcrypt
+  val flywayCore = "org.flywaydb" % "flyway-core" % V.flyway
+  val mysql = "mysql" % "mysql-connector-java" % V.mysql
+  val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
+  val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
+  val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
 
   val enumeroDependencies = List(
     scalatest,
@@ -81,5 +100,40 @@ object Dependencies {
     akkaTestkit,
     akkaPersistenceInMemory
   ).map(_ % Test)
+
+  val toctocCoreDependencies = List(
+    bcrypt,
+    catsCore
+  )
+
+  val toctocSlickPostgresDependencies = List(
+    postgresql,
+    slick,
+    slickHikari,
+    catsEffect,
+    monixCatnap
+  ) ++ List(
+    scalatest,
+    slf4jNop
+  ).map(_ % Test)
+
+  val toctocSlickMySqlDependencies = List(
+    mysql,
+    slick,
+    slickHikari,
+    catsEffect,
+    monixCatnap
+  ) ++ List(
+    scalatest,
+    slf4jNop
+  ).map(_ % Test)
+
+  lazy val toctocLdapDependencies = List(
+    ldap,
+    mysql,
+    slick,
+    slf4jNop,
+    catsEffect
+  )
 
 }

@@ -22,7 +22,8 @@ inThisBuild(
         case _ =>
           compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
       }
-    }
+    },
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary))
   )
 )
 
@@ -63,3 +64,36 @@ lazy val mailo = project
     }
   )
   .dependsOn(enumeroCore)
+
+lazy val toctocCore = project
+  .in(file("toctoc/core"))
+  .settings(
+    name := "toctoc-core",
+    libraryDependencies ++= toctocCoreDependencies,
+    dynverTagPrefix := "toctoc-"
+  )
+  .dependsOn(enumeroCore)
+
+lazy val toctocSlickPostgres = project
+  .in(file("toctoc/slickPostgreSql"))
+  .settings(
+    name := "toctoc-slick-postgresql",
+    libraryDependencies ++= toctocSlickPostgresDependencies
+  )
+  .dependsOn(toctocCore)
+
+lazy val toctocSlickMySql = project
+  .in(file("toctoc/slickMySql"))
+  .settings(
+    name := "toctoc-slick-mysql",
+    libraryDependencies ++= toctocSlickMySqlDependencies
+  )
+  .dependsOn(toctocCore)
+
+lazy val toctocLdap = project
+  .in(file("toctoc/ldap"))
+  .settings(
+    name := "toctoc-ldap",
+    libraryDependencies ++= toctocLdapDependencies
+  )
+  .dependsOn(toctocCore)

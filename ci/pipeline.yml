@@ -54,26 +54,37 @@ resources:
       - project
       - mailo
 
-# - name: postgres
-#   type: docker-image
-#   icon: docker
-#   source:
-#     repository: postgres
-#     tag: "10.1-alpine"
+- type: pull-request
+  name: toctoc-pr
+  icon: source-pull
+  source:
+    repository: buildo/backend
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - toctoc
 
-# - name: mysql
-#   type: docker-image
-#   icon: docker
-#   source:
-#     repository: mysql
-#     tag: "5.7"
+- name: postgres
+  type: docker-image
+  icon: docker
+  source:
+    repository: postgres
+    tag: "10.1-alpine"
 
-# - name: scala-sbt
-#   type: docker-image
-#   icon: docker
-#   source:
-#     repository: buildo/scala-sbt-alpine
-#     tag: 8u201_2.12.8_1.2.8
+- name: mysql
+  type: docker-image
+  icon: docker
+  source:
+    repository: mysql
+    tag: "5.7"
+
+- name: scala-sbt
+  type: docker-image
+  icon: docker
+  source:
+    repository: buildo/scala-sbt-alpine
+    tag: 8u201_2.12.8_1.2.8
 
 jobs:
 
@@ -100,6 +111,24 @@ jobs:
     trigger: true
   - task: test
     file: backend/mailo/ci/test.yml
+
+- name: toctoc
+  plan:
+  - get: backend
+    resource: master
+    trigger: true
+  - get: postgres
+    params:
+      save: true
+  - get: mysql
+    params:
+      save: true
+  - get: scala-sbt
+    params:
+      save: true
+  - task: test
+    file: backend/toctoc/ci/test.yml
+    privileged: true
 
 - name: sbt-buildo-pr
   plan:
@@ -176,6 +205,41 @@ jobs:
         status: success
         context: mailo
 
+- name: toctoc-pr
+  plan:
+  - get: backend
+    resource: toctoc-pr
+    trigger: true
+  - get: postgres
+    params:
+      save: true
+  - get: mysql
+    params:
+      save: true
+  - get: scala-sbt
+    params:
+      save: true
+  - put: toctoc-pr
+    params:
+      path: backend
+      status: pending
+      context: toctoc
+  - task: test
+    file: backend/toctoc/ci/test.yml
+    privileged: true
+    on_failure:
+      put: toctoc-pr
+      params:
+        path: backend
+        status: failure
+        context: toctoc
+    on_success:
+      put: toctoc-pr
+      params:
+        path: backend
+        status: success
+        context: toctoc
+
 - name: release
   plan:
   - get: backend
@@ -185,6 +249,7 @@ jobs:
       - sbt-buildo
       - enumero
       - mailo
+      - toctoc
   - get: tag
     trigger: true
   - task: release on Sonatype
