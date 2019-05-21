@@ -1,4 +1,5 @@
 import Dependencies._
+import xerial.sbt.Sonatype._
 
 val scala212 = "2.12.8"
 val scala213 = "2.13.0-RC2"
@@ -8,27 +9,7 @@ inThisBuild(
     scalaVersion := "2.12.8",
     // crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-    homepage := Some(url("https://github.com/buildo/backend")),
-    developers := List(
-      Developer(
-        "gabro",
-        "Gabriele Petronella",
-        "gabriele@buildo.io",
-        url("https://github.com/gabro")
-      ),
-      Developer(
-        "calippo",
-        "Claudio Caletti",
-        "claudio@buildo.io",
-        url("https://github.com/calippo")
-      ),
-      Developer(
-        "bytecodeguru",
-        "Giuseppe Moscarella",
-        "giuseppe.moscarella@buildo.io",
-        url("https://github.com/bytecodeguru")
-      )
-    ),
+    sonatypeProjectHosting := Some(GitHubHosting("buildo", "backend", "gabriele@buildo.io")),
     // remove when new sbt-buildo is out
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
