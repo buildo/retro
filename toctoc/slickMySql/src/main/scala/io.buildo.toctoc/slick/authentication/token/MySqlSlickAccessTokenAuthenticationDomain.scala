@@ -41,12 +41,12 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
       db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
     }.futureLift.as(this.asRight)
 
-  def unregister(s: Subject): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
+  override def unregister(s: Subject): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
       db.run(accessTokenTable.filter(_.ref === s.ref).delete)
     }.futureLift.as(this.asRight)
 
-  def unregister(c: AccessToken): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
+  override def unregister(c: AccessToken): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
       db.run(accessTokenTable.filter(_.token === c.value).delete)
     }.futureLift.as(this.asRight)
