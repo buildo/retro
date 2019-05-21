@@ -40,8 +40,7 @@ resources:
     paths:
       - build.sbt
       - project
-      - enumeroCore
-      - enumeroCirce
+      - enumero
 
 - type: pull-request
   name: mailo-pr
@@ -102,7 +101,7 @@ jobs:
     resource: master
     trigger: true
   - task: test
-    file: backend/enumeroCore/ci/test.yml
+    file: backend/enumero/ci/test.yml
 
 - name: mailo
   plan:
@@ -166,7 +165,7 @@ jobs:
       status: pending
       context: enumero
   - task: test
-    file: backend/enumeroCore/ci/test.yml
+    file: backend/enumero/ci/test.yml
     on_failure:
       put: enumero-pr
       params:

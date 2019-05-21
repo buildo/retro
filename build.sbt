@@ -36,6 +36,7 @@ lazy val `sbt-buildo` = project
   )
 
 lazy val enumeroCore = project
+  .in(file("enumero/core"))
   .settings(
     name := "enumero", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroDependencies,
@@ -44,6 +45,7 @@ lazy val enumeroCore = project
   )
 
 lazy val enumeroCirce = project
+  .in(file("enumero/circe"))
   .settings(
     name := "enumero-circe-support", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroCirceDependencies,
