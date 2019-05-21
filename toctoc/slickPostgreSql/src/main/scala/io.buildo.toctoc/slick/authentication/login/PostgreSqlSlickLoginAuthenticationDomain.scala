@@ -16,13 +16,15 @@ import _root_.slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.Future
 
-class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](db: Database)(
-  implicit F: Sync[F],
+class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+  db: Database,
+  tableName: String = "login_auth_domain"
+)(
+  implicit F: Sync[F]
 ) extends LoginAuthenticationDomain[F]
     with BCryptHashing {
 
-  class LoginTable(tag: Tag)
-      extends Table[(Int, String, String, String)](tag, "login_auth_domain") {
+  class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def username = column[String]("username")
@@ -37,7 +39,7 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](d
 
   override def register(
     s: Subject,
-    c: Login,
+    c: Login
   ): F[Either[AuthenticationError, LoginDomain[F]]] =
     F.delay {
       db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
@@ -61,7 +63,7 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](d
     } yield res).value
 
   override def authenticate(
-    c: Login,
+    c: Login
   ): F[Either[AuthenticationError, (LoginDomain[F], Subject)]] = {
     F.delay {
       db.run(loginTable.filter(_.username === c.username).result)
