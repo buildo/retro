@@ -8,6 +8,26 @@ inThisBuild(
     scalaVersion := "2.12.8",
     // crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    developers := List(
+      Developer(
+        "gabro",
+        "Gabriele Petronella",
+        "gabriele@buildo.io",
+        url("https://github.com/gabro")
+      ),
+      Developer(
+        "calippo",
+        "Claudio Caletti",
+        "claudio@buildo.io",
+        url("https://github.com/calippo")
+      ),
+      Developer(
+        "bytecodeguru",
+        "Giuseppe Moscarella",
+        "giuseppe.moscarella@buildo.io",
+        url("https://github.com/bytecodeguru")
+      )
+    ),
     // remove when new sbt-buildo is out
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
