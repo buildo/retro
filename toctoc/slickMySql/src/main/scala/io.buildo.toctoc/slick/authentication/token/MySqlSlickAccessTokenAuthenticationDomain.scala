@@ -16,12 +16,14 @@ import _root_.slick.jdbc.JdbcBackend.Database
 import scala.concurrent.Future
 import java.time.Instant
 
-class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](db: Database)(
+class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+  db: Database,
+  tableName: String = "access_token_auth_domain",
+)(
   implicit F: Sync[F],
 ) extends AccessTokenAuthenticationDomain[F] {
 
-  class AccessTokenTable(tag: Tag)
-      extends Table[(Int, String, String, Instant)](tag, "access_token_auth_domain") {
+  class AccessTokenTable(tag: Tag) extends Table[(Int, String, String, Instant)](tag, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def token = column[String]("token", O.Length(255))

@@ -8,13 +8,14 @@ import login.PostgreSqlSlickLoginAuthenticationDomain
 import token.PostgreSqlSlickAccessTokenAuthenticationDomain
 
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
 import cats.effect.IO
 
 class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with EitherValues
