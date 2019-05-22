@@ -3,7 +3,7 @@ id: installation
 title: Installation
 ---
 
-`numero` is composed by multiple modules:
+`enumero` is composed by multiple modules:
 
 - `enumero`: the core library
 - `enumero-circe-support`: provides Circe encoder/decoders for enumero types
