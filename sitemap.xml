@@ -4,6 +4,5 @@
 <url> <loc>https://buildo.github.io/backend/docs/toctoc/concepts/functional-model</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/backend/docs/toctoc/concepts/functional-model" /> </url>
 <url> <loc>https://buildo.github.io/backend/docs/toctoc/concepts/login</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/backend/docs/toctoc/concepts/login" /> </url>
 <url> <loc>https://buildo.github.io/backend/docs/toctoc/concepts/token</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/backend/docs/toctoc/concepts/token" /> </url>
-<url> <loc>https://buildo.github.io/backend/docs/toctoc/guides/token-based-authentication-flow</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/backend/docs/toctoc/guides/token-based-authentication-flow" /> </url>
 <url> <loc>https://buildo.github.io/backend/docs/toctoc/installation</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/backend/docs/toctoc/installation" /> </url>
 </urlset>
