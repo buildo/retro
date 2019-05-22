@@ -34,12 +34,12 @@ object CiReleasePlugin extends AutoPlugin {
   }
 
   override def buildSettings: Seq[Def.Setting[_]] = List(
-    pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
+    pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray()),
   )
 
   override def globalSettings: Seq[Def.Setting[_]] = List(
     publishArtifact.in(Test) := false,
-    publishMavenStyle := true
+    publishMavenStyle := true,
   )
 
   override def projectSettings: Seq[Def.Setting[_]] = List(
@@ -51,34 +51,22 @@ object CiReleasePlugin extends AutoPlugin {
     publishTo := sonatypePublishTo.value,
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
-      setupGpg()
-      tag(dynverTagPrefix.value) match {
-        case None =>
-          if (isSnapshotVersion(currentState)) {
-            println(s"No tag push, publishing SNAPSHOT")
-            sys.env.getOrElse("CI_SNAPSHOT_RELEASE", "+publish") ::
-              currentState
-          } else {
-            println(
-              "Snapshot releases must have -SNAPSHOT version number, doing nothing"
-            )
-            currentState
-          }
-
-        case Some(tag) =>
-          println("Tag push detected, publishing a stable release")
-          sys.env.getOrElse("CI_RELEASE", "+publishSigned") ::
-            sys.env.getOrElse("CI_SONATYPE_RELEASE", "sonatypeRelease") ::
-            currentState
+      // setupGpg()
+      val extracted = Project.extract(currentState)
+      val shouldRelease = extracted.structure.allProjectRefs.exists { projectRef =>
+        val prefix = extracted.get(dynverTagPrefix.in(projectRef))
+        val v = extracted.get(version.in(projectRef))
+        tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
       }
-    }
+      if (shouldRelease) {
+        sys.env.getOrElse("CI_RELEASE", "+publishSigned") ::
+          sys.env.getOrElse("CI_SONATYPE_RELEASE", "sonatypeRelease") ::
+          currentState
+      } else {
+        sys.env.getOrElse("CI_RELEASE", "+publishSigned") ::
+          currentState
+      }
+    },
   )
-
-  def isSnapshotVersion(state: State): Boolean = {
-    version.in(ThisBuild).get(Project.extract(state).structure.data) match {
-      case Some(v) => v.endsWith("-SNAPSHOT")
-      case None    => throw new NoSuchFieldError("version")
-    }
-  }
 
 }
