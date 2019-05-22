@@ -179,48 +179,36 @@ object UserController {
 Here's a sequence diagram that shows the common interactions we've seen above
 
 ```scala mdoc:plantuml
+autoactivate on
+
 actor Subject
 participant UserController
 participant AuthController
 
 group signup
   Subject -> UserController: signup(credentials, user)
-  activate UserController
   UserController -> UserService: create(user)
-  activate UserService
-  UserService -> UserController: userId
-  deactivate UserService
+  return userId
   UserController -> TokenBasedAuthenticationFlow: registerSubjectLogin(userId, credentials)
-  activate TokenBasedAuthenticationFlow
-  TokenBasedAuthenticationFlow -> UserController
-  deactivate TokenBasedAuthenticationFlow
-  UserController -> Subject: userId
-  deactivate UserController
+  return
+  return userId
 end
 
 ...
 
 group login
   Subject -> AuthController: login(credentials)
-  activate AuthController
-  UserController -> TokenBasedAuthenticationFlow: exchangeForTokens(credentials)
-  activate TokenBasedAuthenticationFlow
-  TokenBasedAuthenticationFlow -> UserController: accessToken
-  deactivate TokenBasedAuthenticationFlow
-  AuthController -> Subject: accessToken
-  deactivate AuthController
+  AuthController -> TokenBasedAuthenticationFlow: exchangeForTokens(credentials)
+  return accessToken
+  return accessToken
 end
 
 ...
 
 group logout
   Subject -> AuthController: logout(accessToken)
-  activate AuthController
-  UserController -> TokenBasedAuthenticationFlow: unregisterToken(accessToken)
-  activate TokenBasedAuthenticationFlow
-  TokenBasedAuthenticationFlow -> UserController
-  deactivate TokenBasedAuthenticationFlow
-  AuthController -> Subject:
-  deactivate AuthController
+  AuthController -> TokenBasedAuthenticationFlow: unregisterToken(accessToken)
+  return
+  return
 end
 ```

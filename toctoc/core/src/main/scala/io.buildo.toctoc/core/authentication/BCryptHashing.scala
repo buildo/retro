@@ -22,4 +22,3 @@ trait BCryptHashing {
   def checkPassword(candidate: String, hashed: String): Boolean =
     BCrypt.checkpw(candidate, hashed)
 }
-
