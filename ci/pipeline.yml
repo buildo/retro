@@ -337,7 +337,7 @@ jobs:
     passed:
       - sbt-buildo
       - enumero
-      - mailo
+      # - mailo
       - toctoc
       - metarpheus
       - tapiro
