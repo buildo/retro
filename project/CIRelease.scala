@@ -30,7 +30,7 @@ object CiReleasePlugin extends AutoPlugin {
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
-    (s"echo $secret" #| "gpg --import").!
+    (s"echo $secret" #| "base64 --decode" #| "gpg --import").!
   }
 
   override def buildSettings: Seq[Def.Setting[_]] = List(
@@ -53,19 +53,25 @@ object CiReleasePlugin extends AutoPlugin {
       println("Running ci-release.\n")
       // setupGpg()
       val extracted = Project.extract(currentState)
-      val shouldRelease = extracted.structure.allProjectRefs.exists { projectRef =>
-        val prefix = extracted.get(dynverTagPrefix.in(projectRef))
-        val v = extracted.get(version.in(projectRef))
-        tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
+      val (releaseProjects, snapshotProjects) = extracted.structure.allProjectRefs.partition {
+        projectRef =>
+          val prefix = extracted.get(dynverTagPrefix.in(projectRef))
+          val v = extracted.get(version.in(projectRef))
+          tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
       }
-      if (shouldRelease) {
-        sys.env.getOrElse("CI_RELEASE", "+publishSigned") ::
-          sys.env.getOrElse("CI_SONATYPE_RELEASE", "sonatypeRelease") ::
-          currentState
-      } else {
-        sys.env.getOrElse("CI_RELEASE", "+publishSigned") ::
-          currentState
+
+      val publishSignedCommands = releaseProjects.foldLeft(List.empty[String]) {
+        (state, projectRef) =>
+          s"+${projectRef.project}/publishSigned" :: state
       }
+      val publishCommands = snapshotProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
+        s"+${projectRef.project}/publish" :: state
+      }
+
+      val releaseState =
+        if (releaseProjects.length > 0) "sonatypeRelease" :: currentState else currentState
+
+      publishSignedCommands ::: publishCommands ::: releaseState
     },
   )
 
