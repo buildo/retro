@@ -5,7 +5,7 @@ package authentication
 import cats.Applicative
 import cats.syntax.all._
 
-final class InMemoryAuthenticationDomain[F[_]: Applicative, C <: Credential](
+final class InMemoryAuthenticationDomain[F[_]: Applicative, C](
   private val credentials: Map[C, Subject] = Map.empty,
 ) extends AuthenticationDomain[F, C] {
 
