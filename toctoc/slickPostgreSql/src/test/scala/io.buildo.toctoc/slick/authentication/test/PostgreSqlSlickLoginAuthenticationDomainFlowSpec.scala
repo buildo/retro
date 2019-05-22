@@ -22,10 +22,13 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
     with EitherValues
     with Matchers {
 
+  val loginTableName = "login"
+  val tokenTableName = "token"
+
   val db = Database.forConfig("db")
-  val loginAuthDomain = new PostgreSqlSlickLoginAuthenticationDomain[IO](db)
+  val loginAuthDomain = new PostgreSqlSlickLoginAuthenticationDomain[IO](db, loginTableName)
   val accessTokenAuthDomain =
-    new PostgreSqlSlickAccessTokenAuthenticationDomain[IO](db)
+    new PostgreSqlSlickAccessTokenAuthenticationDomain[IO](db, tokenTableName)
 
   val loginTable = loginAuthDomain.loginTable
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
