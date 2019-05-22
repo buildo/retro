@@ -51,7 +51,9 @@
     "categories": {
       "Setup": "Setup",
       "Getting started": "Getting started",
-      "Contributing": "Contributing"
+      "Contributing": "Contributing",
+      "Concepts": "Concepts",
+      "Guides": "Guides"
     }
   },
   "pages-strings": {

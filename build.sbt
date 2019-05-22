@@ -160,6 +160,5 @@ lazy val docs = project
       "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
     ),
   )
-  .dependsOn(toctocCore)
-  .dependsOn(toctocCore, enumeroCore)
+  .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)

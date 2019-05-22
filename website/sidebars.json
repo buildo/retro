@@ -5,7 +5,8 @@
       "toctoc/concepts/functional-model",
       "toctoc/concepts/login",
       "toctoc/concepts/token"
-    ]
+    ],
+    "Guides": ["toctoc/guides/token-based-authentication-flow"]
   },
   "enumero": {
     "Getting started": ["enumero/introduction", "enumero/installation"]
