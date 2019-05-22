@@ -6,7 +6,7 @@ image_resource:
     repository: quay.io/buildo/dcind
 
 inputs:
-  - name: backend
+  - name: retro
   - name: postgres
   - name: mysql
   - name: scala-sbt
@@ -15,4 +15,4 @@ caches:
   - path: .ivy2
 
 run:
-  path: backend/toctoc/ci/test.sh
+  path: retro/toctoc/ci/test.sh

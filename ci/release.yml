@@ -7,7 +7,7 @@ image_resource:
     tag: 8u181_2.12.8_1.2.8
 
 inputs:
-  - name: backend
+  - name: retro
 
 params:
   GITHUB_DEPLOY_KEY:
@@ -17,7 +17,7 @@ params:
   SONATYPE_PASSWORD:
 
 run:
-  dir: backend
+  dir: retro
   path: bash
   args:
     - -ce

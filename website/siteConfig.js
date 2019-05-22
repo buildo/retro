@@ -9,14 +9,14 @@
 // site configuration options.
 
 const siteConfig = {
-  customDocsPath: "backend-docs/target/mdoc",
-  title: "backend",
-  tagline: "Authentication flows for Scala",
+  customDocsPath: "retro-docs/target/mdoc",
+  title: "retro",
+  tagline: "One repo to rule them all",
   url: "https://buildo.github.io",
-  baseUrl: "/backend/",
+  baseUrl: "/retro/",
 
   // Used for publishing and more
-  projectName: "backend",
+  projectName: "retro",
   organizationName: "buildo",
 
   // For no header links in the top nav bar -> headerLinks: [],
@@ -62,11 +62,11 @@ const siteConfig = {
   // Show documentation's last update time.
   enableUpdateTime: true,
 
-  editUrl: "https://github.com/buildo/backend/edit/master/docs/",
+  editUrl: "https://github.com/buildo/retro/edit/master/docs/",
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  repoUrl: "https://github.com/buildo/backend"
+  repoUrl: "https://github.com/buildo/retro"
 };
 
 module.exports = siteConfig;

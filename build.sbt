@@ -9,7 +9,7 @@ inThisBuild(
     scalaVersion := "2.12.8",
     // crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-    homepage := Some(url("https://github.com/buildo/backend")),
+    homepage := Some(url("https://github.com/buildo/retro")),
     developers := List(
       Developer(
         "gabro",
@@ -114,10 +114,10 @@ lazy val toctocLdap = project
   .dependsOn(toctocCore)
 
 lazy val docs = project
-  .in(file("backend-docs"))
+  .in(file("retro-docs"))
   .settings(
     skip.in(publish) := true,
-    moduleName := "backend-docs",
+    moduleName := "retro-docs",
     mdocVariables := Map(
       "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),

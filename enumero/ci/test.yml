@@ -7,10 +7,10 @@ image_resource:
     tag: 8u201_2.12.8_1.2.8
 
 inputs:
-  - name: backend
+  - name: retro
 
 run:
-  dir: backend
+  dir: retro
   path: sbt
   args:
     - "; enumeroCore/test; enumeroCirce/test"
