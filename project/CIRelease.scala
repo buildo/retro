@@ -51,13 +51,22 @@ object CiReleasePlugin extends AutoPlugin {
     publishTo := sonatypePublishTo.value,
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
-      // setupGpg()
+      setupGpg()
       val extracted = Project.extract(currentState)
       val (releaseProjects, snapshotProjects) = extracted.structure.allProjectRefs.partition {
         projectRef =>
           val prefix = extracted.get(dynverTagPrefix.in(projectRef))
           val v = extracted.get(version.in(projectRef))
           tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
+      }
+
+      if (snapshotProjects.length > 0) {
+        println("Publishing snapshot version of:")
+        println(snapshotProjects.map(_.project).mkString("  - ", "\n  - ", "\n"))
+      }
+      if (releaseProjects.length > 0) {
+        println("Publishing release version of:")
+        println(releaseProjects.map(_.project).mkString("  - ", "\n  - ", "\n"))
       }
 
       val publishSignedCommands = releaseProjects.foldLeft(List.empty[String]) {
