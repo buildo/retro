@@ -151,6 +151,7 @@ lazy val docs = project
   .settings(
     skip.in(publish) := true,
     moduleName := "retro-docs",
+    libraryDependencies ++= docsDependencies,
     mdocVariables := Map(
       "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
