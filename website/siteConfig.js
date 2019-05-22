@@ -9,27 +9,30 @@
 // site configuration options.
 
 const siteConfig = {
-  customDocsPath: "toctoc-docs/target/mdoc",
-  title: "toctoc",
+  customDocsPath: "backend-docs/target/mdoc",
+  title: "backend",
   tagline: "Authentication flows for Scala",
   url: "https://buildo.github.io",
-  baseUrl: "/toctoc/",
+  baseUrl: "/backend/",
 
   // Used for publishing and more
-  projectName: "toctoc",
+  projectName: "backend",
   organizationName: "buildo",
 
   // For no header links in the top nav bar -> headerLinks: [],
-  headerLinks: [],
+  headerLinks: [
+    { doc: "toctoc/installation", label: "toctoc" },
+    { doc: "enumero/installation", label: "enumero" }
+  ],
 
   /* path to images for header/footer */
-  headerIcon: "img/favicon.png",
-  footerIcon: "img/favicon.png",
-  favicon: "img/favicon.png",
+  headerIcon: "img/favicon.ico",
+  footerIcon: "img/favicon.ico",
+  favicon: "img/favicon.ico",
 
   /* Colors for website */
   colors: {
-    primaryColor: "#f3c65b",
+    primaryColor: "#151C27",
     secondaryColor: "#0e7064"
   },
 
@@ -59,11 +62,11 @@ const siteConfig = {
   // Show documentation's last update time.
   enableUpdateTime: true,
 
-  editUrl: "https://github.com/buildo/toctoc/edit/master/docs/",
+  editUrl: "https://github.com/buildo/backend/edit/master/docs/",
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  repoUrl: "https://github.com/buildo/toctoc"
+  repoUrl: "https://github.com/buildo/backend"
 };
 
 module.exports = siteConfig;

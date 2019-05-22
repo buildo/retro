@@ -5,45 +5,26 @@
     "previous": "Previous",
     "tagline": "Authentication flows for Scala",
     "docs": {
-      "concepts/functional-model": {
+      "enumero/installation": {
+        "title": "Installation"
+      },
+      "toctoc/concepts/functional-model": {
         "title": "Functional Model"
       },
-      "concepts/login": {
+      "toctoc/concepts/login": {
         "title": "Login"
       },
-      "concepts/token": {
+      "toctoc/concepts/token": {
         "title": "Token"
       },
-      "doc1": {
-        "title": "Latin-ish",
-        "sidebar_label": "Example Page"
-      },
-      "doc2": {
-        "title": "document number 2"
-      },
-      "doc3": {
-        "title": "This is document number 3"
-      },
-      "doc4": {
-        "title": "Other Document"
-      },
-      "doc5": {
-        "title": "Fifth Document"
-      },
-      "guide/login-flow": {
-        "title": "Login Flow"
-      },
-      "guide/reset-password-flow": {
-        "title": "Reset Password Flow"
-      },
-      "guide/signup-flow": {
-        "title": "Signup Flow"
-      },
-      "installation": {
+      "toctoc/installation": {
         "title": "Installation"
       }
     },
-    "links": {},
+    "links": {
+      "toctoc": "toctoc",
+      "enumero": "enumero"
+    },
     "categories": {
       "Setup": "Setup",
       "Concepts": "Concepts"

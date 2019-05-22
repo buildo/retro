@@ -10,6 +10,7 @@ inputs:
   - name: backend
 
 params:
+  GITHUB_DEPLOY_KEY:
   PGP_PASSPHRASE:
   PGP_SECRET:
   SONATYPE_USERNAME:
@@ -22,4 +23,20 @@ run:
     - -ce
     - |
       git fetch
-      sbt ci-release
+      mkdir -p $HOME/.ssh
+      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      git config --global user.name "nemobot"
+      git config --global user.email "nemobot@buildo.io"
+      git config --global push.default simple
+      echo "$GITHUB_DEPLOY_KEY" > $HOME/.ssh/id_rsa
+      chmod 600 $HOME/.ssh/id_rsa
+      eval "$(ssh-agent -s)"
+      ssh-add $HOME/.ssh/id_rsa
+      curl -sL https://deb.nodesource.com/setup_10.x | bash -
+      apt-get install -y nodejs
+      curl -o- -L https://yarnpkg.com/install.sh | bash
+      source $HOME/.bashrc
+      sbt "; ci-release; docs/mdoc"
+      cd website
+      yarn install
+      USE_SSH=true yarn publish-gh-pages

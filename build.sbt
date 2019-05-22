@@ -25,8 +25,8 @@ inThisBuild(
           compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
       }
     },
-    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary))
-  )
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary)),
+  ),
 )
 
 lazy val `sbt-buildo` = project
@@ -34,7 +34,7 @@ lazy val `sbt-buildo` = project
     sbtPlugin := true,
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9"),
-    dynverTagPrefix := "sbt-buildo-"
+    dynverTagPrefix := "sbt-buildo-",
   )
 
 lazy val enumeroCore = project
@@ -43,7 +43,7 @@ lazy val enumeroCore = project
     name := "enumero", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroDependencies,
     libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value,
-    dynverTagPrefix := "enumero-"
+    dynverTagPrefix := "enumero-",
   )
 
 lazy val enumeroCirce = project
@@ -51,7 +51,7 @@ lazy val enumeroCirce = project
   .settings(
     name := "enumero-circe-support", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroCirceDependencies,
-    dynverTagPrefix := "enumero-"
+    dynverTagPrefix := "enumero-",
   )
   .dependsOn(enumeroCore)
 
@@ -65,7 +65,7 @@ lazy val mailo = project
       _.filter { n =>
         !(n._1.getName.endsWith(".conf.example"))
       }
-    }
+    },
   )
   .dependsOn(enumeroCore)
 
@@ -74,7 +74,7 @@ lazy val toctocCore = project
   .settings(
     name := "toctoc-core",
     libraryDependencies ++= toctocCoreDependencies,
-    dynverTagPrefix := "toctoc-"
+    dynverTagPrefix := "toctoc-",
   )
   .dependsOn(enumeroCore)
 
@@ -83,7 +83,7 @@ lazy val toctocSlickPostgreSql = project
   .settings(
     name := "toctoc-slick-postgresql",
     libraryDependencies ++= toctocSlickPostgresDependencies,
-    dynverTagPrefix := "toctoc-"
+    dynverTagPrefix := "toctoc-",
   )
   .dependsOn(toctocCore)
 
@@ -92,7 +92,7 @@ lazy val toctocSlickMySql = project
   .settings(
     name := "toctoc-slick-mysql",
     libraryDependencies ++= toctocSlickMySqlDependencies,
-    dynverTagPrefix := "toctoc-"
+    dynverTagPrefix := "toctoc-",
   )
   .dependsOn(toctocCore)
 
@@ -101,6 +101,21 @@ lazy val toctocLdap = project
   .settings(
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
-    dynverTagPrefix := "toctoc-"
+    dynverTagPrefix := "toctoc-",
   )
   .dependsOn(toctocCore)
+
+lazy val docs = project
+  .in(file("backend-docs"))
+  .settings(
+    skip.in(publish) := true,
+    moduleName := "backend-docs",
+    mdocVariables := Map(
+      "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
+      "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
+      "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
+      "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
+    ),
+  )
+  .dependsOn(toctocCore)
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)

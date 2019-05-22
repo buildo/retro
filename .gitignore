@@ -17,3 +17,6 @@ project/plugins/project/
 
 .metals
 .bloop
+
+node_modules
+build

@@ -1,0 +1,13 @@
+{
+  "docs": {
+    "Setup": ["toctoc/installation"],
+    "Concepts": [
+      "toctoc/concepts/functional-model",
+      "toctoc/concepts/login",
+      "toctoc/concepts/token"
+    ]
+  },
+  "enumero": {
+    "Setup": ["enumero/installation"]
+  }
+}
