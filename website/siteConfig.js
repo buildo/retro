@@ -23,7 +23,8 @@ const siteConfig = {
   headerLinks: [
     { doc: "toctoc/installation", label: "toctoc" },
     { doc: "enumero/introduction", label: "enumero" },
-    { doc: "sbt-buildo/introduction", label: "sbt-buildo" }
+    { doc: "sbt-buildo/introduction", label: "sbt-buildo" },
+    { href: "https://github.com/buildo/retro", label: "GitHub", external: true }
   ],
 
   /* path to images for header/footer */

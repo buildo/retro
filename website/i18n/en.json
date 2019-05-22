@@ -39,7 +39,8 @@
     "links": {
       "toctoc": "toctoc",
       "enumero": "enumero",
-      "sbt-buildo": "sbt-buildo"
+      "sbt-buildo": "sbt-buildo",
+      "GitHub": "GitHub"
     },
     "categories": {
       "Setup": "Setup",
