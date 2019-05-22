@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Functional Model · backend</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;A &lt;strong&gt;subject&lt;/strong&gt; is a human or machine user agent interacting with a secured&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Functional Model · backend"/><meta property="og:type" content="website"/><meta property="og:url" content="https://buildo.github.io/backend/"/><meta property="og:description" content="&lt;p&gt;A &lt;strong&gt;subject&lt;/strong&gt; is a human or machine user agent interacting with a secured&lt;/p&gt;
+"/><meta property="og:image" content="https://buildo.github.io/backend/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://buildo.github.io/backend/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/backend/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/backend/css/main.css"/><script src="/backend/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/backend/"><img class="logo" src="/backend/img/favicon.ico" alt="backend"/><h2 class="headerTitleWithLogo">backend</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/backend/docs/toctoc/installation" target="_self">toctoc</a></li><li class=""><a href="/backend/docs/enumero/installation" target="_self">enumero</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Concepts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Setup</h3><ul class=""><li class="navListItem"><a class="navItem" href="/backend/docs/toctoc/installation">Installation</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Concepts</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/backend/docs/toctoc/concepts/functional-model">Functional Model</a></li><li class="navListItem"><a class="navItem" href="/backend/docs/toctoc/concepts/login">Login</a></li><li class="navListItem"><a class="navItem" href="/backend/docs/toctoc/concepts/token">Token</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              const headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                if (event.target.tagName === 'A') {
+                  document.body.classList.remove('tocActive');
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/buildo/backend/edit/master/docs/toctoc/concepts/functional-model.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Functional Model</h1></header><article><div><span><p>A <strong>subject</strong> is a human or machine user agent interacting with a secured
+software application.</p>
+<pre><code class="hljs css language-plaintext">s ∈ S
+</code></pre>
+<p>A <strong>credential</strong> is a secret that uniquely identifies a subject.</p>
+<pre><code class="hljs css language-plaintext">c ∈ C
+</code></pre>
+<p>An <strong>authentication domain</strong> is a function <code>Fd</code> from credentials <code>C</code> subjects
+<code>S</code>.</p>
+<pre><code class="hljs css language-plaintext">Fd: C ⟶ S
+</code></pre>
+<p>In particular an authentication domain can be represented by a set
+<code>D := {(c, s) | Fd(c) = s}</code>, where <code>D ⊂ P(C x S)</code>.</p>
+<p>Any fundamental authentication operation should be expressed in the context of
+authentication domains, to be able to explicitly represent side effects.</p>
+<h2><a class="anchor" aria-hidden="true" id="operations"></a><a href="#operations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Operations</h2>
+<h3><a class="anchor" aria-hidden="true" id="authenticate"></a><a href="#authenticate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Authenticate</h3>
+<p>The authenticate operation checks whether a given credential <code>c</code> identifies a
+subject <code>s</code>. This operation could possibly modify a given authentication domain:
+for example, in the OTP use case, a credential must be used only once.</p>
+<pre><code class="hljs css language-plaintext">Fa: D x C ⟶ D x S
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="register"></a><a href="#register" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Register</h3>
+<p>The register operation adds a new association <code>(c, s)</code>. This means that the
+subject <code>s</code> can be identified by the credential <code>c</code>.</p>
+<pre><code class="hljs css language-plaintext">Fr: D x C x S ⟶ D
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="unregister"></a><a href="#unregister" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unregister</h3>
+<p>The unregister operation removes any associations <code>(c, s)</code> for any given subject
+<code>s</code>. This means that <code>s</code> will not be identifiable in the authentication domain.</p>
+<pre><code class="hljs css language-plaintext">Fu: D x C ⟶ D
+</code></pre>
+<p>For greater flexibility we can also define a companion operation that allows to
+remove a single association <code>(c, s)</code>. This means that <code>s</code> will not be
+identifiable by <code>c</code> in the authentication domain.</p>
+<pre><code class="hljs css language-plaintext">Fu': D x C ⟶ D
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="exchange"></a><a href="#exchange" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Exchange</h3>
+<p>The exchange operations allows to use multiple authentication domains and
+different credential types to implement complex authentication workflows. The
+Token Based Authentication, for example, involves the use of login credentials
+which can generate temporary access tokens.</p>
+<pre><code class="hljs css language-plaintext">Fx: Da x Db x Ca x Cb ⟶ Da x Db
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/backend/docs/toctoc/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/backend/docs/toctoc/concepts/login"><span>Login</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#operations">Operations</a><ul class="toc-headings"><li><a href="#authenticate">Authenticate</a></li><li><a href="#register">Register</a></li><li><a href="#unregister">Unregister</a></li><li><a href="#exchange">Exchange</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/backend/" class="nav-home"><img src="/backend/img/favicon.ico" alt="backend" width="66" height="58"/></a><div><h5>Docs</h5><a href="/backend/docs/installation">Installation</a><a href="/backend/docs/concepts/functional-model">Concepts</a></div><div><h5>More</h5><a href="https://twitter.com/buildoHQ">Twitter</a><a href="https://github.com/buildo/backend">GitHub</a><a class="github-button" href="https://github.com/buildo/backend" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2019 buildo</section></footer></div></body></html>
