@@ -13,6 +13,7 @@ import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
 import cats.effect.IO
+import java.time.Duration
 
 class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
     extends AnyFlatSpec
@@ -30,7 +31,8 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
   val schema = loginTable.schema ++ accessTokenTable.schema
 
-  val authFlow = new PostgreSqlSlickTokenBasedAuthenticationFlow[IO](db)
+  val authFlow =
+    new TokenBasedAuthenticationFlow[IO](loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
 
   override def beforeAll() = {
     IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync

@@ -12,6 +12,7 @@ import _root_.slick.jdbc.JdbcBackend.Database
 import io.buildo.toctoc.slick.authentication.login.MySqlSlickLoginAuthenticationDomain
 import io.buildo.toctoc.slick.authentication.token.MySqlSlickAccessTokenAuthenticationDomain
 import cats.effect.IO
+import java.time.Duration
 
 class MySqlSlickLoginAuthenticationDomainFlowSpec
     extends AnyFlatSpec
@@ -29,7 +30,8 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
   val schema = loginTable.schema ++ accessTokenTable.schema
 
-  val authFlow = new MySqlSlickTokenBasedAuthenticationFlow[IO](db)
+  val authFlow =
+    new TokenBasedAuthenticationFlow[IO](loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
 
   override def beforeAll(): Unit = {
     IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync
