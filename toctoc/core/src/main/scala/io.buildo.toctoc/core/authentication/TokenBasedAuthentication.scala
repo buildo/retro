@@ -15,6 +15,11 @@ object TokenBasedAuthentication {
     expiresAt: Instant,
   ) extends Token[String]
 
+  object AccessToken {
+    def generate(value: String, duration: Duration): AccessToken =
+      AccessToken(value, Instant.now().plus(duration))
+  }
+
   case class RefreshToken(
     value: String,
     expiresAt: Instant,
@@ -56,13 +61,13 @@ object TokenBasedAuthentication {
   class TokenBasedAuthenticationFlow[F[_]: Monad](
     loginD: LoginAuthenticationDomain[F],
     accessTokenD: AccessTokenAuthenticationDomain[F],
-    tokenDuration: Duration = Duration.ofDays(365),
+    tokenDuration: Duration,
   ) extends BCryptHashing {
     def registerSubjectLogin(s: Subject, l: Login): F[Either[AuthenticationError, Unit]] =
       loginD.register(s, l).nested.void.value
 
     def exchangeForTokens(l: Login): F[Either[AuthenticationError, AccessToken]] = {
-      val accessToken = AccessToken(randomString(64), Instant.now().plus(tokenDuration))
+      val accessToken = AccessToken.generate(randomString(64), tokenDuration)
       AuthenticationDomain
         .exchangeCredentials(loginD, accessTokenD)(l, accessToken)
         .nested

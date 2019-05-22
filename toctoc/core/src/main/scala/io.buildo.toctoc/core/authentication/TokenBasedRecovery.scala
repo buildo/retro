@@ -5,7 +5,7 @@ package authentication
 import cats.Monad
 import cats.data.EitherT
 
-import java.time.{Duration, Instant}
+import java.time.Duration
 
 object TokenBasedRecovery {
   import TokenBasedAuthentication._
@@ -13,12 +13,12 @@ object TokenBasedRecovery {
   class TokenBasedRecoveryFlow[F[_]: Monad](
     loginD: LoginAuthenticationDomain[F],
     recoveryTokenD: AccessTokenAuthenticationDomain[F],
-    tokenDuration: Duration = Duration.ofDays(365),
+    tokenDuration: Duration,
   ) extends BCryptHashing {
     def registerForRecovery(s: Subject): F[Either[AuthenticationError, AccessToken]] =
       (for {
         rtd <- EitherT(recoveryTokenD.unregister(s))
-        token = AccessToken(randomString(64), Instant.now().plus(tokenDuration))
+        token = AccessToken.generate(randomString(64), tokenDuration)
         _ <- EitherT(rtd.register(s, token))
       } yield token).value
 
