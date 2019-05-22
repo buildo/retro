@@ -28,7 +28,7 @@ object TokenBasedAuthentication {
   case class Login(
     username: String,
     password: String,
-  ) extends Credential
+  )
 
   type LoginDomain[F[_]] = AuthenticationDomain[F, Login]
 

@@ -5,7 +5,7 @@ package authentication
 import cats.data.EitherT
 import cats.Monad
 
-trait AuthenticationDomain[F[_], C <: Credential] {
+trait AuthenticationDomain[F[_], C] {
   def authenticate(c: C): F[Either[AuthenticationError, (AuthenticationDomain[F, C], Subject)]]
   def register(s: Subject, c: C): F[Either[AuthenticationError, AuthenticationDomain[F, C]]]
   def unregister(s: Subject): F[Either[AuthenticationError, AuthenticationDomain[F, C]]]
@@ -13,7 +13,7 @@ trait AuthenticationDomain[F[_], C <: Credential] {
 }
 
 object AuthenticationDomain {
-  def exchangeCredentials[F[_]: Monad, C <: Credential, C2 <: Credential](
+  def exchangeCredentials[F[_]: Monad, C, C2](
     ac: AuthenticationDomain[F, C],
     at: AuthenticationDomain[F, C2],
   )(

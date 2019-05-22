@@ -5,7 +5,7 @@ package token
 
 import java.time.Instant
 
-trait Token[T] extends Credential {
+trait Token[T] {
   def value: T
   def expiresAt: Instant
 }
