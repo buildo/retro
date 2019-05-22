@@ -12,5 +12,8 @@
   },
   "sbt-buildo": {
     "Getting started": ["sbt-buildo/introduction"]
+  },
+  "contributing": {
+    "Contributing": ["contributing-website"]
   }
 }

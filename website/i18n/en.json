@@ -5,6 +5,9 @@
     "previous": "Previous",
     "tagline": "One repo to rule them all",
     "docs": {
+      "contributing-website": {
+        "title": "Contributing to the website"
+      },
       "enumero/installation": {
         "title": "Installation"
       },
@@ -44,7 +47,8 @@
     },
     "categories": {
       "Setup": "Setup",
-      "Getting started": "Getting started"
+      "Getting started": "Getting started",
+      "Contributing": "Contributing"
     }
   },
   "pages-strings": {

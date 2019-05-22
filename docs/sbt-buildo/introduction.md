@@ -4,6 +4,7 @@ title: Introduction
 ---
 
 `sbt-buildo` is an Sbt plugin that's used to share common build configurations
+
 and sbt plugins across the various projects at buildo.
 
 ## Installation
