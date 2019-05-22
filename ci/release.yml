@@ -36,7 +36,6 @@ run:
       apt-get install -y nodejs
       curl -o- -L https://yarnpkg.com/install.sh | bash
       source $HOME/.bashrc
-      echo "dummy" | gpg --pinentry-mode loopback --batch --passphrase $PGP_PASSPHRASE --no-default-keyring --keyring /root/.gnupg/pubring.kbx --detach-sign --armor --use-agent > /dev/null
       sbt "; ci-release; docs/mdoc"
       cd website
       yarn install
