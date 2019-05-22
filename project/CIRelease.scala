@@ -28,7 +28,7 @@ object CiReleasePlugin extends AutoPlugin {
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
-    (s"echo $secret" #| "base64 --decode" #| "gzip -d" #| "gpg --import").!
+    (s"echo $secret" #| "base64 --decode" #| "gzip -d" #| "gpg --batch --import").!
   }
 
   override def buildSettings: Seq[Def.Setting[_]] = List(
