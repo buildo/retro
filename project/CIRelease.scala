@@ -23,10 +23,8 @@ object CiReleasePlugin extends AutoPlugin {
   override def requires =
     JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin && Sonatype
 
-  def tag(prefix: String): Option[String] = {
-    val refPath = Paths.get(".git", "ref")
-    Try(new String(Files.readAllBytes(refPath))).toOption.filter(_.startsWith(s"${prefix}v"))
-  }
+  def tag(prefix: String): Option[String] =
+    Try(("git tag" #| "head").!!).toOption.map(_.trim).filter(_.startsWith(s"${prefix}v"))
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
