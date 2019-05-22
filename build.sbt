@@ -123,7 +123,10 @@ lazy val docs = project
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
       "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
       "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
+      "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
+      "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore)
+  .dependsOn(toctocCore, enumeroCore)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)

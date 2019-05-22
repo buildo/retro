@@ -1,13 +1,16 @@
 {
   "docs": {
     "Setup": ["toctoc/installation"],
-    "Concepts": [
+    "Getting started": [
       "toctoc/concepts/functional-model",
       "toctoc/concepts/login",
       "toctoc/concepts/token"
     ]
   },
   "enumero": {
-    "Setup": ["enumero/installation"]
+    "Getting started": ["enumero/introduction", "enumero/installation"]
+  },
+  "sbt-buildo": {
+    "Getting started": ["sbt-buildo/introduction"]
   }
 }

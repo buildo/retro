@@ -3,10 +3,22 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Authentication flows for Scala",
+    "tagline": "One repo to rule them all",
     "docs": {
       "enumero/installation": {
         "title": "Installation"
+      },
+      "enumero/introduction": {
+        "title": "Introduction"
+      },
+      "sbt-buildo/features": {
+        "title": "sbt-buildo/features"
+      },
+      "sbt-buildo/installation": {
+        "title": "Installation"
+      },
+      "sbt-buildo/introduction": {
+        "title": "Introduction"
       },
       "toctoc/concepts/functional-model": {
         "title": "Functional Model"
@@ -17,17 +29,21 @@
       "toctoc/concepts/token": {
         "title": "Token"
       },
+      "toctoc/guides/token-based-authentication-flow": {
+        "title": "Token-based Authentication Flow"
+      },
       "toctoc/installation": {
         "title": "Installation"
       }
     },
     "links": {
       "toctoc": "toctoc",
-      "enumero": "enumero"
+      "enumero": "enumero",
+      "sbt-buildo": "sbt-buildo"
     },
     "categories": {
       "Setup": "Setup",
-      "Concepts": "Concepts"
+      "Getting started": "Getting started"
     }
   },
   "pages-strings": {
