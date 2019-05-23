@@ -18,8 +18,8 @@ class MySqlSlickTokenBasedRecoveryFlow[F[_]: Sync: FutureLift[?[_], Future]](
   loginTableName: String,
   accessTokenTableName: String,
   tokenDuration: Duration = Duration.ofDays(365),
-) extends TokenBasedRecoveryFlow[F](
+) extends TokenBasedAuthenticationFlow[F](
       loginD = new MySqlSlickLoginAuthenticationDomain[F](db, loginTableName),
-      recoveryTokenD = new MySqlSlickAccessTokenAuthenticationDomain[F](db, accessTokenTableName),
+      accessTokenD = new MySqlSlickAccessTokenAuthenticationDomain[F](db, accessTokenTableName),
       tokenDuration = tokenDuration,
     )
