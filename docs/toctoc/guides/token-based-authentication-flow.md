@@ -62,9 +62,7 @@ Slick, leveraging the `toctoc-slick-postgresql` module (see the
 [installation docs](toctoc/installation.md) for instructions on how to add it as
 a dependency).
 
-<!-- TODO(gabro): enable mdoc -->
-
-```scala
+```scala mdoc
 // The generic flow
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.TokenBasedAuthenticationFlow
 
@@ -90,6 +88,7 @@ object PostgreSqlSlickTokenBasedAuthenticationFlow {
     accessTokenD = new PostgreSqlSlickAccessTokenAuthenticationDomain[F](db),
     tokenDuration = tokenDuration,
   )
+}
 ```
 
 Now that we have it, we can integrate it in our app.
@@ -99,9 +98,7 @@ Now that we have it, we can integrate it in our app.
 Here's a possible implementation of a controller that provides `login` and
 `logout` functionalities:
 
-<!-- TODO(gabro): enable mdoc -->
-
-```scala
+```scala mdoc
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.TokenBasedAuthenticationFlow
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.AccessToken
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.Login
@@ -149,7 +146,6 @@ authentication flow to provide the `signup` functionality:
 
 ```scala mdoc
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.TokenBasedAuthenticationFlow
-import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.AccessToken
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.Login
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.UserSubject
 import io.buildo.toctoc.core.authentication.AuthenticationError
