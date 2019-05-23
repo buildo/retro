@@ -1,5 +1,4 @@
 import Dependencies._
-import xerial.sbt.Sonatype._
 
 val scala212 = "2.12.8"
 val scala213 = "2.13.0-RC2"
