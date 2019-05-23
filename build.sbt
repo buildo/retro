@@ -1,5 +1,4 @@
 import Dependencies._
-import xerial.sbt.Sonatype._
 
 val scala212 = "2.12.8"
 val scala213 = "2.13.0-RC2"
@@ -18,22 +17,6 @@ inThisBuild(
         url("https://github.com/gabro"),
       ),
     ),
-    // remove when new sbt-buildo is out
-    scalacOptions ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, n)) if n >= 13 => "-Ymacro-annotations" :: Nil
-        case _                       => Nil
-      }
-    },
-    // remove when new sbt-buildo is out
-    libraryDependencies ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, n)) if n >= 13 => Nil
-        case _ =>
-          compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
-      }
-    },
-    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary)),
   ),
 )
 
