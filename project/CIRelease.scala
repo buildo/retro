@@ -28,11 +28,12 @@ object CiReleasePlugin extends AutoPlugin {
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
+    val passphrase = sys.env("PGP_PASSPHRASE")
     (s"echo $secret" #| "base64 --decode" #| "gzip -d" #| "gpg --batch --import").!
     // The first time you use `gpg --passphrase` the agent prompts for a password nevertheless
     // The `--pinentry-mode loopback` flag seems to do the trick, but we cannot inject it in sbt-pgp
     // so we're running a dummmy gpg signature here so that we won't be asked for the passphrase later
-    ("echo dummy" #| s"gpg --pinentry-mode loopback --batch --passphrase $secret --no-default-keyring --keyring /root/.gnupg/pubring.kbx --detach-sign --armor --use-agent").!
+    ("echo dummy" #| s"gpg --pinentry-mode loopback --batch --passphrase $passphrase --no-default-keyring --keyring /root/.gnupg/pubring.kbx --detach-sign --armor --use-agent").!
   }
 
   override def buildSettings: Seq[Def.Setting[_]] = List(
