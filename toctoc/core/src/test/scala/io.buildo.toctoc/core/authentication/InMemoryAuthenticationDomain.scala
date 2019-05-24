@@ -5,8 +5,8 @@ package authentication
 import cats.Applicative
 import cats.syntax.all._
 
-final class InMemoryAuthenticationDomain[F[_]: Applicative, C](
-  private val credentials: Map[C, Subject] = Map.empty,
+final class InMemoryAuthenticationDomain[F[_]: Applicative, C] private (
+  credentials: Map[C, Subject],
 ) extends AuthenticationDomain[F, C] {
 
   override def authenticate(
@@ -40,4 +40,11 @@ final class InMemoryAuthenticationDomain[F[_]: Applicative, C](
       .asRight[AuthenticationError]
       .pure[F]
       .widen
+}
+
+object InMemoryAuthenticationDomain {
+  def create[F[_]: Applicative, C](
+    credentials: Map[C, Subject],
+  ): InMemoryAuthenticationDomain[F, C] =
+    new InMemoryAuthenticationDomain[F, C](credentials)
 }
