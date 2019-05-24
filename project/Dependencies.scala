@@ -5,7 +5,9 @@ object Dependencies {
 
   val V = new {
     val circe = "0.12.0-M1"
-    val scalatest = "3.1.0-SNAP9"
+    val scalatest = "3.0.5"
+    val scalacheck = "1.14.0"
+    val scalacheckMagnolia = "0.2.2"
     val mockito = "1.9.5"
     val akka = "2.5.18"
     val akkaHttp = "10.1.3"
@@ -35,6 +37,8 @@ object Dependencies {
   val circeParser = "io.circe" %% "circe-parser" % V.circe
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val scalatest = "org.scalatest" %% "scalatest" % V.scalatest
+  val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
+  val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % V.akka
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % V.akkaHttp
@@ -66,14 +70,14 @@ object Dependencies {
 
   val enumeroDependencies = List(
     scalatest,
-    mockito
+    mockito,
   ).map(_ % Test)
 
   val enumeroCirceDependencies = List(
-    circeCore
+    circeCore,
   ) ++ List(
     circeParser,
-    scalatest
+    scalatest,
   ).map(_ % Test)
 
   val mailoDependencies = List(
@@ -93,28 +97,34 @@ object Dependencies {
     scalaLogging,
     mailin,
     levelDb,
-    jakartaMail
+    jakartaMail,
   ) ++ List(
     scalatest,
     logback,
     akkaTestkit,
-    akkaPersistenceInMemory
+    akkaPersistenceInMemory,
   ).map(_ % Test)
 
   val toctocCoreDependencies = List(
     bcrypt,
-    catsCore
-  )
+    catsCore,
+  ) ++ List(
+    scalatest,
+    scalacheck,
+    scalacheckMagnolia,
+    slf4jNop,
+    catsEffect,
+  ).map(_ % Test)
 
   val toctocSlickPostgresDependencies = List(
     postgresql,
     slick,
     slickHikari,
     catsEffect,
-    monixCatnap
+    monixCatnap,
   ) ++ List(
     scalatest,
-    slf4jNop
+    slf4jNop,
   ).map(_ % Test)
 
   val toctocSlickMySqlDependencies = List(
@@ -122,10 +132,10 @@ object Dependencies {
     slick,
     slickHikari,
     catsEffect,
-    monixCatnap
+    monixCatnap,
   ) ++ List(
     scalatest,
-    slf4jNop
+    slf4jNop,
   ).map(_ % Test)
 
   lazy val toctocLdapDependencies = List(
@@ -133,7 +143,7 @@ object Dependencies {
     mysql,
     slick,
     slf4jNop,
-    catsEffect
+    catsEffect,
   )
 
 }
