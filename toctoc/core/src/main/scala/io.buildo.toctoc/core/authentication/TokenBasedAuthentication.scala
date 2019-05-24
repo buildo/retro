@@ -41,26 +41,11 @@ object TokenBasedAuthentication {
     ref: String,
   ) extends Subject
 
-  trait LoginAuthenticationDomain[F[_]] extends LoginDomain[F] {
-    def authenticate(c: Login): F[Either[AuthenticationError, (LoginDomain[F], Subject)]]
-    def register(s: Subject, c: Login): F[Either[AuthenticationError, LoginDomain[F]]]
-    def unregister(s: Subject): F[Either[AuthenticationError, LoginDomain[F]]]
-    def unregister(c: Login): F[Either[AuthenticationError, LoginDomain[F]]]
-  }
-
   type AccessTokenDomain[F[_]] = AuthenticationDomain[F, AccessToken]
-  trait AccessTokenAuthenticationDomain[F[_]] extends AccessTokenDomain[F] {
-    def authenticate(
-      c: AccessToken,
-    ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]]
-    def register(s: Subject, c: AccessToken): F[Either[AuthenticationError, AccessTokenDomain[F]]]
-    def unregister(s: Subject): F[Either[AuthenticationError, AccessTokenDomain[F]]]
-    def unregister(c: AccessToken): F[Either[AuthenticationError, AccessTokenDomain[F]]]
-  }
 
   class TokenBasedAuthenticationFlow[F[_]: Monad](
-    loginD: LoginAuthenticationDomain[F],
-    accessTokenD: AccessTokenAuthenticationDomain[F],
+    loginD: LoginDomain[F],
+    accessTokenD: AccessTokenDomain[F],
     tokenDuration: Duration,
   ) extends BCryptHashing {
     def registerSubjectLogin(s: Subject, l: Login): F[Either[AuthenticationError, Unit]] =

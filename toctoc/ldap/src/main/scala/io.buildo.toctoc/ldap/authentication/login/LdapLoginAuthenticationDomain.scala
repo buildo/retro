@@ -11,7 +11,7 @@ import cats.implicits._
 import cats.effect.Sync
 
 class LdapLoginAuthenticationDomain[F[_]](ldapConfig: LdapConfig)(implicit F: Sync[F])
-    extends LoginAuthenticationDomain[F] {
+    extends LoginDomain[F] {
 
   override def register(s: Subject, c: Login): F[Either[AuthenticationError, LoginDomain[F]]] =
     ???

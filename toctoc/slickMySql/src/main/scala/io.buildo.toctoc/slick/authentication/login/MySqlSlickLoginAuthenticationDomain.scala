@@ -21,7 +21,7 @@ class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   tableName: String = "login_auth_domain",
 )(
   implicit F: Sync[F],
-) extends LoginAuthenticationDomain[F]
+) extends LoginDomain[F]
     with BCryptHashing {
 
   class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, tableName) {

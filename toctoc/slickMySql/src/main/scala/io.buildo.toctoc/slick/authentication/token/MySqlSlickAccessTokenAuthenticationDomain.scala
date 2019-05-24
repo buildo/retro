@@ -21,7 +21,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   tableName: String = "access_token_auth_domain",
 )(
   implicit F: Sync[F],
-) extends AccessTokenAuthenticationDomain[F] {
+) extends AccessTokenDomain[F] {
 
   class AccessTokenTable(tag: Tag) extends Table[(Int, String, String, Instant)](tag, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
