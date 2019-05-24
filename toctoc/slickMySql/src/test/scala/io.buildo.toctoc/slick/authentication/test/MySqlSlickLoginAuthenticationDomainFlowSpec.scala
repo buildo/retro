@@ -5,7 +5,7 @@ package test
 
 import core.authentication.TokenBasedAuthentication._
 import org.scalatest._
-import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.FlatSpec
 import org.scalatest.concurrent.ScalaFutures
 import _root_.slick.jdbc.MySQLProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
@@ -15,7 +15,7 @@ import cats.effect.IO
 import java.time.Duration
 
 class MySqlSlickLoginAuthenticationDomainFlowSpec
-    extends AnyFlatSpec
+    extends FlatSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with ScalaFutures
