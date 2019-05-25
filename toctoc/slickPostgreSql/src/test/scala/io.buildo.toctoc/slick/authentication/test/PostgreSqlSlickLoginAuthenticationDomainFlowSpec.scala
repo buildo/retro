@@ -8,7 +8,7 @@ import login.PostgreSqlSlickLoginAuthenticationDomain
 import token.PostgreSqlSlickAccessTokenAuthenticationDomain
 
 import org.scalatest._
-import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.FlatSpec
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
@@ -16,16 +16,19 @@ import cats.effect.IO
 import java.time.Duration
 
 class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
-    extends AnyFlatSpec
+    extends FlatSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll
     with EitherValues
     with Matchers {
 
+  val loginTableName = "login"
+  val tokenTableName = "token"
+
   val db = Database.forConfig("db")
-  val loginAuthDomain = new PostgreSqlSlickLoginAuthenticationDomain[IO](db)
+  val loginAuthDomain = new PostgreSqlSlickLoginAuthenticationDomain[IO](db, loginTableName)
   val accessTokenAuthDomain =
-    new PostgreSqlSlickAccessTokenAuthenticationDomain[IO](db)
+    new PostgreSqlSlickAccessTokenAuthenticationDomain[IO](db, tokenTableName)
 
   val loginTable = loginAuthDomain.loginTable
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable

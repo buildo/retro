@@ -28,6 +28,8 @@ lazy val `sbt-buildo` = project
     dynverTagPrefix := "sbt-buildo-",
   )
 
+lazy val enumero = project.aggregate(enumeroCore, enumeroCirce)
+
 lazy val enumeroCore = project
   .in(file("enumero/core"))
   .settings(
@@ -59,6 +61,8 @@ lazy val mailo = project
     },
   )
   .dependsOn(enumeroCore)
+
+lazy val toctoc = project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap)
 
 lazy val toctocCore = project
   .in(file("toctoc/core"))
