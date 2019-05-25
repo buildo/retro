@@ -10,6 +10,7 @@ title: Installation
   Postgres databases
 - `toctoc-slick-mysql`: provides slick-specific implementations for MySql
   databases
+- `toctoc-circe`: provides Circe encoders/decoders for core toctoc types
 
 You can cherry-pick the modules according to the needs of your project. For
 example:
