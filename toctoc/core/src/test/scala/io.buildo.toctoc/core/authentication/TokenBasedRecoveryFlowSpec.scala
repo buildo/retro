@@ -61,11 +61,28 @@ final class TokenBasedRecoveryFlowSpec
           result <- EitherT(f.recoverLogin(token, password) { _ =>
             IO(None)
           })
-        } yield {
-          result
-        }).swap.map {
+        } yield result).leftMap {
           assertResult(AuthenticationError.InvalidCredential)(_)
-        }.value
+        }.swap.value
+      }
+    }
+  }
+
+  property("successful recovery invalidates all existing credentials for a subject") {
+    forAll { (s: UserSubject, username: String, password: String) =>
+      check {
+        (for {
+          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+          (f, token1) = registerResult
+          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+          (f, token2) = registerResult
+          f2 <- EitherT(f.recoverLogin(token2, password)(_ => IO(Some(username))))
+          authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
+          (_, subject) = authenticateResult
+          recoverResult <- EitherT(f.recoverLogin(token1, password)(_ => IO(Some(username))))
+        } yield recoverResult).leftMap {
+          assertResult(AuthenticationError.InvalidCredential)(_)
+        }.swap.value
       }
     }
   }
