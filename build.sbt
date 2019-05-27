@@ -62,7 +62,8 @@ lazy val mailo = project
   )
   .dependsOn(enumeroCore)
 
-lazy val toctoc = project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap)
+lazy val toctoc =
+  project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap, toctocCirce)
 
 lazy val toctocCore = project
   .in(file("toctoc/core"))
@@ -97,6 +98,15 @@ lazy val toctocLdap = project
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
     dynverTagPrefix := "toctoc-",
+  )
+  .dependsOn(toctocCore)
+
+lazy val toctocCirce = project
+  .in(file("toctoc/circe"))
+  .settings(
+    name := "toctoc-circe",
+    dynverTagPrefix := "toctoc-",
+    libraryDependencies ++= toctocCirceDependencies,
   )
   .dependsOn(toctocCore)
 

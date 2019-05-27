@@ -138,12 +138,21 @@ object Dependencies {
     slf4jNop,
   ).map(_ % Test)
 
-  lazy val toctocLdapDependencies = List(
+  val toctocLdapDependencies = List(
     ldap,
     mysql,
     slick,
     slf4jNop,
     catsEffect,
   )
+
+  val toctocCirceDependencies = List(
+    circeCore,
+    circeGeneric,
+  ) ++ List(
+    scalatest,
+    scalacheck,
+    scalacheckMagnolia,
+  ).map(_ % Test)
 
 }
