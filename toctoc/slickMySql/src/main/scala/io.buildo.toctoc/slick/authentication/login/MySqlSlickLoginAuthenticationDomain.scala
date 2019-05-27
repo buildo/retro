@@ -19,12 +19,14 @@ import scala.concurrent.Future
 class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
   tableName: String = "login_auth_domain",
+  schemaName: Option[String] = None,
 )(
   implicit F: Sync[F],
 ) extends LoginDomain[F]
     with BCryptHashing {
 
-  class LoginTable(tag: Tag) extends Table[(Int, String, String, String)](tag, tableName) {
+  class LoginTable(tag: Tag)
+      extends Table[(Int, String, String, String)](tag, schemaName, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def username = column[String]("username", O.Length(255))

@@ -19,15 +19,13 @@ import java.time.Instant
 class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
   tableName: String = "access_token_auth_domain",
+  schemaName: Option[String] = None,
 )(
   implicit F: Sync[F],
 ) extends AccessTokenDomain[F] {
 
   class AccessTokenTable(tag: Tag)
-      extends Table[(Int, String, String, Instant)](
-        tag,
-        tableName,
-      ) {
+      extends Table[(Int, String, String, Instant)](tag, schemaName, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def token = column[String]("token")
