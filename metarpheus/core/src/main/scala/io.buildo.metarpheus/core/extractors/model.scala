@@ -6,22 +6,16 @@ import scala.meta._
 
 package object model {
 
-  case class CaseClassDefnInfo(defn: Defn.Class, commentToken: Option[scala.meta.Token])
-
   def extractCaseClassDefns(source: scala.meta.Source): List[CaseClassDefnInfo] = {
-    source
-      .collect {
-        case c: Defn.Class if c.mods.collectFirst {
-              case Mod.Case() => ()
-            }.isDefined =>
-          c
-      }
-      .map { cc =>
-        val tokens = cc.tokens
-        val tokenIdx = source.tokens.indexOf(tokens(0))
-        val comment = findRelatedComment(source, cc)
-        CaseClassDefnInfo(cc, comment)
-      }
+    source.collect {
+      case c: Defn.Class if c.mods.collectFirst {
+            case Mod.Case() => ()
+          }.isDefined =>
+        c
+    }.map { cc =>
+      val comment = findRelatedComment(source, cc)
+      CaseClassDefnInfo(cc, comment)
+    }
   }
 
   /**
@@ -41,7 +35,7 @@ package object model {
         intermediate.CaseClass.Member(
           name = name,
           tpe = tpeToIntermediate(tpe),
-          desc = paramDescs.find(_.name == name).flatMap(_.desc)
+          desc = paramDescs.find(_.name == name).flatMap(_.desc),
         )
     }.toList
     val typeParams = defn.tparams.map(typeParamToIntermediate).toList
@@ -50,57 +44,45 @@ package object model {
       typeParams = typeParams,
       members = members,
       desc = classDesc,
-      isValueClass = isValueClass
+      isValueClass = isValueClass,
     )
   }
 
-  sealed trait CaseEnumDefns
-  case class SugaredCaseEnumDefns(defn: Defn.Trait) extends CaseEnumDefns
-  case class VanillaCaseEnumDefns(trait_defn: Defn.Trait, obj_defn: Defn.Object)
-      extends CaseEnumDefns
-
-  case class CaseEnumDefnInfo(defns: CaseEnumDefns, commentToken: Option[scala.meta.Token])
-
   def extractCaseEnumDefns(source: scala.meta.Source): List[CaseEnumDefnInfo] = {
-    source
-      .collect {
-        case c: Defn.Trait if c.mods.collectFirst {
-              case Mod.Annot(Init(Name("enum" | "indexedEnum"), _, _)) => ()
-            }.isDefined =>
-          c
+    source.collect {
+      case c: Defn.Trait if c.mods.collectFirst {
+            case Mod.Annot(Init(Name("enum" | "indexedEnum"), _, _)) => ()
+          }.isDefined =>
+        c
+    }.map { cc =>
+      val comment = findRelatedComment(source, cc)
+      CaseEnumDefnInfo(SugaredCaseEnumDefns(cc), comment)
+    } ++
+      source.collect {
+        case c =>
+          c.children
+            .sliding(2)
+            .filter {
+              case (t: Defn.Trait) :: (o: Defn.Object) :: Nil =>
+                t.mods.collectFirst {
+                  case _: Mod.Sealed => ()
+                }.isDefined &&
+                  o.templ.stats.forall {
+                    case c: Defn.Object if c.mods.collectFirst {
+                          case _: Mod.Case => ()
+                        }.isDefined =>
+                      true
+                    case _ => false
+                  }
+              case _ => false
+            }
+            .toList
+      }.flatMap(o => o).map {
+        case (trait_defn: Defn.Trait) :: (object_defn: Defn.Object) :: Nil =>
+          val comment = findRelatedComment(source, trait_defn)
+          CaseEnumDefnInfo(VanillaCaseEnumDefns(trait_defn, object_defn), comment)
+        case t => throw new RuntimeException(s"Unexpected tree: $t")
       }
-      .map { cc =>
-        val comment = findRelatedComment(source, cc)
-        CaseEnumDefnInfo(SugaredCaseEnumDefns(cc), comment)
-      } ++
-      source
-        .collect {
-          case c =>
-            c.children
-              .sliding(2)
-              .filter {
-                case (t: Defn.Trait) :: (o: Defn.Object) :: Nil =>
-                  t.mods.collectFirst {
-                    case _: Mod.Sealed => ()
-                  }.isDefined &&
-                    o.templ.stats
-                      .forall {
-                        case c: Defn.Object if c.mods.collectFirst {
-                              case _: Mod.Case => ()
-                            }.isDefined =>
-                          true
-                        case _ => false
-                      }
-                case _ => false
-              }
-              .toList
-        }
-        .flatMap(o => o)
-        .map {
-          case (trait_defn: Defn.Trait) :: (object_defn: Defn.Object) :: Nil =>
-            val comment = findRelatedComment(source, trait_defn)
-            CaseEnumDefnInfo(VanillaCaseEnumDefns(trait_defn, object_defn), comment)
-        }
   }
 
   /**
@@ -108,7 +90,7 @@ package object model {
     * of extractCaseEnumDefns
     */
   def extractCaseEnum(
-    source: scala.meta.Source
+    source: scala.meta.Source,
   )(caseEnumDefnInfo: CaseEnumDefnInfo): intermediate.CaseEnum = {
 
     def membersFromTempl(t: Template): List[intermediate.CaseEnum.Member] = {

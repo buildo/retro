@@ -19,7 +19,7 @@ object JSFacade {
 
   @JSExportTopLevel("run")
   def run(paths: js.Array[String], jsConfig: js.UndefOr[JSConfig]) = {
-    implicit val circeConfiguration: Configuration =
+    implicit val _: Configuration =
       Configuration.default.withDefaults.withDiscriminator("_type")
     val config = jsConfig.map { jsConfig =>
       val json = js.JSON.stringify(jsConfig)
