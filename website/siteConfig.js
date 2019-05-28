@@ -19,11 +19,17 @@ const siteConfig = {
   projectName: "retro",
   organizationName: "buildo",
 
+  algolia: {
+    indexName: "buildo-retro",
+    apiKey: "123eb5671fc8154df8f1f3ae0355d644"
+  },
+
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     { doc: "toctoc/installation", label: "toctoc" },
     { doc: "enumero/introduction", label: "enumero" },
     { doc: "sbt-buildo/introduction", label: "sbt-buildo" },
+    { search: true },
     { href: "https://github.com/buildo/retro", label: "GitHub", external: true }
   ],
 
