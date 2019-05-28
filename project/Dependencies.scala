@@ -33,8 +33,6 @@ object Dependencies {
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
     val scalameta = "4.1.10"
-    val scallop = "1.0.0"
-    val json4s = "3.5.0"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -74,8 +72,6 @@ object Dependencies {
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
   val diff = "ai.x" %% "diff" % "2.0"
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
-  val scallop = "org.rogach" %% "scallop" % V.scallop
-  val json4sJackson = "org.json4s" %% "json4s-jackson" % V.json4s
 
   val enumeroDependencies = List(
     scalatest,
@@ -176,15 +172,5 @@ object Dependencies {
     circeParser,
     circeGenericExtras,
   )
-
-  val metarpheusCliDependencies = List(
-    scallop,
-    json4sJackson,
-    circeCore,
-    circeParser,
-    circeGenericExtras,
-  ) ++ List(
-    scalatest,
-  ).map(_ % Test)
 
 }

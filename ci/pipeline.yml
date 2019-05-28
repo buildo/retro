@@ -64,6 +64,17 @@ resources:
       - project
       - toctoc
 
+- type: pull-request
+  name: metarpheus-pr
+  icon: source-pull
+  source:
+    repository: buildo/backend
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - metarpheus
+
 - name: postgres
   type: docker-image
   icon: docker
@@ -238,6 +249,31 @@ jobs:
         path: backend
         status: success
         context: toctoc
+
+- name: metarpheus-pr
+  plan:
+  - get: retro
+    resource: metarpheus-pr
+    trigger: true
+  - put: metarpheus-pr
+    params:
+      path: retro
+      status: pending
+      context: metarpheus
+  - task: test
+    file: retro/metarpheus/ci/test.yml
+    on_failure:
+      put: metarpheus-pr
+      params:
+        path: retro
+        status: failure
+        context: metarpheus
+    on_success:
+      put: metarpheus-pr
+      params:
+        path: retro
+        status: success
+        context: metarpheus
 
 - name: release
   plan:

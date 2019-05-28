@@ -137,15 +137,6 @@ lazy val metarpheusJsFacade = project
   )
   .dependsOn(metarpheusCore.js)
 
-lazy val metarpheusCli = project
-  .in(file("metarpheus/cli"))
-  .settings(
-    name := "metarpheus/cli",
-    libraryDependencies ++= metarpheusCliDependencies,
-    dynverTagPrefix := "metarpheus-",
-  )
-  .dependsOn(metarpheusCore.jvm)
-
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(
