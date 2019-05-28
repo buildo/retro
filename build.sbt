@@ -145,10 +145,10 @@ lazy val docs = project
     mdocVariables := Map(
       "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
+      "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore),
       "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
-      "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
+      "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`),
       "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
-      "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore)
