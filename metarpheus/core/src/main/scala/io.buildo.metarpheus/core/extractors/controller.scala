@@ -91,7 +91,7 @@ package object controller {
       .collectFirst {
         case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => (t.name.value, n)
       }
-      .getOrElse(t.name.value, t.name.value)
+      .getOrElse((t.name.value, t.name.value))
 
     methods.map { m =>
       val scaladoc = findRelatedComment(source, m)

@@ -11,7 +11,7 @@ class ApiSuite extends FunSuite {
     import scala.meta._
     List(
       Fixtures.models.parse[Source].get,
-      Fixtures.controllers.parse[Source].get
+      Fixtures.controllers.parse[Source].get,
     )
   }
 
@@ -22,9 +22,9 @@ class ApiSuite extends FunSuite {
 
     assert(api.routes.collectFirst {
       // format: off
-      case Route(get, List(
+      case Route(_, List(
         RouteSegment.String("campings"),
-        RouteSegment.String("getByCoolnessAndSize")
+        RouteSegment.String("getByCoolnessAndSize"),
       ), _, _, _, _, _, _, _) => ()
       // format: on
     }.isDefined)
@@ -35,7 +35,7 @@ class ApiSuite extends FunSuite {
           _,
           _,
           _,
-          _
+          _,
           ) =>
         ()
     }.isEmpty)

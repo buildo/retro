@@ -9,14 +9,14 @@ resources:
   name: master
   icon: github-circle
   source:
-    uri: https://github.com/buildo/backend.git
+    uri: https://github.com/buildo/retro.git
     branch: master
 
 - type: git
   name: tag
   icon: tag
   source:
-    uri: https://github.com/buildo/backend.git
+    uri: https://github.com/buildo/retro.git
     branch: master
     tag_filter: "*"
 
@@ -24,7 +24,7 @@ resources:
   name: sbt-buildo-pr
   icon: source-pull
   source:
-    repository: buildo/backend
+    repository: buildo/retro
     access_token: ((github-token))
     paths:
       - build.sbt
@@ -35,7 +35,7 @@ resources:
   name: enumero-pr
   icon: source-pull
   source:
-    repository: buildo/backend
+    repository: buildo/retro
     access_token: ((github-token))
     paths:
       - build.sbt
@@ -46,7 +46,7 @@ resources:
   name: mailo-pr
   icon: source-pull
   source:
-    repository: buildo/backend
+    repository: buildo/retro
     access_token: ((github-token))
     paths:
       - build.sbt
@@ -57,12 +57,23 @@ resources:
   name: toctoc-pr
   icon: source-pull
   source:
-    repository: buildo/backend
+    repository: buildo/retro
     access_token: ((github-token))
     paths:
       - build.sbt
       - project
       - toctoc
+
+- type: pull-request
+  name: metarpheus-pr
+  icon: source-pull
+  source:
+    repository: buildo/retro
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - metarpheus
 
 - name: postgres
   type: docker-image
@@ -89,31 +100,31 @@ jobs:
 
 - name: sbt-buildo
   plan:
-  - get: backend
+  - get: retro
     resource: master
     trigger: true
   - task: compile
-    file: backend/sbt-buildo/ci/compile.yml
+    file: retro/sbt-buildo/ci/compile.yml
 
 - name: enumero
   plan:
-  - get: backend
+  - get: retro
     resource: master
     trigger: true
   - task: test
-    file: backend/enumero/ci/test.yml
+    file: retro/enumero/ci/test.yml
 
 - name: mailo
   plan:
-  - get: backend
+  - get: retro
     resource: master
     trigger: true
   - task: test
-    file: backend/mailo/ci/test.yml
+    file: retro/mailo/ci/test.yml
 
 - name: toctoc
   plan:
-  - get: backend
+  - get: retro
     resource: master
     trigger: true
   - get: postgres
@@ -126,87 +137,95 @@ jobs:
     params:
       save: true
   - task: test
-    file: backend/toctoc/ci/test.yml
+    file: retro/toctoc/ci/test.yml
     privileged: true
+
+- name: metarpheus
+  plan:
+  - get: retro
+    resource: master
+    trigger: true
+  - task: test
+    file: retro/metarpheus/ci/test.yml
 
 - name: sbt-buildo-pr
   plan:
-  - get: backend
+  - get: retro
     resource: sbt-buildo-pr
     trigger: true
   - put: sbt-buildo-pr
     params:
-      path: backend
+      path: retro
       status: pending
       context: sbt-buildo
   - task: compile
-    file: backend/sbt-buildo/ci/compile.yml
+    file: retro/sbt-buildo/ci/compile.yml
     on_failure:
       put: sbt-buildo-pr
       params:
-        path: backend
+        path: retro
         status: failure
         context: sbt-buildo
     on_success:
       put: sbt-buildo-pr
       params:
-        path: backend
+        path: retro
         status: success
         context: sbt-buildo
 
 - name: enumero-pr
   plan:
-  - get: backend
+  - get: retro
     resource: enumero-pr
     trigger: true
   - put: enumero-pr
     params:
-      path: backend
+      path: retro
       status: pending
       context: enumero
   - task: test
-    file: backend/enumero/ci/test.yml
+    file: retro/enumero/ci/test.yml
     on_failure:
       put: enumero-pr
       params:
-        path: backend
+        path: retro
         status: failure
         context: enumero
     on_success:
       put: enumero-pr
       params:
-        path: backend
+        path: retro
         status: success
         context: enumero
 
 - name: mailo-pr
   plan:
-  - get: backend
+  - get: retro
     resource: mailo-pr
     trigger: true
   - put: mailo-pr
     params:
-      path: backend
+      path: retro
       status: pending
       context: mailo
   - task: test
-    file: backend/mailo/ci/test.yml
+    file: retro/mailo/ci/test.yml
     on_failure:
       put: mailo-pr
       params:
-        path: backend
+        path: retro
         status: failure
         context: mailo
     on_success:
       put: mailo-pr
       params:
-        path: backend
+        path: retro
         status: success
         context: mailo
 
 - name: toctoc-pr
   plan:
-  - get: backend
+  - get: retro
     resource: toctoc-pr
     trigger: true
   - get: postgres
@@ -220,28 +239,53 @@ jobs:
       save: true
   - put: toctoc-pr
     params:
-      path: backend
+      path: retro
       status: pending
       context: toctoc
   - task: test
-    file: backend/toctoc/ci/test.yml
+    file: retro/toctoc/ci/test.yml
     privileged: true
     on_failure:
       put: toctoc-pr
       params:
-        path: backend
+        path: retro
         status: failure
         context: toctoc
     on_success:
       put: toctoc-pr
       params:
-        path: backend
+        path: retro
         status: success
         context: toctoc
 
+- name: metarpheus-pr
+  plan:
+  - get: retro
+    resource: metarpheus-pr
+    trigger: true
+  - put: metarpheus-pr
+    params:
+      path: retro
+      status: pending
+      context: metarpheus
+  - task: test
+    file: retro/metarpheus/ci/test.yml
+    on_failure:
+      put: metarpheus-pr
+      params:
+        path: retro
+        status: failure
+        context: metarpheus
+    on_success:
+      put: metarpheus-pr
+      params:
+        path: retro
+        status: success
+        context: metarpheus
+
 - name: release
   plan:
-  - get: backend
+  - get: retro
     resource: master
     trigger: true
     passed:
@@ -249,10 +293,11 @@ jobs:
       - enumero
       - mailo
       - toctoc
+      - metarpheus
   - get: tag
     trigger: true
   - task: release on Sonatype
-    file: backend/ci/release.yml
+    file: retro/ci/release.yml
     params:
       GITHUB_DEPLOY_KEY: ((private-key))
       PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
