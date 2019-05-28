@@ -1,6 +1,6 @@
 import sbt._
 import sbt.Keys._
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import scala.language.reflectiveCalls
 
 object Dependencies {
 
