@@ -27,22 +27,22 @@ their Sbt build:
 resolvers += Resolver.sonatypeRepo("snapshots")
 ```
 
-## Stable releases
+## Stable release<!--  -->s
 
 Stable releases are published whenever there's a matching Git tag associated
-with the current commit.
+with a current commit on master.
 
 Each project in the monorepo can configure the `dynverTagPrefix` setting to
 declare its matching tag.
 
 > 👉 Example: `enumeroCore` and `enumeroCirce` use `enumero-` as their tag
 > prefix, meaning that a stable release will be published whenever a Git tag
-> starting with `enumero-` is found.
+> starting with `enumero-` is found on master.
 
 ### Releasing a stable version
 
-To release a new stable version of a library, push a Git tag with this pattern:
-`<PREFIX>v<VERSION>`.
+To release a new stable version of a library, push a Git tag on master with this
+pattern: `<PREFIX>v<VERSION>`.
 
 > 👉 Example: you can release the version 1.0.0 of `enumeroCore` and
 > `enumeroCirce` by pushing the `enumero-v1.0.0` tag.
