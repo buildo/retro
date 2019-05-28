@@ -44,7 +44,7 @@ to try the latest unreleased features. For example:
 
 ```scala
 val V = new {
-  val toctoc = "@ENUMERO_SNAPSHOT_VERSION@"
+  val enumero = "@ENUMERO_SNAPSHOT_VERSION@"
 }
 
 resolvers += Resolver.sonatypeRepo("snapshots")
