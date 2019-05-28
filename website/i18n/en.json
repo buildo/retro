@@ -14,6 +14,9 @@
       "enumero/introduction": {
         "title": "Introduction"
       },
+      "releasing": {
+        "title": "Managing releases"
+      },
       "sbt-buildo/features": {
         "title": "sbt-buildo/features"
       },
