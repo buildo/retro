@@ -1,5 +1,6 @@
 import sbt._
 import sbt.Keys._
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 
 object Dependencies {
 
@@ -31,11 +32,15 @@ object Dependencies {
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
+    val scalameta = "4.1.10"
+    val scallop = "1.0.0"
+    val json4s = "3.5.0"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
   val circeParser = "io.circe" %% "circe-parser" % V.circe
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
+  val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
   val scalatest = "org.scalatest" %% "scalatest" % V.scalatest
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
   val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
@@ -67,6 +72,10 @@ object Dependencies {
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
   val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
+  val diff = "ai.x" %% "diff" % "2.0"
+  val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
+  val scallop = "org.rogach" %% "scallop" % V.scallop
+  val json4sJackson = "org.json4s" %% "json4s-jackson" % V.json4s
 
   val enumeroDependencies = List(
     scalatest,
@@ -153,6 +162,29 @@ object Dependencies {
     scalatest,
     scalacheck,
     scalacheckMagnolia,
+  ).map(_ % Test)
+
+  val metarpheusCoreDependencies = List(
+    scalameta,
+  ) ++ List(
+    scalatest,
+    diff,
+  ).map(_ % Test)
+
+  val metarpheusJsFacadeDependencies = List(
+    circeCore,
+    circeParser,
+    circeGenericExtras,
+  )
+
+  val metarpheusCliDependencies = List(
+    scallop,
+    json4sJackson,
+    circeCore,
+    circeParser,
+    circeGenericExtras,
+  ) ++ List(
+    scalatest,
   ).map(_ % Test)
 
 }

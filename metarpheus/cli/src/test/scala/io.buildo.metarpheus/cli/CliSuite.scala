@@ -5,10 +5,11 @@ package test
 import org.scalatest._
 
 class CliSuite extends FunSuite {
-  val fixturesPath = new java.io.File("core/shared/src/test/resources/fixtures").getAbsolutePath
-
+  val fixturesPath = new java.io.File("metarpheus/core/src/test/resources/fixtures").getAbsolutePath
   test("run main") {
-    Cli.main(s"--config cli/src/test/resources/fixtures/config.json $fixturesPath".split(" "))
+    Cli.main(
+      s"--config metarpheus/cli/src/test/resources/fixtures/config.json $fixturesPath".split(" "),
+    )
   }
 
 }

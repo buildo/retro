@@ -1,4 +1,6 @@
 import Dependencies._
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
 val scala212 = "2.12.8"
 val scala213 = "2.13.0-RC2"
@@ -109,6 +111,40 @@ lazy val toctocCirce = project
     libraryDependencies ++= toctocCirceDependencies,
   )
   .dependsOn(toctocCore)
+
+lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("metarpheus/core"))
+  .settings(
+    name := "metarpheus-core",
+    libraryDependencies ++= metarpheusCoreDependencies.map { dep =>
+      if (dep.configurations == Some(Test.name)) dep
+      else dep.cross(ScalaJSCrossVersion.binary)
+    },
+    dynverTagPrefix := "metarpheus-",
+  )
+
+lazy val metarpheusJsFacade = project
+  .in(file("metarpheus/jsFacade"))
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .settings(
+    name := "metarpheus-js-facade",
+    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    libraryDependencies ++= metarpheusJsFacadeDependencies
+      .map(_.cross(ScalaJSCrossVersion.binary)),
+    dynverTagPrefix := "metarpheus-",
+  )
+  .dependsOn(metarpheusCore.js)
+
+lazy val metarpheusCli = project
+  .in(file("metarpheus/cli"))
+  .settings(
+    name := "metarpheus/cli",
+    libraryDependencies ++= metarpheusCliDependencies,
+    dynverTagPrefix := "metarpheus-",
+  )
+  .dependsOn(metarpheusCore.jvm)
 
 lazy val docs = project
   .in(file("retro-docs"))
