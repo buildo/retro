@@ -2,7 +2,35 @@ import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment, RouteParam, 
 import scala.meta._
 
 object Meta {
-  val endpointsClass: (Term.Name, Type.Name, List[Term.Param], List[Defn.Val]) => Pkg = (
+  val http4sClass: (Term.Name, Type.Name, Type.Name, List[Term.Param], List[Defn.Val], Defn.Val) => Pkg = (
+    `package`: Term.Name,
+    controllerName: Type.Name,
+    endpointsName: Type.Name,
+    implicits: List[Term.Param],
+    http4sEndpoints: List[Defn.Val],
+    app: Defn.Val
+  ) => {
+    val tapirEndpoints = q"private[this] val endpoints = new $endpointsName()"
+    val httpsEndpointsName = Type.Name(s"${controllerName.syntax}Http4sEndpoints")
+    q"""package ${`package`} {
+  import cats.effect._
+  import cats.implicits._
+  import cats.data.NonEmptyList
+  
+  import org.http4s._
+  import org.http4s.implicits._
+  
+  import tapir.server.http4s._
+  import tapir.Codec.JsonCodec
+
+  class $httpsEndpointsName(controller: $controllerName[IO])(..$implicits) {
+    ..${tapirEndpoints +: http4sEndpoints :+ app}
+  }
+}
+"""
+  }
+
+  val tapirClass: (Term.Name, Type.Name, List[Term.Param], List[Defn.Val]) => Pkg = (
     `package`: Term.Name,
     name: Type.Name,
     implicits: List[Term.Param],

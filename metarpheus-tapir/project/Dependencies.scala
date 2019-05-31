@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   object versions {
-    lazy val scalaMeta = "4.1.0"
+    lazy val scalaMeta = "4.1.4"
     lazy val catsEffect = "1.2.0"
     lazy val scalaFmt = "2.0.0-RC1"
     lazy val tapir = "0.5.2"
