@@ -6,7 +6,7 @@ title: Managing releases
 We automatically publish all libraries in the monorepo to Sonatype on every
 commit on `master`.
 
-We use a modified version
+We use a modified version of
 [`sbt-ci-release`](https://github.com/olafurpg/sbt-ci-release) that handles
 publishing multiple packages at once.
 
