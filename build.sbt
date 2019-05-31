@@ -137,6 +137,15 @@ lazy val metarpheusJsFacade = project
   )
   .dependsOn(metarpheusCore.js)
 
+lazy val tapiroCore = project
+  .in(file("tapiro/core"))
+  .settings(
+    name := "tapiro-core",
+    libraryDependencies ++= tapiroCoreDependencies,
+    dynverTagPrefix := "tapiro-",
+  )
+  .dependsOn(metarpheusCore.jvm)
+
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(
