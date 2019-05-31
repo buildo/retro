@@ -11,6 +11,7 @@ resources:
   source:
     uri: https://github.com/buildo/retro.git
     branch: master
+    git_crypt_key: ((git-crypt-key))
 
 - type: git
   name: tag
@@ -48,6 +49,7 @@ resources:
   source:
     repository: buildo/retro
     access_token: ((github-token))
+    git_crypt_key: ((git-crypt-key))
     paths:
       - build.sbt
       - project
@@ -335,7 +337,7 @@ jobs:
     passed:
       - sbt-buildo
       - enumero
-      - mailo
+      # - mailo
       - toctoc
       - metarpheus
       - tapiro
