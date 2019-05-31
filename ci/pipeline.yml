@@ -75,6 +75,17 @@ resources:
       - project
       - metarpheus
 
+- type: pull-request
+  name: tapiro-pr
+  icon: source-pull
+  source:
+    repository: buildo/retro
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - tapiro
+
 - name: postgres
   type: docker-image
   icon: docker
@@ -147,6 +158,14 @@ jobs:
     trigger: true
   - task: test
     file: retro/metarpheus/ci/test.yml
+
+- name: tapiro
+  plan:
+  - get: retro
+    resource: master
+    trigger: true
+  - task: test
+    file: retro/tapiro/ci/test.yml
 
 - name: sbt-buildo-pr
   plan:
@@ -283,6 +302,31 @@ jobs:
         status: success
         context: metarpheus
 
+- name: tapiro-pr
+  plan:
+  - get: retro
+    resource: tapiro-pr
+    trigger: true
+  - put: tapiro-pr
+    params:
+      path: retro
+      status: pending
+      context: tapiro
+  - task: test
+    file: retro/tapiro/ci/test.yml
+    on_failure:
+      put: tapiro-pr
+      params:
+        path: retro
+        status: failure
+        context: tapiro
+    on_success:
+      put: tapiro-pr
+      params:
+        path: retro
+        status: success
+        context: tapiro
+
 - name: release
   plan:
   - get: retro
@@ -294,6 +338,7 @@ jobs:
       - mailo
       - toctoc
       - metarpheus
+      - tapiro
   - get: tag
     trigger: true
   - task: release on Sonatype
