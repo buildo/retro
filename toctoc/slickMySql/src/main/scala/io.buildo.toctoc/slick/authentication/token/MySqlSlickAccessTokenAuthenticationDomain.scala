@@ -24,6 +24,8 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   implicit F: Sync[F],
 ) extends AccessTokenDomain[F] {
 
+  import MySqlSlickHelper._
+
   class AccessTokenTable(tag: Tag)
       extends Table[(Int, String, String, Instant)](tag, schemaName, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -55,7 +57,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
       db.run(accessTokenTable.filter(_.token === c.value).delete)
     }.futureLift.as(this.asRight)
 
-  def authenticate(
+  override def authenticate(
     c: AccessToken,
   ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
     F.delay {
