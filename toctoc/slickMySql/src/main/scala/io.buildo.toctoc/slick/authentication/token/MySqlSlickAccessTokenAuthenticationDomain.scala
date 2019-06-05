@@ -30,8 +30,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def token = column[String]("token", O.Length(255))
-    def expiresAt =
-      column[Timestamp]("expires_at", O.SqlType("timestamp not null default CURRENT_TIMESTAMP"))
+    def expiresAt = column[Timestamp]("expires_at")
 
     def uniqueTokenIdx = index("unique_token_idx", token, unique = true)
 
