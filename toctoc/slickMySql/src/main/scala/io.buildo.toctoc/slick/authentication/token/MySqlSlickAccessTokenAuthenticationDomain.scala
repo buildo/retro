@@ -15,6 +15,7 @@ import _root_.slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.Future
 import java.time.Instant
+import java.sql.Timestamp
 
 class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
@@ -24,14 +25,13 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   implicit F: Sync[F],
 ) extends AccessTokenDomain[F] {
 
-  import MySqlSlickHelper._
-
   class AccessTokenTable(tag: Tag)
-      extends Table[(Int, String, String, Instant)](tag, schemaName, tableName) {
+      extends Table[(Int, String, String, Timestamp)](tag, schemaName, tableName) {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def ref = column[String]("ref")
     def token = column[String]("token", O.Length(255))
-    def expiresAt = column[Instant]("expires_at")
+    def expiresAt =
+      column[Timestamp]("expires_at", O.SqlType("timestamp not null default CURRENT_TIMESTAMP"))
 
     def uniqueTokenIdx = index("unique_token_idx", token, unique = true)
 
@@ -44,7 +44,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     c: AccessToken,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
     F.delay {
-      db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
+      db.run(accessTokenTable += ((0, s.ref, c.value, Timestamp.from(c.expiresAt))))
     }.futureLift.as(this.asRight)
 
   override def unregister(s: Subject): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
@@ -63,7 +63,7 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     F.delay {
       db.run(
         accessTokenTable
-          .filter(t => t.token === c.value && t.expiresAt > Instant.now())
+          .filter(t => t.token === c.value && t.expiresAt > Timestamp.from(Instant.now()))
           .result
           .headOption,
       )
