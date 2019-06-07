@@ -5,10 +5,6 @@ import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment}
 import java.io.PrintWriter
 import scala.meta._
 
-object Boot extends App {
-  Util.createFiles("/Users/cale/tmp", "/Users/cale/tmp/o", "pack", true)
-}
-
 object Util {
   import Formatter.format
 
@@ -18,11 +14,9 @@ object Util {
       routes.groupBy(route => route.route.collect { case RouteSegment.String(str) => str }.head)
     controllersRoutes.foreach {
       case (controllerName, routes) =>
-        val endpointsName =
-          if (routes.isEmpty) s"${controllerName}Endpoints"
-          else s"${controllerName}Endpoints"
+        val endpointsName = s"${controllerName}Endpoints"
         val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`)
-        writeToFile(to, tapirEndpoints, s"${controllerName}Endpoints")
+        writeToFile(to, tapirEndpoints, endpointsName)
 
         if (includeHttp4sModels) {
           val http4sEndpoints =
@@ -54,36 +48,16 @@ object Util {
     routes match {
       case Nil => None
       case head :: tail =>
-        val name = s"${head.name.head.capitalize}Endpoints"
-        val implicits = Meta.codecsImplicits(routes) :+ param"implicit io: ContextShift[IO]"
-        val first = Term.Name(head.name.last)
-        val rest = tail.map(a => Term.Name(a.name.last))
-        val app: Defn.Val =
-          q"val app: HttpApp[IO] = NonEmptyList($first, ..$rest).reduceK.orNotFound"
-        val http4sEndpoints = routes.map { route =>
-          val name = Term.Name(route.name.last)
-          val endpointsName = Term.Select(Term.Name("endpoints"), name)
-          val controllersName = Term.Select(Term.Name("controllers"), name)
-          val controllerContent =
-            if (route.method == "get") Term.Select(Term.Eta(controllersName), Term.Name("tupled"))
-            else if (route.method == "post") controllersName
-            else return None
-          val x =
-            Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(controllerContent))
-          q"private[this] val ${Pat.Var(name)}: HttpRoutes[IO] = $x"
-        }
-        Some(
-          format(
-            Meta.http4sClass(
-              Term.Name(`package`),
-              Type.Name(controllerName),
-              Type.Name(endpointsName),
-              implicits,
-              http4sEndpoints,
-              app,
-            ),
+        Some(format(
+          Meta.http4sClass(
+            Term.Name(`package`),
+            Type.Name(controllerName),
+            Type.Name(endpointsName),
+            Meta.codecsImplicits(routes) :+ param"implicit io: ContextShift[IO]",
+            Meta.http4sEndpoints(routes),
+            Meta.httpApp(head, tail),
           ),
-        )
+        ))
     }
   }
 
