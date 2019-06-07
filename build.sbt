@@ -117,10 +117,7 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
   .in(file("metarpheus/core"))
   .settings(
     name := "metarpheus-core",
-    libraryDependencies ++= metarpheusCoreDependencies.map { dep =>
-      if (dep.configurations == Some(Test.name)) dep
-      else dep.cross(ScalaJSCrossVersion.binary)
-    },
+    libraryDependencies ++= metarpheusCoreDependencies,
     dynverTagPrefix := "metarpheus-",
   )
 
