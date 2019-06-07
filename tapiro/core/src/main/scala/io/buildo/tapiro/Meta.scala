@@ -4,8 +4,7 @@ import io.buildo.metarpheus.core.intermediate.{Route, RouteParam, Type => Metarp
 import scala.meta._
 
 object Meta {
-  val http4sClass
-    : (Term.Name, Type.Name, Type.Name, List[Term.Param], List[Defn.Val], Defn.Val) => Pkg = (
+  val http4sClass = (
     `package`: Term.Name,
     controllerName: Type.Name,
     endpointsName: Type.Name,
@@ -33,7 +32,28 @@ object Meta {
 """
   }
 
-  val tapirClass: (Term.Name, Type.Name, List[Term.Param], List[Defn.Val]) => Pkg = (
+  val httpApp = (head: Route, tail: List[Route]) => {
+    val first = Term.Name(head.name.last)
+    val rest = tail.map(a => Term.Name(a.name.last))
+    q"val app: HttpApp[IO] = NonEmptyList($first, List(..$rest)).reduceK.orNotFound"
+  }
+
+  val http4sEndpoints = (routes: List[Route]) =>
+    routes.flatMap { route =>
+      val name = Term.Name(route.name.last)
+      val endpointsName = Term.Select(Term.Name("endpoints"), name)
+      val controllersName = Term.Select(Term.Name("controller"), name)
+      val controllerContent =
+        if (route.method == "get") Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
+        else if (route.method == "post") Some(controllersName)
+        else None
+      controllerContent.map { content =>
+        val toRoutes = Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(content))
+        q"private[this] val ${Pat.Var(name)}: HttpRoutes[IO] = $toRoutes"
+      }
+    }
+
+  val tapirClass = (
     `package`: Term.Name,
     name: Type.Name,
     implicits: List[Term.Param],
@@ -50,13 +70,13 @@ object Meta {
 """,
   }
 
-  val codecsImplicits: List[Route] => List[Term.Param] = (routes: List[Route]) => {
+  val codecsImplicits = (routes: List[Route]) => {
     routes.map { route =>
       List(route.returns) ++ route.body.map(_.tpe)
     }.flatten.distinct.map(typeToImplicitParam),
   }
 
-  val routeToTapirEndpoint: Route => meta.Defn.Val = route =>
+  val routeToTapirEndpoint = (route: Route) =>
     q"val ${Pat.Var(Term.Name(route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
 
   private[this] val typeToImplicitParam = (tpe: MetarpheusType) => {
