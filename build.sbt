@@ -158,6 +158,11 @@ lazy val `sbt-tapiro` = project
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
     scriptedBufferLog := false,
+    scripted := {
+      (metarpheusCore.jvm / publishLocal).value
+      (tapiroCore / publishLocal).value
+      scripted.evaluated
+    },
   )
   .dependsOn(tapiroCore)
 
