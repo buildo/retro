@@ -13,4 +13,4 @@ run:
   dir: retro
   path: sbt
   args:
-    - tapiroCore/compile # TODO(claudio): compile to test once we have them
+    - ;tapiroCore/compile ;sbt-tapiro/scripted # TODO(claudio): compile to test once we have them
