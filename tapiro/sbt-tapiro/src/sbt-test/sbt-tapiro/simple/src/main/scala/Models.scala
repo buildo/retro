@@ -1,3 +1,3 @@
 package testo
 
-case class SpittyCash(name: String, rap: Double)
+case class CustomModel(name: String, double: Double)

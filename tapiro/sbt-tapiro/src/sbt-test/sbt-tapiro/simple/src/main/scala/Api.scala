@@ -4,17 +4,17 @@ import scala.annotation.StaticAnnotation
 class query extends StaticAnnotation
 class command extends StaticAnnotation
 
-case class Errore(message: String)
+case class CustomError(message: String)
 
 trait Controller[F[_]] {
   @query
-  def ghetto(
-    i: Int,
-    s: String,
-  ): F[Either[Errore, SpittyCash]]
+  def queryExample(
+    intParam: Int,
+    stringParam: String,
+  ): F[Either[CustomError, CustomModel]]
 
   @command
-  def pusho(
-    spitty: SpittyCash,
+  def commandExample(
+    body: CustomModel,
   ): F[Either[String, String]]
 }
