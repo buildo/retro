@@ -2,8 +2,10 @@ package io.buildo.tapiro
 
 import io.buildo.metarpheus.core.{Config, Metarpheus}
 import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment}
-import java.io.PrintWriter
 import scala.meta._
+import scala.util.control.NonFatal
+import java.nio.file.Paths
+import java.nio.file.Files
 
 object Util {
   import Formatter.format
@@ -63,14 +65,13 @@ object Util {
 
   private[this] def writeToFile(to: String, endpoints: String, name: String): Unit = {
     try {
-      val completeTo = s"$to/$name.scala"
-      val writer = new PrintWriter(completeTo)
-      writer.write(endpoints)
-      writer.close()
+      val endpointsPath = Paths.get(s"$to/$name.scala")
+      Files.createDirectories(endpointsPath.getParent)
+      Files.write(endpointsPath, endpoints.getBytes)
 
-      println(s"generated tapir file $completeTo 🤖")
+      println(s"generated tapir file ${endpointsPath.toAbsolutePath} 🤖")
     } catch {
-      case e: Exception => e.printStackTrace()
+      case NonFatal(e) => e.printStackTrace()
     }
   }
 

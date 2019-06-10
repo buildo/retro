@@ -1,0 +1,4 @@
+# check if endpoints gets created
+> tapiro
+$ exists "src/main/scala/endpoints/ControllerEndpoints.scala"
+$ exists "src/main/scala/endpoints/ControllerHttp4sEndpoints.scala"
