@@ -76,6 +76,12 @@ package object controller {
         """.stripMargin)
       }
 
+  private[this] def extractErrorType(m: Decl.Def): Option[intermediate.Type] =
+    m.decltpe.collect {
+      case Type.Apply(Type.Name(_), Seq(Type.Apply(Type.Name(_), Seq(tpe, _)))) =>
+        tpeToIntermediate(tpe)
+    }.headOption
+
   def extractAllRoutes(source: Source): List[intermediate.Route] =
     source.collect { case t: Defn.Trait => t }.flatMap(t => extractRoute(source, t))
 
@@ -107,6 +113,7 @@ package object controller {
         params = extractParams(m, paramsDesc, inBody = method == "post"),
         authenticated = extractAuthenticated(m),
         returns = extractReturnType(m),
+        error = extractErrorType(m),
         // FIXME: this is the only case in which we don't preserve the retro-compatibility
         // This is because intermediate.Body is too limiting as it assumes the body has a single Type
         // whereas we want to support bodies composed by multiple parameters each with their own Type

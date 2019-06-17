@@ -48,6 +48,7 @@ case class Route(
   params: List[RouteParam],
   authenticated: Boolean,
   returns: Type,
+  error: Option[Type],
   body: Option[Route.Body],
   ctrl: List[String],
   desc: Option[String],
