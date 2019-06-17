@@ -123,7 +123,10 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= metarpheusCoreDependencies,
   )
   .jsSettings(
-    libraryDependencies ++= metarpheusCoreDependencies.map(_.cross(ScalaJSCrossVersion.binary)),
+    libraryDependencies ++= metarpheusCoreDependencies.map { dep =>
+      if (dep.configurations == Some(Test.name)) dep
+      else dep.cross(ScalaJSCrossVersion.binary)
+    },
   )
 
 lazy val metarpheusJsFacade = project
