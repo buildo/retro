@@ -28,6 +28,13 @@ object CaseEnum {
   case class Member(name: String, desc: Option[String])
 }
 
+case class TaggedUnion(name: String, values: List[TaggedUnion.Member], desc: Option[String])
+    extends Model
+object TaggedUnion {
+  case class Member(name: String, params: List[MemberParam], desc: Option[String])
+  case class MemberParam(name: String, tpe: Type)
+}
+
 case class RouteParam(
   name: Option[String],
   tpe: Type,
