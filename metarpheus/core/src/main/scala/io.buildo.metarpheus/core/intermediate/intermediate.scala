@@ -17,7 +17,7 @@ case class CaseClass(
   members: List[CaseClass.Member],
   desc: Option[String],
   isValueClass: Boolean = false,
-  typeParams: List[Type] = Nil
+  typeParams: List[Type] = Nil,
 ) extends Model
 object CaseClass {
   case class Member(name: String, tpe: Type, desc: Option[String])
@@ -33,7 +33,7 @@ case class RouteParam(
   tpe: Type,
   required: Boolean,
   desc: Option[String],
-  inBody: Boolean = false
+  inBody: Boolean = false,
 )
 
 sealed trait RouteSegment
@@ -52,7 +52,7 @@ case class Route(
   body: Option[Route.Body],
   ctrl: List[String],
   desc: Option[String],
-  name: List[String]
+  name: List[String],
 )
 
 object Route {
@@ -75,7 +75,7 @@ case class API(models: List[Model], routes: List[Route]) {
 
     def inUseConcreteTypeNames(models: Set[Type]): Set[String] = {
       def recurse(t: Type): List[Type.Name] = t match {
-        case name: Type.Name => List(name)
+        case name: Type.Name        => List(name)
         case Type.Apply(name, args) => Type.Name(name) :: args.flatMap(recurse).toList
       }
       models.flatMap(recurse)
@@ -101,7 +101,7 @@ case class API(models: List[Model], routes: List[Route]) {
     val modelsIntersection = recursivelyUsedModels.intersect(modelsForciblyInUse)
     if (!modelsIntersection.isEmpty)
       throw new Exception(
-        s"The following models are already used by the routes, no need to force inclusion: $modelsIntersection"
+        s"The following models are already used by the routes, no need to force inclusion: $modelsIntersection",
       )
 
     val inUseNames = recursivelyUsedModels ++ modelsForciblyInUse

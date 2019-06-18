@@ -9,7 +9,7 @@ package object controller {
 
   private[this] def extractMethod(m: Decl.Def): String =
     m.mods.collectFirst {
-      case Mod.Annot(Init(Name("query"), _, _)) => "get"
+      case Mod.Annot(Init(Name("query"), _, _))   => "get"
       case Mod.Annot(Init(Name("command"), _, _)) => "post"
     }.get
 
@@ -28,53 +28,47 @@ package object controller {
   private[this] def extractParams(
     m: Decl.Def,
     paramsDesc: List[ParamDesc],
-    inBody: Boolean
+    inBody: Boolean,
   ): List[intermediate.RouteParam] = {
-    m.paramss.headOption
-      .map { params =>
-        params
-          .filterNot(isAuthParam)
-          .filterNot(isOperationParameters)
-          .map { p =>
-            val (tpe, required) = p.decltpe.collectFirst {
-              case Type.Apply(Type.Name("Option"), Seq(t)) => (tpeToIntermediate(t), false)
-              case t: Type => (tpeToIntermediate(t), true)
-            }.head
+    m.paramss.headOption.map { params =>
+      params
+        .filterNot(isAuthParam)
+        .filterNot(isOperationParameters)
+        .map { p =>
+          val (tpe, required) = p.decltpe.collectFirst {
+            case Type.Apply(Type.Name("Option"), Seq(t)) => (tpeToIntermediate(t), false)
+            case t: Type                                 => (tpeToIntermediate(t), true)
+          }.head
 
-            val name = p.name.syntax
-            intermediate.RouteParam(
-              name = Option(p.name.syntax),
-              tpe = tpe,
-              required = required,
-              desc = paramsDesc.find(_.name == name).flatMap(_.desc),
-              inBody = inBody
-            )
-          }
-      }
-      .getOrElse(Nil)
-      .toList
+          val name = p.name.syntax
+          intermediate.RouteParam(
+            name = Option(p.name.syntax),
+            tpe = tpe,
+            required = required,
+            desc = paramsDesc.find(_.name == name).flatMap(_.desc),
+            inBody = inBody,
+          )
+        }
+    }.getOrElse(Nil).toList
   }
 
   private[this] def extractReturnType(m: Decl.Def): intermediate.Type =
-    m.decltpe
-      .collect {
-        case Type.Apply(Type.Name(_), Seq(Type.Apply(Type.Name(_), Seq(_, tpe)))) =>
-          tpeToIntermediate(tpe)
-        case Type.Apply(Type.Name(_), Seq(tpe)) =>
-          tpeToIntermediate(tpe)
-      }
-      .headOption
-      .getOrElse {
-        throw new Exception(s"""
-          |This method misses an explicit return type
-          |
-          |  ${m.syntax}
-          |
-          |The return type can be of two types:
-          | - F[E[_, Result]]
-          | - F[Result],
+    m.decltpe.collect {
+      case Type.Apply(Type.Name(_), Seq(Type.Apply(Type.Name(_), Seq(_, tpe)))) =>
+        tpeToIntermediate(tpe)
+      case Type.Apply(Type.Name(_), Seq(tpe)) =>
+        tpeToIntermediate(tpe)
+    }.headOption.getOrElse {
+      throw new Exception(s"""
+                             |This method misses an explicit return type
+                             |
+                             |  ${m.syntax}
+                             |
+                             |The return type can be of two types:
+                             | - F[E[_, Result]]
+                             | - F[Result],
         """.stripMargin)
-      }
+    }
 
   private[this] def extractErrorType(m: Decl.Def): Option[intermediate.Type] =
     m.decltpe.collect {
@@ -93,11 +87,9 @@ package object controller {
         m
     }
 
-    val (controllerName, name) = t.mods
-      .collectFirst {
-        case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => (t.name.value, n)
-      }
-      .getOrElse((t.name.value, t.name.value))
+    val (controllerName, name) = t.mods.collectFirst {
+      case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => (t.name.value, n)
+    }.getOrElse((t.name.value, t.name.value))
 
     methods.map { m =>
       val scaladoc = findRelatedComment(source, m)
@@ -108,7 +100,7 @@ package object controller {
         method = method,
         route = List(
           intermediate.RouteSegment.String(name),
-          intermediate.RouteSegment.String(m.name.syntax)
+          intermediate.RouteSegment.String(m.name.syntax),
         ),
         params = extractParams(m, paramsDesc, inBody = method == "post"),
         authenticated = extractAuthenticated(m),
@@ -126,15 +118,15 @@ package object controller {
           // whereas here's we're deriving it from the name of the trait. They should match in the
           // usual case, nonetheless it may introduce some diffs when migrating a project to wiro
           controllerName.substring(0, 1).toLowerCase() + controllerName.substring(1),
-          m.name.syntax
+          m.name.syntax,
         ),
         desc = desc,
         name = List(
           // FIXME: same as a above, for the time being we preserved the `controllerName.method`
           // semantic, but these should really be prefixed using `name` instead of `controllerName`
           controllerName.substring(0, 1).toLowerCase() + controllerName.substring(1),
-          m.name.syntax
-        )
+          m.name.syntax,
+        ),
       )
     }
   }
