@@ -76,6 +76,7 @@ case class API(models: List[Model], routes: List[Route]) {
         } ++
           route.params.map(_.tpe) ++
           List(route.returns) ++
+          route.error.toList ++
           route.body.map(b => List(b.tpe)).getOrElse(Nil)
       }
     }.toSet
