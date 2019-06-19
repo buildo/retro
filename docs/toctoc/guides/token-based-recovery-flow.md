@@ -3,7 +3,7 @@ id: token-based-recovery-flow
 title: Token-based Recovery Flow
 ---
 
-This flow allows to implement the password recovery functionality of a web
+This flow allows to implement the password reset functionality of a web
 application.
 
 ## Authentication domains
