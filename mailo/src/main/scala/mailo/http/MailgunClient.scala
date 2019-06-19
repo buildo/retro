@@ -20,7 +20,6 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import cats.data.EitherT
 import cats.syntax.either._
-import cats.instances.future._
 
 import akka.http.scaladsl.model.ContentType
 import akka.util.ByteString
@@ -318,7 +317,9 @@ class MailgunClient(
       HttpEntity(ContentTypes.`application/json`, ByteString(recipientVariables.asJson.noSpaces))
     val recipientVariablesForm =
       Multipart.FormData.BodyPart.Strict("recipient-variables", recipientVariablesEntity)
-    val tos = recipientVariables.map { case (to, _) => Multipart.FormData.BodyPart.Strict("to", to) }
+    val tos = recipientVariables.map {
+      case (to, _) => Multipart.FormData.BodyPart.Strict("to", to)
+    }
 
     val attachmentsForm = attachments.map(
       attachment =>

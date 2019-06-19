@@ -1,9 +1,10 @@
 import Dependencies._
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSCrossVersion
+import sbtcrossproject.CrossPlugin.autoImport.CrossType
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
-val scala212 = "2.12.11"
-val scala213 = "2.13.1"
+val scala212 = "2.12.12"
+val scala213 = "2.13.3"
 
 inThisBuild(
   List(
@@ -27,7 +28,7 @@ lazy val `sbt-buildo` = project
   .enablePlugins(SbtPlugin)
   .settings(
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
-    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9"),
+    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0"),
     dynverTagPrefix := "sbt-buildo-",
   )
 

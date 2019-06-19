@@ -7,7 +7,6 @@ import com.typesafe.config.Config
 import com.amazonaws.regions.RegionUtils
 import cats.syntax.either._
 import cats.syntax.traverse._
-import cats.instances.either._
 import alleycats.std.all._
 import mailo.data.S3MailDataError._
 

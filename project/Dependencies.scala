@@ -6,19 +6,19 @@ object Dependencies {
 
   val V = new {
     val circe = "0.13.0"
-    val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.4.0"
-    val mockito = "1.9.5"
+    val scalacheck = "1.14.1"
+    val scalacheckMagnolia = "0.5.1"
     val akka = "2.6.4"
     val akkaHttp = "10.1.11"
-    val akkaHttpCirce = "1.32.0"
-    val awscala = "0.5.+"
-    val cats = "1.6.0"
-    val catsEffect = "1.3.0"
-    val monixCatnap = "3.0.0-RC2"
-    val config = "1.3.0"
-    val scalacacheGuava = "0.9.3"
-    val scalaLogging = "3.8.0"
+    val akkaPersistenceInMemory = "2.5.23" // no release
+    val akkaHttpCirce = "1.35.0"
+    val awscala = "0.8.+"
+    val cats = "2.2.0"
+    val catsEffect = "2.2.0"
+    val monixCatnap = "3.2.2"
+    val config = "1.4.0"
+    val scalacacheGuava = "0.28.0"
+    val scalaLogging = "3.9.2"
     val logback = "1.2.3"
     val leveldb = "1.8"
     val mailin = "3.0.1"
@@ -31,11 +31,13 @@ object Dependencies {
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
     val scalameta = "4.3.13"
-    val scalafmtCore = "2.0.0-RC5"
+    val scopt = "3.7.1"
+    val scalafmtCore = "2.7.5"
     val plantuml = "8059"
-    val pprint = "0.5.9"
-    val tapir = "0.14.4"
-    val munit = "0.7.3"
+    val pprint = "0.6.0"
+    val tapir = "0.16.6"
+    val munit = "0.7.13"
+    val mockito = "3.5.13"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -44,7 +46,7 @@ object Dependencies {
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
   val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
-  val mockito = "org.mockito" % "mockito-all" % V.mockito
+  val mockito = "org.mockito" % "mockito-core" % V.mockito
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % V.akka
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % V.akkaHttp
   val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % V.akka
@@ -60,6 +62,7 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % V.logback
   val levelDb = "org.fusesource.leveldbjni" % "leveldbjni-all" % V.leveldb
   val mailin = "com.sendinblue" % "sib-api-v3-sdk" % V.mailin
+  val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistenceInMemory
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % V.akka
   val jakartaMail = "com.sun.mail" % "jakarta.mail" % V.jakartaMail
   val slick = "com.typesafe.slick" %% "slick" % V.slick
