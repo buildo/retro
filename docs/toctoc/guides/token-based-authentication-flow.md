@@ -22,7 +22,7 @@ generated string -- and an expiration date.
 
 ## Functionalities
 
-The flow is implemented by the `TokenBasedAuthenticationGlow` class, which
+The flow is implemented by the `TokenBasedAuthenticationFlow` class, which
 exposes these functionalities:
 
 - `registerSubjectLogin`: registers the `Login` of a `Subject` in the

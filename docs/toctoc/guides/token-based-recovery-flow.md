@@ -34,7 +34,7 @@ generated string -- and an expiration date.
 The flow is implemented by the `TokenBasedRecoveryFlow` class, which exposes
 these functionalities:
 
-- `registerSubjectLogin`: registers a `Subject` for recovery, by creating an
+- `registerForRecovery`: registers a `Subject` for recovery, by creating an
   `AccessToken` in the `AccessTokenDomain`. This is typically used when a user
   begins the password recovery flow.
 
