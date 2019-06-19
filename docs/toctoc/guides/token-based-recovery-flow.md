@@ -26,8 +26,8 @@ generated string -- and an expiration date.
 > However, you should normally have **two separate instances** for those
 > domains, as their semantics and policies are likely to be different.
 >
-> For example, you usually want to limit the password recovery access token to
-> the recovery functionality, and use an auth token for anything else.
+> For example, you usually want to limit the recovery access token to the
+> password reset functionality, and use an auth token for anything else.
 
 ## Functionalities
 
@@ -36,7 +36,7 @@ these functionalities:
 
 - `registerForRecovery`: registers a `Subject` for recovery, by creating an
   `AccessToken` in the `AccessTokenDomain`. This is typically used when a user
-  begins the password recovery flow.
+  asks for a password reset.
 
 - `recoverLogin`: resets the `Login` credentials for a `Subject`. The `Subject`
   is identified using an `AccessToken` normally issued by the
@@ -86,7 +86,7 @@ object PostgreSqlSlickTokenBasedRecoveryFlow {
 
 Now that we have it, we can integrate it in our app.
 
-### Password recovery
+### Password reset
 
 For our example, we'll need a `UserService` which manages our users. Here's a
 possible implementation:
@@ -104,8 +104,8 @@ trait UserService[F[_]] {
 }
 ```
 
-Now we can implement a controller that provides `beginPasswordRecovery` and
-`completePasswordRecovery` functionalities:
+Now we can implement a controller that provides `beginPasswordReset` and
+`completePasswordReset` functionalities:
 
 ```scala mdoc
 import io.buildo.toctoc.core.authentication.TokenBasedRecovery.TokenBasedRecoveryFlow
@@ -117,21 +117,21 @@ import cats.data.EitherT
 import cats.implicits._
 import java.util.UUID
 
-trait PasswordRecoveryController[F[_]] {
-  def beginPasswordRecovery(username: String): F[Either[AuthenticationError, AccessToken]]
-  def completePasswordRecovery(
+trait PasswordResetController[F[_]] {
+  def beginPasswordReset(username: String): F[Either[AuthenticationError, AccessToken]]
+  def completePasswordReset(
     recoveryToken: AccessToken,
     newPassword: String
   ): F[Either[AuthenticationError, Unit]]
 }
 
-object PasswordRecoveryController {
+object PasswordResetController {
   def create[F[_]: Sync](
     recoveryFlow: TokenBasedRecoveryFlow[F],
     userService: UserService[F]
-  ): PasswordRecoveryController[F] = new PasswordRecoveryController[F] {
+  ): PasswordResetController[F] = new PasswordResetController[F] {
 
-    override def beginPasswordRecovery(username: String): F[Either[AuthenticationError, AccessToken]] =
+    override def beginPasswordReset(username: String): F[Either[AuthenticationError, AccessToken]] =
       (for {
         user <- EitherT.fromOptionF(
           userService.readByUsername(username),
@@ -141,7 +141,7 @@ object PasswordRecoveryController {
         (_, recoveryToken) = result
       } yield recoveryToken).value
 
-    override def completePasswordRecovery(
+    override def completePasswordReset(
       recoveryToken: AccessToken,
       newPassword: String
     ): F[Either[AuthenticationError, Unit]] =
@@ -161,19 +161,19 @@ Here's a sequence diagram that shows the common interactions we've seen above
 autoactivate on
 
 actor Subject
-participant PasswordRecoveryController
+participant PasswordResetController
 participant AuthController
 
-group password recovery
-  Subject -> PasswordRecoveryController: beginPasswordRecovery(username)
-  PasswordRecoveryController -> TokenBasedRecoveryFlow: registerForRecovery(username)
+group password reset
+  Subject -> PasswordResetController: beginPasswordReset(username)
+  PasswordResetController -> TokenBasedRecoveryFlow: registerForRecovery(username)
   return recoveryToken
   return recoveryToken (e.g. via email)
 
 ...
 
-  Subject -> PasswordRecoveryController: completePasswordRecovery(recoveryToken, newPassword)
-  PasswordRecoveryController -> TokenBasedRecoveryFlow: recoverLogin(recoveryToken, newPassword)
+  Subject -> PasswordResetController: completePasswordReset(recoveryToken, newPassword)
+  PasswordResetController -> TokenBasedRecoveryFlow: recoverLogin(recoveryToken, newPassword)
   return
   return
 end
