@@ -38,6 +38,9 @@
       "toctoc/guides/token-based-authentication-flow": {
         "title": "Token-based Authentication Flow"
       },
+      "toctoc/guides/token-based-recovery-flow": {
+        "title": "Token-based Recovery Flow"
+      },
       "toctoc/installation": {
         "title": "Installation"
       }
@@ -51,6 +54,7 @@
     "categories": {
       "Setup": "Setup",
       "Getting started": "Getting started",
+      "Guides": "Guides",
       "Contributing": "Contributing"
     }
   },

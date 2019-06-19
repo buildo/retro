@@ -5,6 +5,10 @@
       "toctoc/concepts/functional-model",
       "toctoc/concepts/login",
       "toctoc/concepts/token"
+    ],
+    "Guides": [
+      "toctoc/guides/token-based-authentication-flow",
+      "toctoc/guides/token-based-recovery-flow"
     ]
   },
   "enumero": {
