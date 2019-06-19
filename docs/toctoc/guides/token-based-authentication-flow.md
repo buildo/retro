@@ -4,7 +4,7 @@ title: Token-based Authentication Flow
 ---
 
 This flow allows to implement the common signup, login and authentication
-functionalies of a web application.
+functionalities of a web application.
 
 ## Authentication domains
 
@@ -22,7 +22,7 @@ generated string -- and an expiration date.
 
 ## Functionalities
 
-The flow is implemented by the `TokenBasedAuthenticationFGlow` class, which
+The flow is implemented by the `TokenBasedAuthenticationGlow` class, which
 exposes these functionalities:
 
 - `registerSubjectLogin`: registers the `Login` of a `Subject` in the
@@ -53,7 +53,7 @@ exposes these functionalities:
 
 ## How to use it
 
-You can create an `TokenBasedAuthenticationFlow` by providing the two
+You can create a `TokenBasedAuthenticationFlow` by providing the two
 authentication domains discussed above.
 
 `toctoc` provides some specialized implementations of such domains combinations
