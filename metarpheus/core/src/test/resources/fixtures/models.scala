@@ -71,5 +71,5 @@ object Surface {
 }
 
 case class IgnoreMe(
-  ignore: String
+  ignore: String,
 )
