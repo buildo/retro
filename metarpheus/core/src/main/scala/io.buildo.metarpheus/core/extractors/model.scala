@@ -133,21 +133,25 @@ package object model {
       t.stats.collect {
         case c @ Defn.Class(_, Type.Name(memberName), _, _, _) => {
           val comment = findRelatedComment(source, c)
-          val (memberDesc, _) = extractDescAndTagsFromComment(comment)
+          val (memberDesc, tags) = extractDescAndTagsFromComment(comment)
+          // FIXME fail if unmatched parameter descriptions are found
+          val paramDescs = tags.collect { case p: ParamDesc => p }
           val Ctor.Primary(_, _: Name.Anonymous, List(plist)) = c.ctor
           val memberParams = plist.map {
             case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
               intermediate.TaggedUnion.MemberParam(
                 name = name,
                 tpe = tpeToIntermediate(tpe),
+                desc = paramDescs.find(_.name == name).flatMap(_.desc),
               )
           }.toList
-          intermediate.TaggedUnion.Member(memberName, memberParams, memberDesc)
+          val isValueClass = c.templ.inits.exists(_.syntax == "AnyVal")
+          intermediate.TaggedUnion.Member(memberName, memberParams, memberDesc, isValueClass)
         }
         case o @ Defn.Object(_, Term.Name(memberName), _) => {
           val comment = findRelatedComment(source, o)
           val (memberDesc, _) = extractDescAndTagsFromComment(comment)
-          intermediate.TaggedUnion.Member(memberName, List(), memberDesc)
+          intermediate.TaggedUnion.Member(memberName, List(), memberDesc, false)
         }
       }.toList
     }
