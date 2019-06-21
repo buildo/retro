@@ -97,6 +97,7 @@ case class API(models: List[Model], routes: List[Route]) {
           .filter(m => inUseConcreteTypeNames(inUse).contains(m.name))
           .collect {
             case CaseClass(_, members, _, _, _) => members.map(_.tpe)
+            case TaggedUnion(_, values, _)      => values.flatMap(_.params.map(_.tpe))
           }
           .flatMap(o => o)
       if (newInUse == inUse) inUseConcreteTypeNames(inUse)
