@@ -130,6 +130,36 @@ class ModelSuite extends FunSuite {
           ),
           desc = Some("Surface of the camping site"),
         ),
+        TaggedUnion(
+          name = "CreateCampingError",
+          values = List(
+            TaggedUnion.Member(
+              name = "DuplicateName",
+              params = List(
+                TaggedUnion.MemberParam(
+                  name = "names",
+                  tpe = Type.Name("SuggestedNames"),
+                  desc = Some("suggestions for names that are not in use"),
+                ),
+              ),
+              desc = Some("The name is already in use"),
+            ),
+            TaggedUnion.Member(
+              name = "SizeOutOfBounds",
+              params = List(
+                TaggedUnion.MemberParam(name = "min", tpe = Type.Name("Int"), desc = None),
+                TaggedUnion.MemberParam(name = "max", tpe = Type.Name("Int"), desc = None),
+              ),
+              desc = Some("The chosen size is not allowed"),
+            ),
+            TaggedUnion.Member(
+              name = "OtherError",
+              params = List(),
+              desc = None,
+            ),
+          ),
+          desc = Some("Errors that can happen when creating a camping"),
+        ),
         CaseClass(
           name = "IgnoreMe",
           members = List(
@@ -137,6 +167,37 @@ class ModelSuite extends FunSuite {
           ),
           desc = None,
           isValueClass = false,
+        ),
+        CaseClass(
+          name = "DuplicateName",
+          members = List(
+            CaseClass.Member(
+              name = "names",
+              tpe = Type.Name("SuggestedNames"),
+              desc = Some("suggestions for names that are not in use"),
+            ),
+          ),
+          desc = Some("The name is already in use"),
+        ),
+        CaseClass(
+          name = "SizeOutOfBounds",
+          members = List(
+            CaseClass.Member(name = "min", tpe = Type.Name("Int"), desc = None),
+            CaseClass.Member(name = "max", tpe = Type.Name("Int"), desc = None),
+          ),
+          desc = Some("The chosen size is not allowed"),
+        ),
+        CaseClass(
+          name = "SuggestedNames",
+          members = List(
+            CaseClass
+              .Member(
+                name = "names",
+                tpe = Type.Apply("List", List(Type.Name("String"))),
+                desc = None,
+              ),
+          ),
+          desc = None,
         ),
       )
     val comparison = DiffShow.diff[List[Model]](expected, result)

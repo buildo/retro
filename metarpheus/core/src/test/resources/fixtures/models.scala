@@ -70,6 +70,27 @@ object Surface {
   Another
 }
 
+/*
+ * Errors that can happen when creating a camping
+ */
+sealed trait CreateCampingError
+object CreateCampingError {
+
+  /**
+    *  The name is already in use
+    *  @param names suggestions for names that are not in use
+    */
+  case class DuplicateName(names: SuggestedNames) extends CreateCampingError
+
+  /*
+   *  The chosen size is not allowed
+   */
+  case class SizeOutOfBounds(min: Int, max: Int) extends CreateCampingError
+  case object OtherError extends CreateCampingError
+}
+
+case class SuggestedNames(names: List[String])
+
 case class IgnoreMe(
   ignore: String,
 )

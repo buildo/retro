@@ -169,7 +169,7 @@ class ControllerSuite extends FunSuite {
             ),
             authenticated = false,
             returns = Type.Name("Camping"),
-            error = Some(Type.Name("String")),
+            error = Some(Type.Name("CreateCampingError")),
             body = None,
             ctrl = List("campingController", "create"),
             desc = Some("create a camping"),

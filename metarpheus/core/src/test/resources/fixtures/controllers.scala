@@ -58,7 +58,10 @@ trait CampingController {
     * create a camping
     */
   @command
-  def create(camping: Camping, parameters: OperationParameters): Future[Either[String, Camping]]
+  def create(
+    camping: Camping,
+    parameters: OperationParameters,
+  ): Future[Either[CreateCampingError, Camping]]
 
   @command @metarpheusIgnore
   def ignoreMe(ignore: IgnoreMe): Future[Either[String, String]]
@@ -99,7 +102,7 @@ class CampingControllerImpl(
   def getByHasBeach(hasBeach: Boolean): Future[Either[String, List[Camping]]] = ???
 
   @command
-  def create(camping: Camping): Future[Either[String, Camping]] = ???
+  def create(camping: Camping): Future[Either[CreateCampingError, Camping]] = ???
 
   @command
   def ignoreMe(ignore: IgnoreMe): Future[Either[String, String]] = ???
