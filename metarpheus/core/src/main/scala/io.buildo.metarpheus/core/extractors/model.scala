@@ -3,15 +3,13 @@ package core
 package extractors
 
 import scala.meta._
+import scala.meta.contrib._
 
 package object model {
 
   def extractCaseClassDefns(source: scala.meta.Source): List[CaseClassDefnInfo] = {
     source.collect {
-      case c: Defn.Class if c.mods.collectFirst {
-            case Mod.Case() => ()
-          }.isDefined =>
-        c
+      case c: Defn.Class if c.hasMod(Mod.Case()) => c
     }.map { cc =>
       val comment = findRelatedComment(source, cc)
       CaseClassDefnInfo(cc, comment)
@@ -59,35 +57,28 @@ package object model {
       CaseEnumDefnInfo(cc, comment)
     }
 
-  def extractTaggedUnionDefns(source: scala.meta.Source): List[TaggedUnionDefnInfo] = {
-    source.collect {
-      case c =>
-        c.children
-          .sliding(2)
-          .filter {
-            case (t: Defn.Trait) :: (o: Defn.Object) :: Nil =>
-              t.mods.collectFirst {
-                case _: Mod.Sealed => ()
-              }.isDefined &&
-                o.templ.stats.forall {
-                  case c: Defn.Class if c.mods.collectFirst {
-                        case _: Mod.Case => ()
-                      }.isDefined =>
-                    true
-                  case c: Defn.Object if c.mods.collectFirst {
-                        case _: Mod.Case => ()
-                      }.isDefined =>
-                    true
-                  case _ => false
-                }
-            case _ => false
-          }
-          .toList
-    }.flatMap(o => o).map {
-      case (trait_defn: Defn.Trait) :: (object_defn: Defn.Object) :: Nil =>
-        val comment = findRelatedComment(source, trait_defn)
-        TaggedUnionDefnInfo(trait_defn, object_defn, comment)
-      case t => throw new RuntimeException(s"Unexpected tree: $t")
+  def extractTaggedUnionDefns(source: Source): List[TaggedUnionDefnInfo] = {
+
+    def checkExtends(templ: Template, t: Defn.Trait): Boolean =
+      templ.inits.exists(_.syntax == t.name.value)
+
+    val sealedTraits = source.collect {
+      case t: Defn.Trait if t.hasMod(Mod.Sealed()) => t
+    }
+    val members = source.collect {
+      case d: Defn.Object if d.hasMod(Mod.Case()) => d
+      case d: Defn.Class if d.hasMod(Mod.Case())  => d
+    }
+
+    sealedTraits.map { t =>
+      TaggedUnionDefnInfo(
+        traitDefn = t,
+        memberDefns = members.collect {
+          case d: Defn.Object if checkExtends(d.templ, t) => d
+          case d: Defn.Class if checkExtends(d.templ, t)  => d
+        },
+        commentToken = findRelatedComment(source, t),
+      )
     }
   }
 
@@ -129,11 +120,11 @@ package object model {
     source: scala.meta.Source,
   )(taggedUnionDefnInfo: TaggedUnionDefnInfo): intermediate.TaggedUnion = {
 
-    def membersFromTempl(t: Template): List[intermediate.TaggedUnion.Member] = {
-      t.stats.collect {
-        case c @ Defn.Class(_, Type.Name(memberName), _, _, _) => {
-          val comment = findRelatedComment(source, c)
-          val (memberDesc, tags) = extractDescAndTagsFromComment(comment)
+    def toMember(d: Defn): intermediate.TaggedUnion.Member = {
+      val commentToken = findRelatedComment(source, d)
+      d match {
+        case c: Defn.Class =>
+          val (memberDesc, tags) = extractDescAndTagsFromComment(commentToken)
           // FIXME fail if unmatched parameter descriptions are found
           val paramDescs = tags.collect { case p: ParamDesc => p }
           val Ctor.Primary(_, _: Name.Anonymous, List(plist)) = c.ctor
@@ -144,20 +135,25 @@ package object model {
                 tpe = tpeToIntermediate(tpe),
                 desc = paramDescs.find(_.name == name).flatMap(_.desc),
               )
-          }.toList
-          val isValueClass = c.templ.inits.exists(_.syntax == "AnyVal")
-          intermediate.TaggedUnion.Member(memberName, memberParams, memberDesc, isValueClass)
-        }
-        case o @ Defn.Object(_, Term.Name(memberName), _) => {
-          val comment = findRelatedComment(source, o)
-          val (memberDesc, _) = extractDescAndTagsFromComment(comment)
-          intermediate.TaggedUnion.Member(memberName, List(), memberDesc, false)
-        }
-      }.toList
+          }
+          intermediate.TaggedUnion.Member(
+            name = c.name.value,
+            params = memberParams,
+            desc = memberDesc,
+            isValueClass = c.templ.inits.exists(_.syntax == "AnyVal"),
+          )
+        case o: Defn.Object =>
+          intermediate.TaggedUnion.Member(
+            name = o.name.value,
+            params = List(),
+            desc = extractDescAndTagsFromComment(commentToken)._1,
+            isValueClass = false,
+          )
+      }
     }
 
-    val traitName = taggedUnionDefnInfo.trait_defn.name.value
-    val members = membersFromTempl(taggedUnionDefnInfo.obj_defn.templ)
+    val traitName = taggedUnionDefnInfo.traitDefn.name.value
+    val members = taggedUnionDefnInfo.memberDefns.map(toMember)
 
     val (desc, _) = extractDescAndTagsFromComment(taggedUnionDefnInfo.commentToken)
     intermediate.TaggedUnion(traitName, members, desc)

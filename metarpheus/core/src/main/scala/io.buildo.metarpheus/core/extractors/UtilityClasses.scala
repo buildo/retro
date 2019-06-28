@@ -12,7 +12,7 @@ case class CaseClassDefnInfo(defn: Defn.Class, commentToken: Option[scala.meta.T
 case class CaseEnumDefnInfo(defn: Defn.Trait, commentToken: Option[scala.meta.Token])
 
 case class TaggedUnionDefnInfo(
-  trait_defn: Defn.Trait,
-  obj_defn: Defn.Object,
+  traitDefn: Defn.Trait,
+  memberDefns: List[Defn],
   commentToken: Option[scala.meta.Token],
 )
