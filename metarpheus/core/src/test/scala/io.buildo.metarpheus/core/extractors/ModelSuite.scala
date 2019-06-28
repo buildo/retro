@@ -136,7 +136,7 @@ class ModelSuite extends FunSuite {
             TaggedUnion.Member(
               name = "DuplicateName",
               params = List(
-                TaggedUnion.MemberParam(
+                CaseClass.Member(
                   name = "names",
                   tpe = Type.Name("SuggestedNames"),
                   desc = Some("suggestions for names that are not in use"),
@@ -147,8 +147,8 @@ class ModelSuite extends FunSuite {
             TaggedUnion.Member(
               name = "SizeOutOfBounds",
               params = List(
-                TaggedUnion.MemberParam(name = "min", tpe = Type.Name("Int"), desc = None),
-                TaggedUnion.MemberParam(name = "max", tpe = Type.Name("Int"), desc = None),
+                CaseClass.Member(name = "min", tpe = Type.Name("Int"), desc = None),
+                CaseClass.Member(name = "max", tpe = Type.Name("Int"), desc = None),
               ),
               desc = Some("The chosen size is not allowed"),
             ),

@@ -33,11 +33,10 @@ case class TaggedUnion(name: String, values: List[TaggedUnion.Member], desc: Opt
 object TaggedUnion {
   case class Member(
     name: String,
-    params: List[MemberParam],
+    params: List[CaseClass.Member],
     desc: Option[String],
     isValueClass: Boolean = false,
   )
-  case class MemberParam(name: String, tpe: Type, desc: Option[String])
 }
 
 case class RouteParam(

@@ -139,7 +139,7 @@ package object model {
           val Ctor.Primary(_, _: Name.Anonymous, List(plist)) = c.ctor
           val memberParams = plist.map {
             case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
-              intermediate.TaggedUnion.MemberParam(
+              intermediate.CaseClass.Member(
                 name = name,
                 tpe = tpeToIntermediate(tpe),
                 desc = paramDescs.find(_.name == name).flatMap(_.desc),
