@@ -7,7 +7,7 @@ import models._
 import wiro.OperationParameters
 import wiro.annotation._
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 @path("campings")
 trait CampingController {
@@ -22,7 +22,7 @@ trait CampingController {
   def getByCoolnessAndSize(
     coolness: String,
     size: Option[Int],
-    nickname: String
+    nickname: String,
   ): Future[Either[String, List[Camping]]]
 
   /**
@@ -58,32 +58,35 @@ trait CampingController {
     * create a camping
     */
   @command
-  def create(camping: Camping, parameters: OperationParameters): Future[Either[String, Camping]]
+  def create(
+    camping: Camping,
+    parameters: OperationParameters,
+  ): Future[Either[CreateCampingError, Camping]]
 
   @command @metarpheusIgnore
   def ignoreMe(ignore: IgnoreMe): Future[Either[String, String]]
 
   @query
   def taglessFinalRouteV1(
-    input: String
+    input: String,
   ): F[String]
 
   @query
   def taglessFinalRouteV2(
-    input: String
+    input: String,
   ): F[E[Exception, String]]
 }
 
 class CampingControllerImpl(
   implicit
-  executionContext: ExecutionContext
+  executionContext: ExecutionContext,
 ) extends CampingController {
 
   @query
   def getByCoolnessAndSize(
     coolness: String,
     size: Int,
-    nickname: String
+    nickname: String,
   ): Future[Either[String, List[Camping]]] = ???
 
   @query
@@ -99,7 +102,7 @@ class CampingControllerImpl(
   def getByHasBeach(hasBeach: Boolean): Future[Either[String, List[Camping]]] = ???
 
   @command
-  def create(camping: Camping): Future[Either[String, Camping]] = ???
+  def create(camping: Camping): Future[Either[CreateCampingError, Camping]] = ???
 
   @command
   def ignoreMe(ignore: IgnoreMe): Future[Either[String, String]] = ???

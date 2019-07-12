@@ -17,7 +17,7 @@ case class CaseClass(
   members: List[CaseClass.Member],
   desc: Option[String],
   isValueClass: Boolean = false,
-  typeParams: List[Type] = Nil
+  typeParams: List[Type] = Nil,
 ) extends Model
 object CaseClass {
   case class Member(name: String, tpe: Type, desc: Option[String])
@@ -28,12 +28,23 @@ object CaseEnum {
   case class Member(name: String, desc: Option[String])
 }
 
+case class TaggedUnion(name: String, values: List[TaggedUnion.Member], desc: Option[String])
+    extends Model
+object TaggedUnion {
+  case class Member(
+    name: String,
+    params: List[CaseClass.Member],
+    desc: Option[String],
+    isValueClass: Boolean = false,
+  )
+}
+
 case class RouteParam(
   name: Option[String],
   tpe: Type,
   required: Boolean,
   desc: Option[String],
-  inBody: Boolean = false
+  inBody: Boolean = false,
 )
 
 sealed trait RouteSegment
@@ -48,10 +59,11 @@ case class Route(
   params: List[RouteParam],
   authenticated: Boolean,
   returns: Type,
+  error: Option[Type],
   body: Option[Route.Body],
   ctrl: List[String],
   desc: Option[String],
-  name: List[String]
+  name: List[String],
 )
 
 object Route {
@@ -68,13 +80,14 @@ case class API(models: List[Model], routes: List[Route]) {
         } ++
           route.params.map(_.tpe) ++
           List(route.returns) ++
+          route.error.toList ++
           route.body.map(b => List(b.tpe)).getOrElse(Nil)
       }
     }.toSet
 
     def inUseConcreteTypeNames(models: Set[Type]): Set[String] = {
       def recurse(t: Type): List[Type.Name] = t match {
-        case name: Type.Name => List(name)
+        case name: Type.Name        => List(name)
         case Type.Apply(name, args) => Type.Name(name) :: args.flatMap(recurse).toList
       }
       models.flatMap(recurse)
@@ -88,6 +101,7 @@ case class API(models: List[Model], routes: List[Route]) {
           .filter(m => inUseConcreteTypeNames(inUse).contains(m.name))
           .collect {
             case CaseClass(_, members, _, _, _) => members.map(_.tpe)
+            case TaggedUnion(_, values, _)      => values.flatMap(_.params.map(_.tpe))
           }
           .flatMap(o => o)
       if (newInUse == inUse) inUseConcreteTypeNames(inUse)
@@ -100,7 +114,7 @@ case class API(models: List[Model], routes: List[Route]) {
     val modelsIntersection = recursivelyUsedModels.intersect(modelsForciblyInUse)
     if (!modelsIntersection.isEmpty)
       throw new Exception(
-        s"The following models are already used by the routes, no need to force inclusion: $modelsIntersection"
+        s"The following models are already used by the routes, no need to force inclusion: $modelsIntersection",
       )
 
     val inUseNames = recursivelyUsedModels ++ modelsForciblyInUse

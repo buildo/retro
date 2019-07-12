@@ -9,8 +9,10 @@ private[extractors] case class RouteName(name: List[String]) extends Tag
 
 case class CaseClassDefnInfo(defn: Defn.Class, commentToken: Option[scala.meta.Token])
 
-sealed trait CaseEnumDefns
-case class SugaredCaseEnumDefns(defn: Defn.Trait) extends CaseEnumDefns
-case class VanillaCaseEnumDefns(trait_defn: Defn.Trait, obj_defn: Defn.Object) extends CaseEnumDefns
+case class CaseEnumDefnInfo(defn: Defn.Trait, commentToken: Option[scala.meta.Token])
 
-case class CaseEnumDefnInfo(defns: CaseEnumDefns, commentToken: Option[scala.meta.Token])
+case class TaggedUnionDefnInfo(
+  traitDefn: Defn.Trait,
+  memberDefns: List[Defn],
+  commentToken: Option[scala.meta.Token],
+)
