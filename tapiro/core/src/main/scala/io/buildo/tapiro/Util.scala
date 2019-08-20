@@ -9,10 +9,6 @@ import java.nio.file.Files
 
 import MetarpheusHelper._
 
-object Main extends App {
-  Util.createFiles("/Users/cale/workdir/testo/src/main/scala/", "/Users/cale/workdir/testo/src/main/scala", "testo", true)
-}
-
 case class TapiroRoute(route: Route, errorValues: List[TaggedUnion.Member])
 
 object Util {
