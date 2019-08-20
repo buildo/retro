@@ -31,6 +31,7 @@ object Util {
         val endpointsName = s"${controllerName}Endpoints"
         val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`)
         writeToFile(to, tapirEndpoints, endpointsName)
+
         if (includeHttp4sModels) {
           val http4sEndpoints =
             createHttp4sEndpoints(`package`, controllerName, endpointsName, routes)
@@ -45,15 +46,14 @@ object Util {
     `package`: String,
   ): String = {
     format(
-      Meta.tapirClass(
+      TapirMeta.`class`(
         Term.Name(`package`),
         Type.Name(endpointsName),
         Meta.codecsImplicits(routes),
-        routes.map(Meta.routeToTapirEndpoint),
+        routes.map(TapirMeta.routeToTapirEndpoint),
       ),
     )
   }
-
   private[this] def createHttp4sEndpoints(
     `package`: String,
     controllerName: String,
@@ -65,13 +65,13 @@ object Util {
       case Nil => None
       case head :: tail =>
         Some(format(
-          Meta.http4sClass(
+          Http4sMeta.`class`(
             Term.Name(`package`),
             Type.Name(controllerName),
             Type.Name(endpointsName),
             Meta.codecsImplicits(tapiroRoutes) :+ param"implicit io: ContextShift[IO]",
-            Meta.http4sEndpoints(routes),
-            Meta.httpApp(head, tail),
+            Http4sMeta.endpoints(routes),
+            Http4sMeta.app(head, tail),
           ),
         ))
     }
