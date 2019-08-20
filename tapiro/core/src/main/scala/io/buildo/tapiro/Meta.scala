@@ -1,6 +1,7 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{Route, RouteParam, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.{Route, RouteParam, TaggedUnion, Type => MetarpheusType}
+
 import scala.meta._
 
 object Meta {
@@ -57,32 +58,36 @@ object Meta {
     `package`: Term.Name,
     name: Type.Name,
     implicits: List[Term.Param],
-    objects: List[Defn.Val],
+    body: List[Defn.Val],
   ) => {
     q"""package ${`package`} {
   import tapir._
   import tapir.Codec.JsonCodec
 
-  class $name(..$implicits) {
-   ..$objects
+  class $name(statusCodes: String => Int = _ => 422)(..$implicits) {
+   ..$body
   }
 }
 """,
   }
 
-  val codecsImplicits = (routes: List[Route]) => {
-    routes.map { route =>
-      List(route.returns) ++ route.body.map(_.tpe)
-    }.flatten.distinct.map(typeToImplicitParam),
+  val codecsImplicits = (routes: List[TapiroRoute]) => {
+    routes.map { case TapiroRoute(route, errorValues) =>
+      (List(route.returns) ++ route.body.map(_.tpe)).map(typeToImplicitParam) ++
+        errorValues.map(error => stringToImplicitParam(error.name))
+    }.flatten.distinct
   }
 
-  val routeToTapirEndpoint = (route: Route) =>
-    q"val ${Pat.Var(Term.Name(route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
+  val routeToTapirEndpoint = (route: TapiroRoute) =>
+    q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route.route)} = ${endpointImpl(route)}"
 
-  private[this] val typeToImplicitParam = (tpe: MetarpheusType) => {
-    val name = typeNameString(tpe)
+  private[this] val typeToImplicitParam = (tpe: MetarpheusType) =>
+    stringToImplicitParam(typeNameString(tpe))
+
+  private[this] val stringToImplicitParam = (name: String) => {
     val paramName = Term.Name(s"${name.head.toLower}${name.tail}")
-    param"implicit ${paramName}: JsonCodec[${typeName(tpe)}]"
+    val nameType = Type.Name(name)
+    param"implicit ${paramName}: JsonCodec[$nameType]"
   }
 
   private[this] val typeName = (`type`: MetarpheusType) => Type.Name(typeNameString(`type`))
@@ -102,29 +107,32 @@ object Meta {
       case head :: Nil => head
       case l           => Type.Tuple(l)
     }
-    t"Endpoint[$argsType, String, $returnType, Nothing]"
+    val error = Type.Name(route.error.map(typeNameString).getOrElse("String"))
+    t"Endpoint[$argsType, $error, $returnType, Nothing]"
   }
 
-  private[this] val endpointImpl = (route: Route) => {
+  private[this] val endpointImpl = (route: TapiroRoute) => {
     val basicEndpoint = Term.Apply(
-      Term.Select(Term.Select(Term.Name("endpoint"), Term.Name(route.method)), Term.Name("in")),
-      List(Lit.String(route.name.tail.mkString)),
+      Term.Select(Term.Select(Term.Name("endpoint"), Term.Name(route.route.method)), Term.Name("in")),
+      List(Lit.String(route.route.name.tail.mkString)),
     )
     withOutput(
       withError(
-        route.method match {
+        route.route.method match {
           case "get" =>
-            route.params.foldLeft(basicEndpoint) { (acc, param) =>
+            route.route.params.foldLeft(basicEndpoint) { (acc, param) =>
               withParam(acc, param)
             }
           case "post" =>
-            route.params.foldLeft(basicEndpoint) { (acc, param) =>
+            route.route.params.foldLeft(basicEndpoint) { (acc, param) =>
               withBody(acc, param.tpe)
             }
           case _ => throw new Exception("method not supported")
         },
+        route.errorValues,
+        route.route.error.map(typeNameString).get
       ),
-      route.returns,
+      route.route.returns,
     )
   }
 
@@ -135,8 +143,33 @@ object Meta {
     ),
   }
 
-  private[this] val withError = (endpoints: meta.Term) =>
-    Term.Apply(Term.Select(endpoints, Term.Name("errorOut")), List(Term.Name("stringBody")))
+  private[this] val withError = (endpoints: meta.Term, errorValues: List[TaggedUnion.Member], errorName: String) =>
+    Term.Apply(
+      Term.Select(endpoints,
+        Term.Name("errorOut")),
+      List(
+        if(errorValues.isEmpty) Term.Name("stringBody")
+        else errors(errorValues, errorName)
+      )
+    )
+
+  private[this] val errors = (errorValues: List[TaggedUnion.Member], errorName: String) =>
+    Term.Apply(
+      Term.ApplyType(
+        Term.Name("oneOf"),
+        List(Type.Name(errorName))),
+      errorValues.map { error =>
+        Term.Apply(Term.Name("statusMapping"),
+          List(
+            Term.Apply(Term.Name("statusCodes"), List(Lit.String(error.name))),
+            Term.ApplyType(
+              Term.Name("jsonBody"),
+              List(Type.Name(error.name)))
+          )
+        )
+      }
+    )
+
 
   private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) =>
     Term.Apply(
