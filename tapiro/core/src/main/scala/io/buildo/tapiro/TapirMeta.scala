@@ -1,6 +1,11 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{Route, RouteParam, TaggedUnion, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.{
+  Route,
+  RouteParam,
+  TaggedUnion,
+  Type => MetarpheusType,
+}
 
 import scala.meta._
 
@@ -42,7 +47,8 @@ object TapirMeta {
 
   private[this] val endpointImpl = (route: TapiroRoute) => {
     val basicEndpoint = Term.Apply(
-      Term.Select(Term.Select(Term.Name("endpoint"), Term.Name(route.route.method)), Term.Name("in")),
+      Term
+        .Select(Term.Select(Term.Name("endpoint"), Term.Name(route.route.method)), Term.Name("in")),
       List(Lit.String(route.route.name.tail.mkString)),
     )
     withOutput(
@@ -59,7 +65,7 @@ object TapirMeta {
           case _ => throw new Exception("method not supported")
         },
         route.errorValues,
-        route.route.error.map(typeNameString).get
+        route.route.error.map(typeNameString).get,
       ),
       route.route.returns,
     )
@@ -72,33 +78,29 @@ object TapirMeta {
     ),
   }
 
-  private[this] val withError = (endpoints: meta.Term, errorValues: List[TaggedUnion.Member], errorName: String) =>
-    Term.Apply(
-      Term.Select(endpoints,
-        Term.Name("errorOut")),
-      List(
-        if(errorValues.isEmpty) Term.Name("stringBody")
-        else listErrors(errorValues, errorName)
+  private[this] val withError =
+    (endpoints: meta.Term, errorValues: List[TaggedUnion.Member], errorName: String) =>
+      Term.Apply(
+        Term.Select(endpoints, Term.Name("errorOut")),
+        List(
+          if (errorValues.isEmpty) Term.Name("stringBody")
+          else listErrors(errorValues, errorName),
+        ),
       )
-    )
 
   private[this] val listErrors = (errorValues: List[TaggedUnion.Member], errorName: String) =>
     Term.Apply(
-      Term.ApplyType(
-        Term.Name("oneOf"),
-        List(Type.Name(errorName))),
+      Term.ApplyType(Term.Name("oneOf"), List(Type.Name(errorName))),
       errorValues.map { error =>
-        Term.Apply(Term.Name("statusMapping"),
+        Term.Apply(
+          Term.Name("statusMapping"),
           List(
             Term.Apply(Term.Name("statusCodes"), List(Lit.String(error.name))),
-            Term.ApplyType(
-              Term.Name("jsonBody"),
-              List(Type.Name(error.name)))
-          )
+            Term.ApplyType(Term.Name("jsonBody"), List(Type.Name(error.name))),
+          ),
         )
-      }
+      },
     )
-
 
   private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) =>
     Term.Apply(

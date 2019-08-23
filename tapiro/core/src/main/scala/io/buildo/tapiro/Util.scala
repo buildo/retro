@@ -21,7 +21,9 @@ object Util {
       TapiroRoute(route, errorValues)
     }
     val controllersRoutes =
-      routes.groupBy(route => route.route.route.collect { case RouteSegment.String(str) => str }.head)
+      routes.groupBy(
+        route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
+      )
     controllersRoutes.foreach {
       case (controllerName, routes) =>
         val endpointsName = s"${controllerName}Endpoints"
@@ -60,16 +62,18 @@ object Util {
     routes match {
       case Nil => None
       case head :: tail =>
-        Some(format(
-          Http4sMeta.`class`(
-            Term.Name(`package`),
-            Type.Name(controllerName),
-            Type.Name(endpointsName),
-            Meta.codecsImplicits(tapiroRoutes) :+ param"implicit io: ContextShift[IO]",
-            Http4sMeta.endpoints(routes),
-            Http4sMeta.app(head, tail),
+        Some(
+          format(
+            Http4sMeta.`class`(
+              Term.Name(`package`),
+              Type.Name(controllerName),
+              Type.Name(endpointsName),
+              Meta.codecsImplicits(tapiroRoutes) :+ param"implicit io: ContextShift[IO]",
+              Http4sMeta.endpoints(routes),
+              Http4sMeta.app(head, tail),
+            ),
           ),
-        ))
+        )
     }
   }
 

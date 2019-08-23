@@ -54,4 +54,3 @@ object Http4sMeta {
       }
     }
 }
-

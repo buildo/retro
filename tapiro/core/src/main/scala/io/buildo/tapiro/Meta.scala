@@ -6,10 +6,11 @@ import scala.meta._
 
 object Meta {
   val codecsImplicits = (routes: List[TapiroRoute]) => {
-    routes.map { case TapiroRoute(route, errorValues) =>
-      (List(route.returns) ++ route.body.map(_.tpe)).map(typeToImplicitParam) ++
-        errorValues.map(error => stringToImplicitParam(error.name))
-    }.flatten.distinct
+    routes.map {
+      case TapiroRoute(route, errorValues) =>
+        (List(route.returns) ++ route.body.map(_.tpe)).map(typeToImplicitParam) ++
+          errorValues.map(error => stringToImplicitParam(error.name))
+    }.flatten.distinct,
   }
 
   private[this] val typeToImplicitParam = (tpe: MetarpheusType) =>
@@ -29,4 +30,3 @@ object Meta {
       case MetarpheusType.Name(name)     => name
     }
 }
-
