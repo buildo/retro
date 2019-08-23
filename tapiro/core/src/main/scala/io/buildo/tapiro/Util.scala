@@ -46,7 +46,7 @@ object Util {
     format(
       TapirMeta.`class`(
         Term.Name(`package`),
-        Type.Name(endpointsName),
+        Term.Name(endpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
       ),
@@ -67,10 +67,10 @@ object Util {
             Http4sMeta.`class`(
               Term.Name(`package`),
               Type.Name(controllerName),
-              Type.Name(endpointsName),
-              Meta.codecsImplicits(tapiroRoutes) :+ param"implicit io: ContextShift[IO]",
+              Term.Name(endpointsName),
+              Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(routes),
-              Http4sMeta.app(head, tail),
+              Http4sMeta.routes(head, tail),
             ),
           ),
         )

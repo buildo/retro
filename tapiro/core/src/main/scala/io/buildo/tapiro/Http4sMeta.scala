@@ -8,35 +8,35 @@ object Http4sMeta {
   val `class` = (
     `package`: Term.Name,
     controllerName: Type.Name,
-    endpointsName: Type.Name,
+    endpointsName: Term.Name,
     implicits: List[Term.Param],
     http4sEndpoints: List[Defn.Val],
-    app: Defn.Val,
+    routes: Term,
   ) => {
-    val tapirEndpoints = q"private[this] val endpoints = new $endpointsName()"
-    val httpsEndpointsName = Type.Name(s"${controllerName.syntax}Http4sEndpoints")
-    q"""package ${`package`} {
-  import cats.effect._
-  import cats.implicits._
-  import cats.data.NonEmptyList
+    val tapirEndpoints = q"val endpoints = $endpointsName.create()"
+    val httpsEndpointsName = Term.Name(s"${controllerName.syntax}Http4sEndpoints")
+    q"""
+    package ${`package`} {
+      import cats.effect._
+      import cats.implicits._
+      import cats.data.NonEmptyList
+      import org.http4s._
+      import tapir.server.http4s._
+      import tapir.Codec.JsonCodec
 
-  import org.http4s._
-  import org.http4s.implicits._
-
-  import tapir.server.http4s._
-  import tapir.Codec.JsonCodec
-
-  class $httpsEndpointsName(controller: $controllerName[IO])(..$implicits) {
-    ..${tapirEndpoints +: http4sEndpoints :+ app}
+      object $httpsEndpointsName {
+        def routes[F[_]: Sync](controller: $controllerName[F])(..$implicits): HttpRoutes[F] = {
+          ..${tapirEndpoints +: http4sEndpoints :+ routes}
+        }
+      }
+    }
+    """
   }
-}
-"""
-  }
 
-  val app = (head: Route, tail: List[Route]) => {
+  val routes = (head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    q"val app: HttpApp[IO] = NonEmptyList($first, List(..$rest)).reduceK.orNotFound"
+    q"NonEmptyList($first, List(..$rest)).reduceK"
   }
 
   val endpoints = (routes: List[Route]) =>
@@ -50,7 +50,7 @@ object Http4sMeta {
         else None
       controllerContent.map { content =>
         val toRoutes = Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(content))
-        q"private[this] val ${Pat.Var(name)}: HttpRoutes[IO] = $toRoutes"
+        q"val ${Pat.Var(name)} = $toRoutes"
       }
     }
 }

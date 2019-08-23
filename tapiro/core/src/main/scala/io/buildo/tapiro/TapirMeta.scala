@@ -14,20 +14,30 @@ object TapirMeta {
 
   val `class` = (
     `package`: Term.Name,
-    name: Type.Name,
+    name: Term.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
-  ) => {
-    q"""package ${`package`} {
-  import tapir._
-  import tapir.Codec.JsonCodec
+  ) =>
+    q"""
+    package ${`package`} {
+      import tapir._
+      import tapir.Codec.JsonCodec
 
-  class $name(statusCodes: String => Int = _ => 422)(..$implicits) {
-   ..$body
-  }
-}
-""",
-  }
+      trait ${Type.Name(name.value)} {
+        ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
+      }
+
+      object $name {
+        def create(statusCodes: String => Int = _ => 422)(..$implicits) = new ${Init(
+      Type.Name(name.value),
+      Name.Anonymous(),
+      Nil,
+    )} { ..${body.map(
+      d => d.copy(mods = mod"override" :: d.mods),
+    )} }
+      }
+    }
+    """
 
   val routeToTapirEndpoint = (route: TapiroRoute) =>
     q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route.route)} = ${endpointImpl(route)}"
