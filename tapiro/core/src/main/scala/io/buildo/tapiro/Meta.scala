@@ -5,16 +5,12 @@ import io.buildo.metarpheus.core.intermediate.{Type => MetarpheusType}
 import scala.meta._
 
 object Meta {
-  val codecsImplicits = (routes: List[TapiroRoute]) => {
-    routes.map {
+  val codecsImplicits = (routes: List[TapiroRoute]) => routes.flatMap {
       case TapiroRoute(route, errorValues) =>
-        (List(route.returns) ++ route.body.map(_.tpe)).map(typeToImplicitParam) ++
-          errorValues.map(error => stringToImplicitParam(error.name))
-    }.flatten.distinct,
-  }
-
-  private[this] val typeToImplicitParam = (tpe: MetarpheusType) =>
-    stringToImplicitParam(typeNameString(tpe))
+        errorValues.map(_.name) ++
+          route.body.map(b => typeNameString(b.tpe)) :+
+          typeNameString(route.returns)
+    }.distinct.map(stringToImplicitParam)
 
   private[this] val stringToImplicitParam = (name: String) => {
     val paramName = Term.Name(s"${name.head.toLower}${name.tail}")
