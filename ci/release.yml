@@ -31,6 +31,7 @@ run:
       git config --unset-all filter.git-crypt.clean
       git config --unset-all filter.git-crypt.smudge
       git config --unset-all filter.git-crypt.required
+      git reset --hard
       echo "$GITHUB_DEPLOY_KEY" > $HOME/.ssh/id_rsa
       chmod 600 $HOME/.ssh/id_rsa
       eval "$(ssh-agent -s)"
