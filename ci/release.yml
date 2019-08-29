@@ -28,6 +28,9 @@ run:
       git config --global user.name "nemobot"
       git config --global user.email "nemobot@buildo.io"
       git config --global push.default simple
+      git config --unset-all filter.git-crypt.clean
+      git config --unset-all filter.git-crypt.smudge
+      git config --unset-all filter.git-crypt.required
       echo "$GITHUB_DEPLOY_KEY" > $HOME/.ssh/id_rsa
       chmod 600 $HOME/.ssh/id_rsa
       eval "$(ssh-agent -s)"
