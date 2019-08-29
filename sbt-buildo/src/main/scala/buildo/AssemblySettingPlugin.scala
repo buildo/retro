@@ -16,7 +16,8 @@ object AssemblySettingPlugin extends AutoPlugin {
     assemblyJarName in assembly := s"${name.value}.jar",
     assemblyMergeStrategy in assembly := {
       case PathList("application.conf") => MergeStrategy.discard
-      case "module-info.class"          => MergeStrategy.discard
+      case PathList(ps @ _*) if ps.last == "module-info.class" =>
+        MergeStrategy.discard
       case x =>
         val defaultStrategy = (assemblyMergeStrategy in assembly).value
         defaultStrategy(x)
