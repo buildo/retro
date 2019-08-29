@@ -22,7 +22,7 @@ run:
   args:
     - -ce
     - |
-      git fetch
+      git fetch --tags
       mkdir -p $HOME/.ssh
       ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
       git config --global user.name "nemobot"
