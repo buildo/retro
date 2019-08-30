@@ -20,9 +20,10 @@ object Meta {
 
   val typeName = (`type`: MetarpheusType) => Type.Name(typeNameString(`type`))
 
-  val typeNameString = (`type`: MetarpheusType) =>
+  def typeNameString(`type`: MetarpheusType): String =
     `type` match {
-      case MetarpheusType.Apply(name, _) => name
-      case MetarpheusType.Name(name)     => name
+      case MetarpheusType.Apply(name, args) =>
+        Type.Apply(Type.Name(name), args.map(t => Type.Name(typeNameString(t))).toList).syntax
+      case MetarpheusType.Name(name) => name
     }
 }
