@@ -28,12 +28,17 @@ class ModelSuite extends FunSuite {
           ),
           desc = None,
           isValueClass = true,
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "Camping",
           members = List(
             CaseClass.Member(name = "id", tpe = Type.Name("UUID"), desc = None),
-            CaseClass.Member(name = "name", tpe = Type.Name("CampingName"), desc = None),
+            CaseClass.Member(
+              name = "name",
+              tpe = Type.Name("CampingName"),
+              desc = None,
+            ),
             CaseClass
               .Member(name = "size", tpe = Type.Name("Int"), desc = Some("number of tents")),
             CaseClass.Member(
@@ -56,6 +61,7 @@ class ModelSuite extends FunSuite {
           typeParams = List(
             Type.Name("A"),
           ),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "Swan",
@@ -67,6 +73,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Represents a swan"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseEnum(
           name = "CampingLocation",
@@ -81,6 +88,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Location of the camping site"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseEnum(
           name = "CampingRating",
@@ -99,6 +107,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Rating of the camping site"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseEnum(
           name = "Planet",
@@ -113,6 +122,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Planet of the camping site"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         TaggedUnion(
           name = "Surface",
@@ -129,6 +139,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Surface of the camping site"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         TaggedUnion(
           name = "CreateCampingError",
@@ -159,6 +170,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("Errors that can happen when creating a camping"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "IgnoreMe",
@@ -167,6 +179,7 @@ class ModelSuite extends FunSuite {
           ),
           desc = None,
           isValueClass = false,
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "DuplicateName",
@@ -178,6 +191,7 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("The name is already in use"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "SizeOutOfBounds",
@@ -186,6 +200,7 @@ class ModelSuite extends FunSuite {
             CaseClass.Member(name = "max", tpe = Type.Name("Int"), desc = None),
           ),
           desc = Some("The chosen size is not allowed"),
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
           name = "SuggestedNames",
@@ -198,6 +213,7 @@ class ModelSuite extends FunSuite {
               ),
           ),
           desc = None,
+          `package` = List("io", "buildo", "baseexample", "models"),
         ),
       )
     val comparison = DiffShow.diff[List[Model]](expected, result)

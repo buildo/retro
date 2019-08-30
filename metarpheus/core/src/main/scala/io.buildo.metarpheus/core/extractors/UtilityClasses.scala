@@ -7,7 +7,11 @@ private[extractors] case class ParamDesc(name: String, desc: Option[String]) ext
 private[extractors] case class PathParamDesc(name: String, desc: Option[String]) extends Tag
 private[extractors] case class RouteName(name: List[String]) extends Tag
 
-case class CaseClassDefnInfo(defn: Defn.Class, commentToken: Option[scala.meta.Token])
+case class CaseClassDefnInfo(
+  defn: Defn.Class,
+  commentToken: Option[Token],
+  `package`: List[String],
+)
 
 case class CaseEnumDefnInfo(defn: Defn.Trait, commentToken: Option[scala.meta.Token])
 

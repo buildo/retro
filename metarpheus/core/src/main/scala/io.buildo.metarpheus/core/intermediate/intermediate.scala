@@ -18,18 +18,28 @@ case class CaseClass(
   desc: Option[String],
   isValueClass: Boolean = false,
   typeParams: List[Type] = Nil,
+  `package`: List[String],
 ) extends Model
 object CaseClass {
   case class Member(name: String, tpe: Type, desc: Option[String])
 }
 
-case class CaseEnum(name: String, values: List[CaseEnum.Member], desc: Option[String]) extends Model
+case class CaseEnum(
+  name: String,
+  values: List[CaseEnum.Member],
+  desc: Option[String],
+  `package`: List[String],
+) extends Model
 object CaseEnum {
   case class Member(name: String, desc: Option[String])
 }
 
-case class TaggedUnion(name: String, values: List[TaggedUnion.Member], desc: Option[String])
-    extends Model
+case class TaggedUnion(
+  name: String,
+  values: List[TaggedUnion.Member],
+  desc: Option[String],
+  `package`: List[String],
+) extends Model
 object TaggedUnion {
   case class Member(
     name: String,
@@ -100,8 +110,8 @@ case class API(models: List[Model], routes: List[Route]) {
         models
           .filter(m => inUseConcreteTypeNames(inUse).contains(m.name))
           .collect {
-            case CaseClass(_, members, _, _, _) => members.map(_.tpe)
-            case TaggedUnion(_, values, _)      => values.flatMap(_.params.map(_.tpe))
+            case CaseClass(_, members, _, _, _, _) => members.map(_.tpe)
+            case TaggedUnion(_, values, _, _)      => values.flatMap(_.params.map(_.tpe))
           }
           .flatMap(o => o)
       if (newInUse == inUse) inUseConcreteTypeNames(inUse)

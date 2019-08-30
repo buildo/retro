@@ -7,12 +7,32 @@ import scala.meta.contrib._
 
 package object model {
 
+  private def flattenPackage(pkg: Pkg): List[String] =
+    pkg.ref match {
+      case Term.Name(name) => List(name)
+      case s: Term.Select  => flattenSelect(s)
+    }
+
+  private def flattenSelect(s: Term.Select): List[String] =
+    s.qual match {
+      case sel: Term.Select => flattenSelect(sel) ++ List(s.name.value)
+      case Term.Name(n)     => List(n, s.name.value)
+    }
+
+  private def extractPackage(source: Source): List[String] =
+    source.collect {
+      case pkg: Pkg => flattenPackage(pkg)
+    }.flatten match {
+      case Nil => List("_root_")
+      case x   => x
+    }
+
   def extractCaseClassDefns(source: scala.meta.Source): List[CaseClassDefnInfo] = {
     source.collect {
       case c: Defn.Class if c.hasMod(Mod.Case()) => c
     }.map { cc =>
       val comment = findRelatedComment(source, cc)
-      CaseClassDefnInfo(cc, comment)
+      CaseClassDefnInfo(cc, comment, extractPackage(source))
     }
   }
 
@@ -21,7 +41,7 @@ package object model {
     * of extractCaseClassDefns
     */
   def extractCaseClass(caseClassDefnInfo: CaseClassDefnInfo): intermediate.CaseClass = {
-    val CaseClassDefnInfo(defn, comment) = caseClassDefnInfo
+    val CaseClassDefnInfo(defn, comment, pkg) = caseClassDefnInfo
     val isValueClass = defn.templ.inits.exists(_.syntax == "AnyVal")
     val className = defn.name.value
     val Ctor.Primary(_, _: Name.Anonymous, List(plist)) = defn.ctor
@@ -43,6 +63,7 @@ package object model {
       members = members,
       desc = classDesc,
       isValueClass = isValueClass,
+      `package` = pkg,
     )
   }
 
@@ -109,7 +130,7 @@ package object model {
     val members = membersFromTempl(caseEnumDefnInfo.defn.templ)
 
     val (desc, _) = extractDescAndTagsFromComment(caseEnumDefnInfo.commentToken)
-    intermediate.CaseEnum(traitName, members, desc)
+    intermediate.CaseEnum(traitName, members, desc, extractPackage(source))
   }
 
   /**
@@ -156,7 +177,7 @@ package object model {
     val members = taggedUnionDefnInfo.memberDefns.map(toMember)
 
     val (desc, _) = extractDescAndTagsFromComment(taggedUnionDefnInfo.commentToken)
-    intermediate.TaggedUnion(traitName, members, desc)
+    intermediate.TaggedUnion(traitName, members, desc, extractPackage(source))
   }
 
   def extractModel(source: scala.meta.Source): List[intermediate.Model] =
