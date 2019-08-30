@@ -36,6 +36,7 @@ class ApiSuite extends FunSuite {
           _,
           _,
           _,
+          _,
           ) =>
         ()
     }.isEmpty)
