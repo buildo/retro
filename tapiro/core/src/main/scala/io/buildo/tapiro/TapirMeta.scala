@@ -14,12 +14,14 @@ object TapirMeta {
 
   val `class` = (
     `package`: Term.Ref,
+    imports: Set[Term.Ref],
     name: Term.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
   ) =>
     q"""
     package ${`package`} {
+      ..${imports.toList.map(i => q"import $i._")}
       import tapir._
       import tapir.Codec.JsonCodec
 
