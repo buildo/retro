@@ -1,6 +1,8 @@
 val circeVersion = "0.10.0"
 val http4sVersion = "0.20.0-M7"
 
+import cats.data.NonEmptyList
+
 lazy val root = (project in file("."))
   .enablePlugins(SbtTapiro)
   .settings(
