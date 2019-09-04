@@ -1,6 +1,7 @@
 package io.buildo.tapiro
 
 import scopt.OParser
+import cats.data.NonEmptyList
 
 case class CliConfig(
   from: String = "/Users/cale/tmp",
@@ -9,6 +10,7 @@ case class CliConfig(
   includeHttp4sModels: Boolean = true,
 )
 
+//[Deprecated] the cli is going to be deprecated
 object Cli {
   def main(args: Array[String]): Unit = {
     val builder = OParser.builder[CliConfig]
@@ -33,8 +35,12 @@ object Cli {
     }
 
     OParser.parse(parser, args, CliConfig()) match {
-      case Some(c) =>
-        Util.createFiles(c.from, c.to, c.`package`, c.includeHttp4sModels)
+      case Some(c) => {
+        c.`package`.split(".").toList match {
+          case Nil => throw new Exception("Cannot create routes with empty package")
+          case head :: tail => Util.createFiles(c.from, c.to, NonEmptyList(head, tail), c.includeHttp4sModels)
+        }
+      }
       case _ =>
         println("Couldn't read the configurations")
     }
