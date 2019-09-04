@@ -37,6 +37,7 @@ object Dependencies {
     val scopt = "4.0.0-RC2"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
+    val pprint = "0.5.5"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -80,6 +81,7 @@ object Dependencies {
   val tapirCore = "com.softwaremill.tapir" %% "tapir-core" % V.tapirCore
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
+  val pprint = "com.lihaoyi" %% "pprint" % V.pprint
 
   val enumeroDependencies = List(
     scalatest,
@@ -186,6 +188,8 @@ object Dependencies {
     scalafmtCore,
     tapirCore,
     scopt,
+    circeCore,
+    pprint
   )
 
   val docsDependencies = List(
