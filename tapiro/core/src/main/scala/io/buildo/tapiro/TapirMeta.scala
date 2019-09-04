@@ -13,7 +13,7 @@ object TapirMeta {
   import Meta._
 
   val `class` = (
-    `package`: Term.Name,
+    `package`: Term.Ref,
     name: Term.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
