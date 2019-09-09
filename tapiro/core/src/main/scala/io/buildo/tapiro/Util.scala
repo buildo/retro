@@ -7,6 +7,8 @@ import scala.util.control.NonFatal
 import java.nio.file.Paths
 import java.nio.file.Files
 
+import cats.data.NonEmptyList
+
 import MetarpheusHelper._
 
 case class TapiroRoute(route: Route, errorValues: List[TaggedUnion.Member])
@@ -14,7 +16,7 @@ case class TapiroRoute(route: Route, errorValues: List[TaggedUnion.Member])
 object Util {
   import Formatter.format
 
-  def createFiles(from: String, to: String, `package`: String, includeHttp4sModels: Boolean) = {
+  def createFiles(from: String, to: String, `package`: NonEmptyList[String], includeHttp4sModels: Boolean) = {
     val meta = Metarpheus.run(List(from), Config(Set.empty))
     val routes: List[TapiroRoute] = meta.routes.map { route =>
       val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, meta.models)
@@ -41,11 +43,11 @@ object Util {
   private[this] def createTapirEndpoints(
     endpointsName: String,
     routes: List[TapiroRoute],
-    `package`: String,
+    `package`: NonEmptyList[String],
   ): String = {
     format(
       TapirMeta.`class`(
-        Term.Name(`package`),
+        Meta.packageFromList(`package`),
         Term.Name(endpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
@@ -53,7 +55,7 @@ object Util {
     )
   }
   private[this] def createHttp4sEndpoints(
-    `package`: String,
+    `package`: NonEmptyList[String],
     controllerName: String,
     endpointsName: String,
     tapiroRoutes: List[TapiroRoute],
@@ -65,7 +67,7 @@ object Util {
         Some(
           format(
             Http4sMeta.`class`(
-              Term.Name(`package`),
+              Meta.packageFromList(`package`),
               Type.Name(controllerName),
               Term.Name(endpointsName),
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",

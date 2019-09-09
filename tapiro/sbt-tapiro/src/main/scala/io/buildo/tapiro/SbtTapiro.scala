@@ -3,6 +3,7 @@ package io.buildo.tapiro
 import sbt._
 import sbt.Keys._
 import sbt.plugins.JvmPlugin
+import cats.data.NonEmptyList
 
 object SbtTapiro extends AutoPlugin {
 
@@ -13,7 +14,7 @@ object SbtTapiro extends AutoPlugin {
     val tapiro = taskKey[Unit]("Generate tapir endpoints from controller sources")
     val tapiroControllersPath = settingKey[String]("Path to controller sources")
     val tapiroEndpointsPath = settingKey[String]("Path to output generated endpoints")
-    val tapiroEndpointsPackage = settingKey[String]("Package of generate endpoints")
+    val tapiroEndpointsPackage = settingKey[NonEmptyList[String]]("Package of generate endpoints")
     val tapiroIncludeHttp4sModels = settingKey[Boolean]("Whether to include http4s generated code")
   }
 

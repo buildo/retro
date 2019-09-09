@@ -6,7 +6,7 @@ import scala.meta._
 
 object Http4sMeta {
   val `class` = (
-    `package`: Term.Name,
+    `package`: Term.Ref,
     controllerName: Type.Name,
     endpointsName: Term.Name,
     implicits: List[Term.Param],

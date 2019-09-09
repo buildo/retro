@@ -11,7 +11,7 @@ object MetarpheusHelper {
       }
 
       models.collect {
-        case TaggedUnion(name, values, _) if name == errorName => values
+        case TaggedUnion(name, values, _, _) if name == errorName => values
       }.flatten
     }.getOrElse(Nil)
 }
