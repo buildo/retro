@@ -1,7 +1,7 @@
 package io.buildo.tapiro
 
 import io.buildo.metarpheus.core.{Config, Metarpheus}
-import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment, TaggedUnion}
+import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment, TaggedUnion, CaseEnum, CaseClass}
 import scala.meta._
 import scala.util.control.NonFatal
 import java.nio.file.Paths
@@ -26,15 +26,22 @@ object Util {
       routes.groupBy(
         route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
       )
+    val modelsPackages = meta.models.map {
+      case c: CaseClass => c.`package`
+      case c: CaseEnum => c.`package` 
+      case t: TaggedUnion => t.`package` 
+    }.collect {
+      case head :: tail => NonEmptyList(head, tail)
+    }
     controllersRoutes.foreach {
       case (controllerName, routes) =>
         val endpointsName = s"${controllerName}Endpoints"
-        val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`)
+        val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`, modelsPackages)
         writeToFile(to, tapirEndpoints, endpointsName)
 
         if (includeHttp4sModels) {
           val http4sEndpoints =
-            createHttp4sEndpoints(`package`, controllerName, endpointsName, routes)
+            createHttp4sEndpoints(`package`, controllerName, endpointsName, modelsPackages, routes)
           http4sEndpoints.foreach(writeToFile(to, _, s"${controllerName}Http4sEndpoints"))
         }
     }
@@ -44,20 +51,24 @@ object Util {
     endpointsName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
+    modelsPackages: List[NonEmptyList[String]]
   ): String = {
     format(
       TapirMeta.`class`(
         Meta.packageFromList(`package`),
+        modelsPackages.toSet.map(Meta.packageFromList),
         Term.Name(endpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
       ),
     )
   }
+
   private[this] def createHttp4sEndpoints(
     `package`: NonEmptyList[String],
     controllerName: String,
     endpointsName: String,
+    modelsPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
     val routes = tapiroRoutes.map(_.route)
@@ -68,6 +79,7 @@ object Util {
           format(
             Http4sMeta.`class`(
               Meta.packageFromList(`package`),
+              modelsPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
               Term.Name(endpointsName),
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",

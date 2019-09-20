@@ -7,6 +7,7 @@ import scala.meta._
 object Http4sMeta {
   val `class` = (
     `package`: Term.Ref,
+    imports: Set[Term.Ref],
     controllerName: Type.Name,
     endpointsName: Term.Name,
     implicits: List[Term.Param],
@@ -17,6 +18,7 @@ object Http4sMeta {
     val httpsEndpointsName = Term.Name(s"${controllerName.syntax}Http4sEndpoints")
     q"""
     package ${`package`} {
+      ..${imports.toList.map(i => q"import $i._")}
       import cats.effect._
       import cats.implicits._
       import cats.data.NonEmptyList
