@@ -45,8 +45,8 @@ object TapirMeta {
     q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route.route)} = ${endpointImpl(route)}"
 
   private[this] val endpointType = (route: Route) => {
-    val returnType = typeName(route.returns)
-    val argsList = route.params.map(p => typeName(p.tpe)) ++
+    val returnType = toScalametaType(route.returns)
+    val argsList = route.params.map(p => toScalametaType(p.tpe)) ++
       route.body.map(b => typeName(b.tpe))
     val argsType = argsList match {
       case Nil         => Type.Name("Unit")

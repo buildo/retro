@@ -29,6 +29,12 @@ object Meta {
       case MetarpheusType.Name(name)     => name
     }
 
+  val toScalametaType: MetarpheusType => Type = {
+    case MetarpheusType.Apply(name, args) =>
+      Type.Apply(Type.Name(name), args.map(toScalametaType).toList)
+    case MetarpheusType.Name(name) => Type.Name(name)
+  }
+
   def packageFromList(`package`: NonEmptyList[String]): Term.Ref =
     `package`.tail
       .foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
