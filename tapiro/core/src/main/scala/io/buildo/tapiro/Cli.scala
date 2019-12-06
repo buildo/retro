@@ -38,7 +38,8 @@ object Cli {
       case Some(c) => {
         c.`package`.split(".").toList match {
           case Nil => throw new Exception("Cannot create routes with empty package")
-          case head :: tail => Util.createFiles(c.from, c.to, NonEmptyList(head, tail), c.includeHttp4sModels)
+          case head :: tail =>
+            Util.createFiles(c.from, c.to, NonEmptyList(head, tail), c.includeHttp4sModels)
         }
       }
       case _ =>

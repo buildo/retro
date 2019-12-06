@@ -1,7 +1,13 @@
 package io.buildo.tapiro
 
 import io.buildo.metarpheus.core.{Config, Metarpheus}
-import io.buildo.metarpheus.core.intermediate.{Route, RouteSegment, TaggedUnion, CaseEnum, CaseClass}
+import io.buildo.metarpheus.core.intermediate.{
+  CaseClass,
+  CaseEnum,
+  Route,
+  RouteSegment,
+  TaggedUnion,
+}
 import scala.meta._
 import scala.util.control.NonFatal
 import java.nio.file.Paths
@@ -16,7 +22,12 @@ case class TapiroRoute(route: Route, errorValues: List[TaggedUnion.Member])
 object Util {
   import Formatter.format
 
-  def createFiles(from: String, to: String, `package`: NonEmptyList[String], includeHttp4sModels: Boolean) = {
+  def createFiles(
+    from: String,
+    to: String,
+    `package`: NonEmptyList[String],
+    includeHttp4sModels: Boolean,
+  ) = {
     val meta = Metarpheus.run(List(from), Config(Set.empty))
     val routes: List[TapiroRoute] = meta.routes.map { route =>
       val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, meta.models)
@@ -27,9 +38,9 @@ object Util {
         route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
       )
     val modelsPackages = meta.models.map {
-      case c: CaseClass => c.`package`
-      case c: CaseEnum => c.`package` 
-      case t: TaggedUnion => t.`package` 
+      case c: CaseClass   => c.`package`
+      case c: CaseEnum    => c.`package`
+      case t: TaggedUnion => t.`package`
     }.collect {
       case head :: tail => NonEmptyList(head, tail)
     }
@@ -51,7 +62,7 @@ object Util {
     endpointsName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
-    modelsPackages: List[NonEmptyList[String]]
+    modelsPackages: List[NonEmptyList[String]],
   ): String = {
     format(
       TapirMeta.`class`(

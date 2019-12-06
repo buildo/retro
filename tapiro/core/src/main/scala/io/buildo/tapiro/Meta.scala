@@ -7,7 +7,8 @@ import scala.meta._
 import cats.data.NonEmptyList
 
 object Meta {
-  val codecsImplicits = (routes: List[TapiroRoute]) => routes.flatMap {
+  val codecsImplicits = (routes: List[TapiroRoute]) =>
+    routes.flatMap {
       case TapiroRoute(route, errorValues) =>
         errorValues.map(_.name) ++
           route.body.map(b => typeNameString(b.tpe)) :+
@@ -29,5 +30,6 @@ object Meta {
     }
 
   def packageFromList(`package`: NonEmptyList[String]): Term.Ref =
-    `package`.tail.foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
+    `package`.tail
+      .foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
 }
