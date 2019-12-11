@@ -45,15 +45,15 @@ object TapirMeta {
     q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route.route)} = ${endpointImpl(route)}"
 
   private[this] val endpointType = (route: Route) => {
-    val returnType = typeName(route.returns)
-    val argsList = route.params.map(p => typeName(p.tpe)) ++
-      route.body.map(b => typeName(b.tpe))
+    val returnType = toScalametaType(route.returns)
+    val argsList = route.params.map(p => toScalametaType(p.tpe)) ++
+      route.body.map(b => toScalametaType(b.tpe))
     val argsType = argsList match {
       case Nil         => Type.Name("Unit")
       case head :: Nil => head
       case l           => Type.Tuple(l)
     }
-    val error = Type.Name(route.error.map(typeNameString).getOrElse("String"))
+    val error = route.error.map(toScalametaType).getOrElse(Type.Name("String"))
     t"Endpoint[$argsType, $error, $returnType, Nothing]"
   }
 
@@ -86,7 +86,7 @@ object TapirMeta {
   private[this] val withBody = (endpoint: meta.Term, tpe: MetarpheusType) => {
     Term.Apply(
       Term.Select(endpoint, Term.Name("in")),
-      List(Term.ApplyType(Term.Name("jsonBody"), List(Type.Name(typeNameString(tpe))))),
+      List(Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(tpe)))),
     ),
   }
 
@@ -120,7 +120,7 @@ object TapirMeta {
       List(
         Term.ApplyType(
           Term.Name("jsonBody"),
-          List(typeName(returnType)),
+          List(toScalametaType(returnType)),
         ),
       ),
     )
@@ -131,7 +131,7 @@ object TapirMeta {
         Term.Select(endpoint, Term.Name("in")),
         List(
           Term.Apply(
-            Term.ApplyType(Term.Name("query"), List(Type.Name(typeNameString(param.tpe)))),
+            Term.ApplyType(Term.Name("query"), List(toScalametaType(param.tpe))),
             List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)))),
           ),
         ),
