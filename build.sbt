@@ -30,7 +30,7 @@ lazy val `sbt-buildo` = project
     dynverTagPrefix := "sbt-buildo-",
   )
 
-lazy val enumero = project.aggregate(enumeroCore, enumeroCirce)
+lazy val enumero = project.aggregate(enumeroCore, enumeroCirce, enumeroPureConfig)
 
 lazy val enumeroCore = project
   .in(file("enumero/core"))
@@ -46,6 +46,15 @@ lazy val enumeroCirce = project
   .settings(
     name := "enumero-circe-support", // TODO(gabro): name consistency
     libraryDependencies ++= enumeroCirceDependencies,
+    dynverTagPrefix := "enumero-",
+  )
+  .dependsOn(enumeroCore)
+
+lazy val enumeroPureConfig = project
+  .in(file("enumero/pureconfig"))
+  .settings(
+    name := "enumero-pureconfig-support", // TODO(gabro): name consistency
+    libraryDependencies ++= enumeroPureConfigDependencies,
     dynverTagPrefix := "enumero-",
   )
   .dependsOn(enumeroCore)

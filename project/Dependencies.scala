@@ -38,6 +38,7 @@ object Dependencies {
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.5"
+    val pureconfig = "0.12.1"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -82,6 +83,7 @@ object Dependencies {
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
   val pprint = "com.lihaoyi" %% "pprint" % V.pprint
+  val pureconfig = "com.github.pureconfig" %% "pureconfig" % V.pureconfig
 
   val enumeroDependencies = List(
     scalatest,
@@ -92,6 +94,12 @@ object Dependencies {
     circeCore,
   ) ++ List(
     circeParser,
+    scalatest,
+  ).map(_ % Test)
+
+  val enumeroPureConfigDependencies = List(
+    pureconfig,
+  ) ++ List(
     scalatest,
   ).map(_ % Test)
 
