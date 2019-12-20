@@ -11,6 +11,7 @@ object Meta {
     routes.flatMap {
       case TapiroRoute(route, errorValues) =>
         errorValues.map(m => MetarpheusType.Name(m.name)) ++
+          route.params.map(_.tpe) ++
           route.body.map(_.tpe) :+
           route.returns
     }.distinct.map(toImplicitParam)
