@@ -48,10 +48,10 @@ object Http4sMeta {
       val controllersName = Term.Select(Term.Name("controller"), name)
       val controllerContent =
         if (route.method == "post") Some(controllersName)
-        else if (route.method == "get")
-          if (route.params.length >= 1) Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
-          else Some(controllersName)
-        else None
+        else if (route.method == "get") {
+          if (route.params.isEmpty) Some(controllersName)
+          else Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
+        } else None
       controllerContent.map { content =>
         val toRoutes = Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(content))
         q"val ${Pat.Var(name)} = $toRoutes"
