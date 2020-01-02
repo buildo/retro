@@ -34,7 +34,6 @@ object Dependencies {
     val slf4j = "1.7.25"
     val scalameta = "4.1.10"
     val tapirCore = "0.5.2"
-    val scopt = "4.0.0-RC2"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.5"
@@ -77,7 +76,6 @@ object Dependencies {
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
   val diff = "ai.x" %% "diff" % "2.0"
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
-  val scopt = "com.github.scopt" %% "scopt" % V.scopt
   val tapirCore = "com.softwaremill.tapir" %% "tapir-core" % V.tapirCore
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
@@ -187,7 +185,6 @@ object Dependencies {
     scalameta,
     scalafmtCore,
     tapirCore,
-    scopt,
     circeCore,
     pprint
   )
