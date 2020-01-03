@@ -23,21 +23,23 @@ object Util {
   import Formatter.format
 
   def createFiles(
-    from: String,
-    to: String,
+    routesPaths: NonEmptyList[String],
+    modelsPaths: NonEmptyList[String],
+    outputPath: String,
     `package`: NonEmptyList[String],
     includeHttp4sModels: Boolean,
   ) = {
-    val meta = Metarpheus.run(List(from), Config(Set.empty))
-    val routes: List[TapiroRoute] = meta.routes.map { route =>
-      val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, meta.models)
+    val config = Config(Set.empty)
+    val models = Metarpheus.run(modelsPaths.toList, config).models
+    val routes: List[TapiroRoute] = Metarpheus.run(routesPaths.toList, config).routes.map { route =>
+      val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, models)
       TapiroRoute(route, errorValues)
     }
     val controllersRoutes =
       routes.groupBy(
         route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
       )
-    val modelsPackages = meta.models.map {
+    val modelsPackages = models.map {
       case c: CaseClass   => c.`package`
       case c: CaseEnum    => c.`package`
       case t: TaggedUnion => t.`package`
@@ -48,12 +50,12 @@ object Util {
       case (controllerName, routes) =>
         val endpointsName = s"${controllerName}Endpoints"
         val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`, modelsPackages)
-        writeToFile(to, tapirEndpoints, endpointsName)
+        writeToFile(outputPath, tapirEndpoints, endpointsName)
 
         if (includeHttp4sModels) {
           val http4sEndpoints =
             createHttp4sEndpoints(`package`, controllerName, endpointsName, modelsPackages, routes)
-          http4sEndpoints.foreach(writeToFile(to, _, s"${controllerName}Http4sEndpoints"))
+          http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
         }
     }
   }
@@ -102,9 +104,9 @@ object Util {
     }
   }
 
-  private[this] def writeToFile(to: String, endpoints: String, name: String): Unit = {
+  private[this] def writeToFile(outputPath: String, endpoints: String, name: String): Unit = {
     try {
-      val endpointsPath = Paths.get(s"$to/$name.scala")
+      val endpointsPath = Paths.get(s"$outputPath/$name.scala")
       Files.createDirectories(endpointsPath.getParent)
       Files.write(endpointsPath, endpoints.getBytes)
 
