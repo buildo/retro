@@ -13,6 +13,7 @@ object Meta {
         val params: List[MetarpheusType] = route.params.map(_.tpe)
         errorValues.map(m => MetarpheusType.Name(m.name)) ++
           (if (route.method == "post") params else Nil) ++
+          route.error ++
           route.body.map(_.tpe) :+
           route.returns
     }.distinct.map(toJsonCodec)
