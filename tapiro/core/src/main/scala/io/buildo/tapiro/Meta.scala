@@ -7,20 +7,34 @@ import scala.meta._
 import cats.data.NonEmptyList
 
 object Meta {
-  val codecsImplicits = (routes: List[TapiroRoute]) =>
-    routes.flatMap {
+  val codecsImplicits = (routes: List[TapiroRoute]) => {
+    val jsonCodecs = routes.flatMap {
       case TapiroRoute(route, errorValues) =>
+        val params: List[MetarpheusType] = route.params.map(_.tpe)
         errorValues.map(m => MetarpheusType.Name(m.name)) ++
-          route.params.map(_.tpe) ++
+          (if (route.method == "post") params else Nil) ++
           route.body.map(_.tpe) :+
           route.returns
-    }.distinct.map(toImplicitParam)
+    }.distinct.map(toJsonCodec)
+    val plainCodecs = routes.flatMap {
+      case TapiroRoute(route, _) =>
+        (if (route.method == "get") route.params.map(_.tpe) else Nil)
+    }.distinct.map(toPlainCodec)
+    jsonCodecs ++ plainCodecs
+  }
 
-  private[this] val toImplicitParam = (`type`: MetarpheusType) => {
+  private[this] val toJsonCodec = (`type`: MetarpheusType) => {
     val typeName = typeNameString(`type`)
-    val paramName = Term.Name(s"${typeName.head.toLower}${typeName.tail}")
+    val paramName = Term.Name(s"${typeName.head.toLower}${typeName.tail}JsonCodec")
     val paramType = toScalametaType(`type`)
     param"implicit ${paramName}: JsonCodec[$paramType]"
+  }
+
+  private[this] val toPlainCodec = (`type`: MetarpheusType) => {
+    val typeName = typeNameString(`type`)
+    val paramName = Term.Name(s"${typeName.head.toLower}${typeName.tail}PlainCodec")
+    val paramType = toScalametaType(`type`)
+    param"implicit ${paramName}: PlainCodec[$paramType]"
   }
 
   val typeName = (`type`: MetarpheusType) => Type.Name(typeNameString(`type`))
