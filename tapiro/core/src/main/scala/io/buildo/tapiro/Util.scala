@@ -24,13 +24,13 @@ object Util {
 
   def createFiles(
     routesPaths: NonEmptyList[String],
-    modelsPaths: NonEmptyList[String],
+    modelsPaths: List[String],
     outputPath: String,
     `package`: NonEmptyList[String],
     includeHttp4sModels: Boolean,
   ) = {
     val config = Config(Set.empty)
-    val models = Metarpheus.run(modelsPaths.toList, config).models
+    val models = Metarpheus.run(modelsPaths, config).models
     val routes: List[TapiroRoute] = Metarpheus.run(routesPaths.toList, config).routes.map { route =>
       val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, models)
       TapiroRoute(route, errorValues)
