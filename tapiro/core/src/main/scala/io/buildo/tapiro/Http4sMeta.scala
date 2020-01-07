@@ -24,7 +24,7 @@ object Http4sMeta {
       import cats.data.NonEmptyList
       import org.http4s._
       import tapir.server.http4s._
-      import tapir.Codec.JsonCodec
+      import tapir.Codec.{ JsonCodec, PlainCodec }
 
       object $httpsEndpointsName {
         def routes[F[_]: Sync](controller: $controllerName[F])(..$implicits): HttpRoutes[F] = {

@@ -23,7 +23,7 @@ object TapirMeta {
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
       import tapir._
-      import tapir.Codec.JsonCodec
+      import tapir.Codec.{ JsonCodec, PlainCodec }
 
       trait ${Type.Name(name.value)} {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
