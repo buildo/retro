@@ -95,8 +95,9 @@ object TapirMeta {
       Term.Apply(
         Term.Select(endpoints, Term.Name("errorOut")),
         List(
-          if (errorValues.isEmpty) Term.Name("stringBody")
-          else listErrors(errorValues, errorName),
+          if (errorValues.isEmpty && errorName == "String") Term.Name("stringBody")
+          else if (errorValues.isEmpty && errorName != "String") Term.ApplyType(Term.Name("jsonBody"), List(Type.Name(errorName)))
+          else listErrors(errorValues, errorName)
         ),
       )
 
