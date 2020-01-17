@@ -22,15 +22,16 @@ object TapirMeta {
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
-      import tapir._
-      import tapir.Codec.{ JsonCodec, PlainCodec }
+      import sttp.tapir._
+      import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
+      import sttp.model.StatusCode
 
       trait ${Type.Name(name.value)} {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
       }
 
       object $name {
-        def create(statusCodes: String => Int = _ => 422)(..$implicits) = new ${Init(
+        def create(statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits) = new ${Init(
       Type.Name(name.value),
       Name.Anonymous(),
       Nil,
