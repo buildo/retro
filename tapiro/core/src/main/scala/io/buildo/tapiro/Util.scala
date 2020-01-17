@@ -7,6 +7,7 @@ import io.buildo.metarpheus.core.intermediate.{
   Route,
   RouteSegment,
   TaggedUnion,
+  Type => MetarpheusType,
 }
 import scala.meta._
 import scala.util.control.NonFatal
@@ -17,7 +18,14 @@ import cats.data.NonEmptyList
 
 import MetarpheusHelper._
 
-case class TapiroRoute(route: Route, errorValues: List[TaggedUnion.Member])
+sealed trait TapiroRouteError
+
+object TapiroRouteError {
+  case class TaggedUnionError(taggedUnion: TaggedUnion) extends TapiroRouteError
+  case class OtherError(`type`: MetarpheusType) extends TapiroRouteError
+}
+
+case class TapiroRoute(route: Route, error: TapiroRouteError)
 
 object Util {
   import Formatter.format
@@ -32,8 +40,7 @@ object Util {
     val config = Config(Set.empty)
     val models = Metarpheus.run(modelsPaths, config).models
     val routes: List[TapiroRoute] = Metarpheus.run(routesPaths.toList, config).routes.map { route =>
-      val errorValues: List[TaggedUnion.Member] = routeErrorValues(route, models)
-      TapiroRoute(route, errorValues)
+      TapiroRoute(route, routeError(route, models))
     }
     val controllersRoutes =
       routes.groupBy(
