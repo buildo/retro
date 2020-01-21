@@ -1,11 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{
-  Route,
-  RouteParam,
-  TaggedUnion,
-  Type => MetarpheusType,
-}
+import io.buildo.metarpheus.core.intermediate.{RouteParam, TaggedUnion, Type => MetarpheusType}
 
 import scala.meta._
 
@@ -43,18 +38,21 @@ object TapirMeta {
     """
 
   val routeToTapirEndpoint = (route: TapiroRoute) =>
-    q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route.route)} = ${endpointImpl(route)}"
+    q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
 
-  private[this] val endpointType = (route: Route) => {
-    val returnType = toScalametaType(route.returns)
-    val argsList = route.params.map(p => toScalametaType(p.tpe)) ++
-      route.body.map(b => toScalametaType(b.tpe))
+  private[this] val endpointType = (route: TapiroRoute) => {
+    val returnType = toScalametaType(route.route.returns)
+    val argsList = route.route.params.map(p => toScalametaType(p.tpe)) ++
+      route.route.body.map(b => toScalametaType(b.tpe))
     val argsType = argsList match {
       case Nil         => Type.Name("Unit")
       case head :: Nil => head
       case l           => Type.Tuple(l)
     }
-    val error = route.error.map(toScalametaType).getOrElse(Type.Name("String"))
+    val error = toScalametaType(route.error match {
+      case TapiroRouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
+      case TapiroRouteError.OtherError(t)       => t
+    })
     t"Endpoint[$argsType, $error, $returnType, Nothing]"
   }
 
@@ -77,8 +75,7 @@ object TapirMeta {
             }
           case _ => throw new Exception("method not supported")
         },
-        route.errorValues,
-        route.route.error.map(typeNameString).get,
+        route.error,
       ),
       route.route.returns,
     )
@@ -92,25 +89,30 @@ object TapirMeta {
   }
 
   private[this] val withError =
-    (endpoints: meta.Term, errorValues: List[TaggedUnion.Member], errorName: String) =>
+    (endpoints: meta.Term, routeError: TapiroRouteError) =>
       Term.Apply(
         Term.Select(endpoints, Term.Name("errorOut")),
         List(
-          if (errorValues.isEmpty && errorName == "String") Term.Name("stringBody")
-          else if (errorValues.isEmpty && errorName != "String") Term.ApplyType(Term.Name("jsonBody"), List(Type.Name(errorName)))
-          else listErrors(errorValues, errorName)
+          routeError match {
+            case TapiroRouteError.TaggedUnionError(taggedUnion) =>
+              listErrors(taggedUnion)
+            case TapiroRouteError.OtherError(MetarpheusType.Name("String")) =>
+              Term.Name("stringBody")
+            case TapiroRouteError.OtherError(t) =>
+              Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
+          },
         ),
       )
 
-  private[this] val listErrors = (errorValues: List[TaggedUnion.Member], errorName: String) =>
+  private[this] val listErrors = (taggedUnion: TaggedUnion) =>
     Term.Apply(
-      Term.ApplyType(Term.Name("oneOf"), List(Type.Name(errorName))),
-      errorValues.map { error =>
+      Term.ApplyType(Term.Name("oneOf"), List(Type.Name(taggedUnion.name))),
+      taggedUnion.values.map { member =>
         Term.Apply(
           Term.Name("statusMapping"),
           List(
-            Term.Apply(Term.Name("statusCodes"), List(Lit.String(error.name))),
-            Term.ApplyType(Term.Name("jsonBody"), List(Type.Name(error.name))),
+            Term.Apply(Term.Name("statusCodes"), List(Lit.String(member.name))),
+            Term.ApplyType(Term.Name("jsonBody"), List(taggedUnionMemberType(taggedUnion)(member))),
           ),
         )
       },

@@ -3,15 +3,20 @@ package io.buildo.tapiro
 import io.buildo.metarpheus.core.intermediate.{Type => MetarpheusType, Model, TaggedUnion, Route}
 
 object MetarpheusHelper {
-  def routeErrorValues(route: Route, models: List[Model]): List[TaggedUnion.Member] =
+  def routeError(route: Route, models: List[Model]): TapiroRouteError =
     route.error.map { error =>
       val errorName = error match {
         case MetarpheusType.Name(name)     => name
         case MetarpheusType.Apply(name, _) => name
       }
 
-      models.collect {
-        case TaggedUnion(name, values, _, _) if name == errorName => values
-      }.flatten
-    }.getOrElse(Nil)
+      val candidates = models.collect {
+        case tu @ TaggedUnion(name, _, _, _) if name == errorName => tu
+      }
+      if (candidates.length > 1) throw new Exception(s"ambiguous error type name $errorName")
+      else
+        candidates.headOption
+          .map(TapiroRouteError.TaggedUnionError.apply)
+          .getOrElse(TapiroRouteError.OtherError(error))
+    }.getOrElse(TapiroRouteError.OtherError(MetarpheusType.Name("String")))
 }
