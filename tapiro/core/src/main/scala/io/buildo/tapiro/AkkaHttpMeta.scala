@@ -11,7 +11,7 @@ object AkkaHttpMeta {
     controllerName: Type.Name,
     endpointsName: Term.Name,
     implicits: List[Term.Param],
-    http4sEndpoints: List[Defn.Val],
+    akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
     val tapirEndpoints = q"val endpoints = $endpointsName.create()"
@@ -29,7 +29,7 @@ object AkkaHttpMeta {
 
       object $akkaHttpEndpointsName {
         def routes(controller: $controllerName)(..$implicits): Route = {
-          ..${tapirEndpoints +: http4sEndpoints :+ routes}
+          ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
       }
     }
