@@ -49,7 +49,7 @@ object Http4sMeta {
       val controllerContent =
         if (route.method == "post") Some(controllersName)
         else if (route.method == "get") {
-          if (route.params.isEmpty) Some(controllersName)
+          if (route.params.length <= 1) Some(controllersName)
           else Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
         } else None
       controllerContent.map { content =>
