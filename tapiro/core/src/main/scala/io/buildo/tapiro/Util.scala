@@ -18,8 +18,14 @@ import cats.data.NonEmptyList
 
 import MetarpheusHelper._
 
-sealed trait TapiroRouteError
+sealed trait Server
+object Server {
+  case object AkkaHttp extends Server
+  case object Http4s extends Server
+  case object NoServer extends Server
+}
 
+sealed trait TapiroRouteError
 object TapiroRouteError {
   case class TaggedUnionError(taggedUnion: TaggedUnion) extends TapiroRouteError
   case class OtherError(`type`: MetarpheusType) extends TapiroRouteError
@@ -35,7 +41,7 @@ object Util {
     modelsPaths: List[String],
     outputPath: String,
     `package`: NonEmptyList[String],
-    includeHttp4sModels: Boolean,
+    server: Server,
   ) = {
     val config = Config(Set.empty)
     val models = Metarpheus.run(modelsPaths, config).models
@@ -59,10 +65,30 @@ object Util {
         val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`, modelsPackages)
         writeToFile(outputPath, tapirEndpoints, endpointsName)
 
-        if (includeHttp4sModels) {
-          val http4sEndpoints =
-            createHttp4sEndpoints(`package`, controllerName, endpointsName, modelsPackages, routes)
-          http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+        server match {
+          case Server.Http4s =>
+            val http4sEndpoints =
+              createHttp4sEndpoints(
+                `package`,
+                controllerName,
+                endpointsName,
+                modelsPackages,
+                routes,
+              )
+            http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+          case Server.AkkaHttp =>
+            val akkaHttpEndpoints =
+              createAkkaHttpEndpoints(
+                `package`,
+                controllerName,
+                endpointsName,
+                modelsPackages,
+                routes,
+              )
+            akkaHttpEndpoints.foreach(
+              writeToFile(outputPath, _, s"${controllerName}AkkaHttpEndpoints"),
+            )
+          case Server.NoServer => ()
         }
     }
   }
@@ -105,6 +131,33 @@ object Util {
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(routes),
               Http4sMeta.routes(head, tail),
+            ),
+          ),
+        )
+    }
+  }
+
+  private[this] def createAkkaHttpEndpoints(
+    `package`: NonEmptyList[String],
+    controllerName: String,
+    endpointsName: String,
+    modelsPackages: List[NonEmptyList[String]],
+    tapiroRoutes: List[TapiroRoute],
+  ): Option[String] = {
+    val routes = tapiroRoutes.map(_.route)
+    routes match {
+      case Nil => None
+      case head :: tail =>
+        Some(
+          format(
+            AkkaHttpMeta.`class`(
+              Meta.packageFromList(`package`),
+              modelsPackages.toSet.map(Meta.packageFromList),
+              Type.Name(controllerName),
+              Term.Name(endpointsName),
+              Meta.codecsImplicits(tapiroRoutes),
+              AkkaHttpMeta.endpoints(routes),
+              AkkaHttpMeta.routes(head, tail),
             ),
           ),
         )

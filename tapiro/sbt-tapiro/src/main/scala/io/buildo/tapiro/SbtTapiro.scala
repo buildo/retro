@@ -12,11 +12,12 @@ object SbtTapiro extends AutoPlugin {
 
   object autoImport {
     val tapiro = taskKey[Unit]("Generate tapir endpoints from controller sources")
-    val tapiroRoutesPaths = settingKey[NonEmptyList[String]]("Paths to the controllers describing the routes")
+    val tapiroRoutesPaths =
+      settingKey[NonEmptyList[String]]("Paths to the controllers describing the routes")
     val tapiroModelsPaths = settingKey[List[String]]("Paths to the models used by the controllers")
     val tapiroOutputPath = settingKey[String]("Path to output generated endpoints")
     val tapiroEndpointsPackages = settingKey[NonEmptyList[String]]("Packages of generate endpoints")
-    val tapiroIncludeHttp4sModels = settingKey[Boolean]("Whether to include http4s generated code")
+    val tapiroServer = settingKey[Server]("For which server generate models (akka-http, http4s...)")
   }
 
   import autoImport._
@@ -25,7 +26,7 @@ object SbtTapiro extends AutoPlugin {
     tapiro / tapiroRoutesPaths := NonEmptyList("", Nil),
     tapiro / tapiroModelsPaths := Nil,
     tapiro / tapiroOutputPath := "",
-    tapiro / tapiroIncludeHttp4sModels := true,
+    tapiro / tapiroServer := Server.Http4s,
   )
 
   override val projectSettings = inConfig(Compile)(
@@ -36,7 +37,7 @@ object SbtTapiro extends AutoPlugin {
           tapiroModelsPaths.in(tapiro).value.map(s => (scalaSource.value / s).toString),
           (scalaSource.value / tapiroOutputPath.in(tapiro).value).toString,
           tapiroEndpointsPackages.in(tapiro).value,
-          tapiroIncludeHttp4sModels.in(tapiro).value,
+          tapiroServer.in(tapiro).value,
         )
       },
     ),
