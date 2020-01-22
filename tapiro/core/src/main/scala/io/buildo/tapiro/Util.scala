@@ -18,8 +18,14 @@ import cats.data.NonEmptyList
 
 import MetarpheusHelper._
 
-sealed trait TapiroRouteError
+sealed trait Server
+object Server {
+  case object AkkaHttp extends Server
+  case object Http4s extends Server
+  case object NoServer extends Server
+}
 
+sealed trait TapiroRouteError
 object TapiroRouteError {
   case class TaggedUnionError(taggedUnion: TaggedUnion) extends TapiroRouteError
   case class OtherError(`type`: MetarpheusType) extends TapiroRouteError
@@ -35,7 +41,7 @@ object Util {
     modelsPaths: List[String],
     outputPath: String,
     `package`: NonEmptyList[String],
-    includeHttp4sModels: Boolean,
+    server: Server,
   ) = {
     val config = Config(Set.empty)
     val models = Metarpheus.run(modelsPaths, config).models
@@ -59,10 +65,18 @@ object Util {
         val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`, modelsPackages)
         writeToFile(outputPath, tapirEndpoints, endpointsName)
 
-        if (includeHttp4sModels) {
-          val http4sEndpoints =
-            createHttp4sEndpoints(`package`, controllerName, endpointsName, modelsPackages, routes)
-          http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+        server match {
+          case Server.Http4s =>
+            val http4sEndpoints =
+              createHttp4sEndpoints(
+                `package`,
+                controllerName,
+                endpointsName,
+                modelsPackages,
+                routes,
+              )
+            http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+          case _ => ()
         }
     }
   }
