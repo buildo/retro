@@ -76,7 +76,19 @@ object Util {
                 routes,
               )
             http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
-          case _ => ()
+          case Server.AkkaHttp =>
+            val akkaHttpEndpoints =
+              createAkkaHttpEndpoints(
+                `package`,
+                controllerName,
+                endpointsName,
+                modelsPackages,
+                routes,
+              )
+            akkaHttpEndpoints.foreach(
+              writeToFile(outputPath, _, s"${controllerName}AkkaHttpEndpoints"),
+            )
+          case Server.NoServer => ()
         }
     }
   }
@@ -119,6 +131,33 @@ object Util {
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(routes),
               Http4sMeta.routes(head, tail),
+            ),
+          ),
+        )
+    }
+  }
+
+  private[this] def createAkkaHttpEndpoints(
+    `package`: NonEmptyList[String],
+    controllerName: String,
+    endpointsName: String,
+    modelsPackages: List[NonEmptyList[String]],
+    tapiroRoutes: List[TapiroRoute],
+  ): Option[String] = {
+    val routes = tapiroRoutes.map(_.route)
+    routes match {
+      case Nil => None
+      case head :: tail =>
+        Some(
+          format(
+            AkkaHttpMeta.`class`(
+              Meta.packageFromList(`package`),
+              modelsPackages.toSet.map(Meta.packageFromList),
+              Type.Name(controllerName),
+              Term.Name(endpointsName),
+              Meta.codecsImplicits(tapiroRoutes),
+              AkkaHttpMeta.endpoints(routes),
+              AkkaHttpMeta.routes(head, tail),
             ),
           ),
         )
