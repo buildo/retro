@@ -14,7 +14,7 @@ object AkkaHttpMeta {
     akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $endpointsName.create()"
+    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken]()"
     val akkaHttpEndpointsName = Term.Name(s"${controllerName.syntax}AkkaHttpEndpoints")
     q"""
     package ${`package`} {
@@ -28,7 +28,7 @@ object AkkaHttpMeta {
       import akka.http.scaladsl.server.Directives._
 
       object $akkaHttpEndpointsName {
-        def routes(controller: $controllerName)(..$implicits): Route = {
+        def routes[AuthToken](controller: $controllerName[AuthToken])(..$implicits): Route = {
           ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
       }
