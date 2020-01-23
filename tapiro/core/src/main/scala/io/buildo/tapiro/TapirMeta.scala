@@ -7,6 +7,8 @@ import scala.meta._
 object TapirMeta {
   import Meta._
 
+  private[this] val authTokenName: String = "AuthToken"
+
   val `class` = (
     `package`: Term.Ref,
     imports: Set[Term.Ref],
@@ -21,16 +23,16 @@ object TapirMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
 
-      trait ${Type.Name(name.value)} {
+      trait ${Type.Name(name.value)}[AuthToken] {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
       }
 
       object $name {
-        def create(statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits) = new ${Init(
+        def create[AuthToken](statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits) = new ${Init(
       Type.Name(name.value),
       Name.Anonymous(),
       Nil,
-    )} { ..${body.map(
+    )}[AuthToken] { ..${body.map(
       d => d.copy(mods = mod"override" :: d.mods),
     )} }
       }
@@ -62,24 +64,48 @@ object TapirMeta {
         .Select(Term.Select(Term.Name("endpoint"), Term.Name(route.route.method)), Term.Name("in")),
       List(Lit.String(route.route.name.tail.mkString)),
     )
+    val (auth, params) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
+    val endpointsWithParams = withParams(basicEndpoint, route.route.method, params)
     withOutput(
       withError(
-        route.route.method match {
-          case "get" =>
-            route.route.params.foldLeft(basicEndpoint) { (acc, param) =>
-              withParam(acc, param)
-            }
-          case "post" =>
-            route.route.params.foldLeft(basicEndpoint) { (acc, param) =>
-              withBody(acc, param.tpe)
-            }
-          case _ => throw new Exception("method not supported")
+        auth match {
+          case Nil => endpointsWithParams
+          case _   => withAuth(endpointsWithParams)
         },
         route.error,
       ),
       route.route.returns,
     )
   }
+
+  private[this] val withAuth = (endpoint: meta.Term) =>
+    Term.Apply(
+      Term.Select(endpoint, Term.Name("in")),
+      List(
+        Term.Apply(
+          Term.ApplyType(
+            Term.Name("header"),
+            List(Type.Name(authTokenName)),
+          ),
+          List(Lit.String("Authorization")),
+        ),
+      ),
+    )
+
+  private[this] val withParams =
+    (endpoint: meta.Term, method: String, params: List[RouteParam]) => {
+      method match {
+        case "get" =>
+          params.foldLeft(endpoint) { (acc, param) =>
+            withParam(acc, param)
+          }
+        case "post" =>
+          params.foldLeft(endpoint) { (acc, param) =>
+            withBody(acc, param.tpe)
+          }
+        case _ => throw new Exception("method not supported")
+      },
+    }
 
   private[this] val withBody = (endpoint: meta.Term, tpe: MetarpheusType) => {
     Term.Apply(

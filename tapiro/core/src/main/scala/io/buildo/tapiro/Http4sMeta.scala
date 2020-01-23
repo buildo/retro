@@ -14,7 +14,7 @@ object Http4sMeta {
     http4sEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $endpointsName.create()"
+    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken]()"
     val httpsEndpointsName = Term.Name(s"${controllerName.syntax}Http4sEndpoints")
     q"""
     package ${`package`} {
@@ -27,7 +27,7 @@ object Http4sMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
 
       object $httpsEndpointsName {
-        def routes[F[_]: Sync](controller: $controllerName[F])(..$implicits): HttpRoutes[F] = {
+        def routes[F[_]: Sync, AuthToken](controller: $controllerName[F, AuthToken])(..$implicits): HttpRoutes[F] = {
           ..${tapirEndpoints +: http4sEndpoints :+ routes}
         }
       }
