@@ -15,6 +15,7 @@ object JSFacade {
 
   trait JSConfig extends js.Object {
     val modelsForciblyInUse: js.UndefOr[js.Array[String]]
+    val discardRouteErrorModel: js.UndefOr[Boolean]
   }
 
   @JSExportTopLevel("run")
