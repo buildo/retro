@@ -15,7 +15,7 @@ object Metarpheus {
     val parsed = files.map(File(_).parse[Source].get)
     extractors
       .extractFullAPI(parsed = parsed)
-      .stripUnusedModels(config.modelsForciblyInUse)
+      .stripUnusedModels(config.modelsForciblyInUse, config.discardRouteErrorModels)
   }
 
 }
