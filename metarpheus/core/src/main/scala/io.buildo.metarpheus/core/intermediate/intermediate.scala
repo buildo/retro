@@ -82,7 +82,10 @@ object Route {
 
 case class API(models: List[Model], routes: List[Route]) {
 
-  def stripUnusedModels(modelsForciblyInUse: Set[String] = Set.empty): API = {
+  def stripUnusedModels(
+    modelsForciblyInUse: Set[String] = Set.empty,
+    discardRouteErrorModels: Boolean = false,
+  ): API = {
     val modelsInUse: Set[Type] = {
       routes.flatMap { route =>
         route.route.collect {
@@ -90,7 +93,7 @@ case class API(models: List[Model], routes: List[Route]) {
         } ++
           route.params.map(_.tpe) ++
           List(route.returns) ++
-          route.error.toList ++
+          (if (discardRouteErrorModels) Nil else route.error.toList) ++
           route.body.map(b => List(b.tpe)).getOrElse(Nil)
       }
     }.toSet

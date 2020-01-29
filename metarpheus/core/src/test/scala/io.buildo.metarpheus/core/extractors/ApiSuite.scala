@@ -30,6 +30,16 @@ class ApiSuite extends FunSuite {
     }.isDefined)
 
     assert(api.models.collectFirst {
+      case TaggedUnion(
+          "CreateCampingError",
+          _,
+          _,
+          _,
+          ) =>
+        ()
+    }.isDefined)
+
+    assert(api.models.collectFirst {
       case CaseClass(
           "IgnoreMe",
           _,
@@ -42,4 +52,32 @@ class ApiSuite extends FunSuite {
     }.isEmpty)
   }
 
+  test("extract used models, discarding error models") {
+    import intermediate._
+
+    val api = extractFullAPI(parsed)
+      .stripUnusedModels(Common.modelsForciblyInUse, discardRouteErrorModels = true)
+
+    assert(api.models.collectFirst {
+      case TaggedUnion(
+          "CreateCampingError",
+          _,
+          _,
+          _,
+          ) =>
+        ()
+    }.isEmpty)
+
+    assert(api.models.collectFirst {
+      case CaseClass(
+          "Camping",
+          _,
+          _,
+          _,
+          _,
+          _,
+          ) =>
+        ()
+    }.isDefined)
+  }
 }
