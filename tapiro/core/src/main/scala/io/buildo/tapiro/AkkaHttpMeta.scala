@@ -19,9 +19,6 @@ object AkkaHttpMeta {
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
-      import cats.effect._
-      import cats.implicits._
-      import cats.data.NonEmptyList
       import sttp.tapir.server.akkahttp._
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import akka.http.scaladsl.server._
