@@ -19,6 +19,8 @@ object Meta {
           route.body.map(_.tpe) :+
           route.returns)
     }.distinct
+    //no json codec for Unit in tapir
+      .filter(t => typeName(t) != "Unit")
       .map(toScalametaType)
       ++ taggedUnionErrorMembers(routes))
       .map(t => t"JsonCodec[$t]")
