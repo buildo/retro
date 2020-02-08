@@ -73,7 +73,7 @@ object Dependencies {
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
   val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
-  val diff = "ai.x" %% "diff" % "2.0"
+  val diff = "ai.x" %% "diff" % "2.0.1"
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
