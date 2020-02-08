@@ -19,7 +19,7 @@ object Dependencies {
     val catsEffect = "1.3.0"
     val monixCatnap = "3.0.0-RC2"
     val config = "1.3.0"
-    val scalacacheGuava = "0.9.3"
+    val scalacacheGuava = "0.9.4"
     val scalaLogging = "3.8.0"
     val logback = "1.2.3"
     val leveldb = "1.8"
