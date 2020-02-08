@@ -13,7 +13,7 @@ object Dependencies {
     val akka = "2.5.18"
     val akkaHttp = "10.1.3"
     val akkaPersistence = "2.5.15.1"
-    val akkaHttpCirce = "1.25.2"
+    val akkaHttpCirce = "1.31.0"
     val awscala = "0.5.+"
     val cats = "1.6.0"
     val catsEffect = "1.3.0"
