@@ -48,6 +48,6 @@ object ScalaSettingPlugin extends AutoPlugin {
           compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
       }
     },
-    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary))
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.3").cross(CrossVersion.binary))
   )
 }
