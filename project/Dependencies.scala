@@ -8,7 +8,7 @@ object Dependencies {
     val circe = "0.12.0-M1"
     val scalatest = "3.0.5"
     val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.2.2"
+    val scalacheckMagnolia = "0.3.1"
     val mockito = "1.9.5"
     val akka = "2.5.18"
     val akkaHttp = "10.1.3"
