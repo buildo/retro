@@ -35,7 +35,7 @@ object Dependencies {
     val scalameta = "4.1.10"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
-    val pprint = "0.5.5"
+    val pprint = "0.5.9"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
