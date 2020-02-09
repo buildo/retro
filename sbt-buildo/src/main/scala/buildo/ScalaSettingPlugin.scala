@@ -11,7 +11,7 @@ object ScalaSettingPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] = baseSettings
 
   lazy val baseBuildSettings: Seq[Def.Setting[_]] = Seq(
-    organization := "io.buildo"
+    organization := "io.buildo",
   )
 
   def crossFlags(scalaVersion: String): Seq[String] =
@@ -38,7 +38,7 @@ object ScalaSettingPlugin extends AutoPlugin {
       "-Ywarn-value-discard",
       "-Ywarn-unused",
       "-Ywarn-unused-import",
-      "-Yrangepos"
+      "-Yrangepos",
     ) ++ crossFlags(scalaVersion.value),
     resolvers += Resolver.jcenterRepo,
     libraryDependencies ++= {
@@ -48,6 +48,6 @@ object ScalaSettingPlugin extends AutoPlugin {
           compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)) :: Nil
       }
     },
-    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.10.3").cross(CrossVersion.binary))
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.11.0").cross(CrossVersion.full)),
   )
 }
