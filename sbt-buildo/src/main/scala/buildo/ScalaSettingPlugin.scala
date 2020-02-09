@@ -16,9 +16,9 @@ object ScalaSettingPlugin extends AutoPlugin {
 
   def crossFlags(scalaVersion: String): Seq[String] =
     CrossVersion.partialVersion(scalaVersion) match {
-      case Some((2, 11)) => Seq("-Yinline-warnings", "-Ypartial-unification", "-Xfuture")
-      case Some((2, 12)) => Seq("-opt-warnings", "-Ypartial-unification", "-Xfuture")
-      case Some((2, 13)) => Seq("-Ymacro-annotations")
+      case Some((2, 12)) =>
+        Seq("-opt-warnings", "-Ypartial-unification", "-Xfuture", "-Ywarn-unused-import")
+      case Some((2, 13)) => Seq("-Ymacro-annotations", "-Ywarn-unused:imports")
       case _             => Nil
     }
 
@@ -37,7 +37,6 @@ object ScalaSettingPlugin extends AutoPlugin {
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
       "-Ywarn-unused",
-      "-Ywarn-unused-import",
       "-Yrangepos",
     ) ++ crossFlags(scalaVersion.value),
     resolvers += Resolver.jcenterRepo,
