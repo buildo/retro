@@ -1,4 +1,4 @@
-addSbtPlugin("io.buildo" %% "sbt-buildo" % "0.11.4")
+addSbtPlugin("io.buildo" %% "sbt-buildo" % "0.11.5")
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.1.1")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.26")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.14.0")
