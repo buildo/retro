@@ -23,7 +23,7 @@ export IVY_PATH="$PWD/.ivy2"
 docker-compose -f retro/toctoc/ci/docker-compose.yml up -d
 
 # Run the tests inside the tests container
-docker exec -it tests bash -c 'cd /project && sbt ";toctocSlickPostgreSql/test; toctocSlickMySql/test"'
+docker exec -it tests bash -c 'cd /project && sbt -batch ";toctocSlickPostgreSql/test; toctocSlickMySql/test"'
 
 # Cleanup
 docker-compose -f retro/toctoc/ci/docker-compose.yml down
