@@ -144,8 +144,9 @@ object TapirMeta {
       },
     )
 
-  private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) =>
-    Term.Apply(
+  private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) => {
+    if (typeNameString(returnType) == "Unit") endpoint
+    else Term.Apply(
       Term.Select(endpoint, Term.Name("out")),
       List(
         Term.ApplyType(
@@ -154,6 +155,7 @@ object TapirMeta {
         ),
       ),
     )
+  }
 
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
     val noDesc =
