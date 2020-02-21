@@ -3,7 +3,6 @@ package io.buildo.tapiro
 import sbt._
 import sbt.Keys._
 import sbt.plugins.JvmPlugin
-import cats.data.NonEmptyList
 
 object SbtTapiro extends AutoPlugin {
 
@@ -13,17 +12,17 @@ object SbtTapiro extends AutoPlugin {
   object autoImport {
     val tapiro = taskKey[Unit]("Generate tapir endpoints from controller sources")
     val tapiroRoutesPaths =
-      settingKey[NonEmptyList[String]]("Paths to the controllers describing the routes")
+      settingKey[List[String]]("Paths to the controllers describing the routes")
     val tapiroModelsPaths = settingKey[List[String]]("Paths to the models used by the controllers")
     val tapiroOutputPath = settingKey[String]("Path to output generated endpoints")
-    val tapiroEndpointsPackages = settingKey[NonEmptyList[String]]("Packages of generate endpoints")
+    val tapiroEndpointsPackages = settingKey[List[String]]("Packages of generate endpoints")
     val tapiroServer = settingKey[Server]("For which server generate models (akka-http, http4s...)")
   }
 
   import autoImport._
 
   override val globalSettings = Seq(
-    tapiro / tapiroRoutesPaths := NonEmptyList("", Nil),
+    tapiro / tapiroRoutesPaths := Nil,
     tapiro / tapiroModelsPaths := Nil,
     tapiro / tapiroOutputPath := "",
     tapiro / tapiroServer := Server.Http4s,
