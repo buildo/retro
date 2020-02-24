@@ -18,7 +18,7 @@ import cats.data.NonEmptyList
 
 import MetarpheusHelper._
 
-import com.typesafe.scalalogging.LazyLogging
+import sbt.internal.util.ManagedLogger
 
 sealed trait Server
 object Server {
@@ -35,7 +35,7 @@ object TapiroRouteError {
 
 case class TapiroRoute(route: Route, error: TapiroRouteError)
 
-object Util extends LazyLogging {
+class Util(logger: ManagedLogger) {
   import Formatter.format
 
   def createFiles(
