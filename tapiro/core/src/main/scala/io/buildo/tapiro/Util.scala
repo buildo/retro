@@ -18,6 +18,8 @@ import cats.data.NonEmptyList
 
 import MetarpheusHelper._
 
+import com.typesafe.scalalogging.LazyLogging
+
 sealed trait Server
 object Server {
   case object AkkaHttp extends Server
@@ -33,64 +35,68 @@ object TapiroRouteError {
 
 case class TapiroRoute(route: Route, error: TapiroRouteError)
 
-object Util {
+object Util extends LazyLogging {
   import Formatter.format
 
   def createFiles(
-    routesPaths: NonEmptyList[String],
+    routesPaths: List[String],
     modelsPaths: List[String],
     outputPath: String,
-    `package`: NonEmptyList[String],
+    `package`: List[String],
     server: Server,
   ) = {
-    val config = Config(Set.empty)
-    val models = Metarpheus.run(modelsPaths, config).models
-    val routes: List[TapiroRoute] = Metarpheus.run(routesPaths.toList, config).routes.map { route =>
-      TapiroRoute(route, routeError(route, models))
-    }
-    val controllersRoutes =
-      routes.groupBy(
-        route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
-      )
-    val modelsPackages = models.map {
-      case c: CaseClass   => c.`package`
-      case c: CaseEnum    => c.`package`
-      case t: TaggedUnion => t.`package`
-    }.collect {
-      case head :: tail => NonEmptyList(head, tail)
-    }
-    controllersRoutes.foreach {
-      case (controllerName, routes) =>
-        val endpointsName = s"${controllerName}Endpoints"
-        val tapirEndpoints = createTapirEndpoints(endpointsName, routes, `package`, modelsPackages)
-        writeToFile(outputPath, tapirEndpoints, endpointsName)
-
-        server match {
-          case Server.Http4s =>
-            val http4sEndpoints =
-              createHttp4sEndpoints(
-                `package`,
-                controllerName,
-                endpointsName,
-                modelsPackages,
-                routes,
-              )
-            http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
-          case Server.AkkaHttp =>
-            val akkaHttpEndpoints =
-              createAkkaHttpEndpoints(
-                `package`,
-                controllerName,
-                endpointsName,
-                modelsPackages,
-                routes,
-              )
-            akkaHttpEndpoints.foreach(
-              writeToFile(outputPath, _, s"${controllerName}AkkaHttpEndpoints"),
-            )
-          case Server.NoServer => ()
+    NonEmptyList.fromList(`package`) match {
+      case Some(nonEmptyPackage) =>
+        val config = Config(Set.empty)
+        val models = Metarpheus.run(modelsPaths, config).models
+        val routes: List[TapiroRoute] = Metarpheus.run(routesPaths, config).routes.map { route =>
+          TapiroRoute(route, routeError(route, models))
         }
-    }
+        val controllersRoutes =
+          routes.groupBy(
+            route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
+          )
+        val modelsPackages = models.map {
+          case c: CaseClass   => c.`package`
+          case c: CaseEnum    => c.`package`
+          case t: TaggedUnion => t.`package`
+        }.collect {
+          case head :: tail => NonEmptyList(head, tail)
+        }
+        controllersRoutes.foreach {
+          case (controllerName, routes) =>
+            val endpointsName = s"${controllerName}Endpoints"
+            val tapirEndpoints = createTapirEndpoints(endpointsName, routes, nonEmptyPackage, modelsPackages)
+            writeToFile(outputPath, tapirEndpoints, endpointsName)
+
+            server match {
+              case Server.Http4s =>
+                val http4sEndpoints =
+                  createHttp4sEndpoints(
+                    nonEmptyPackage,
+                    controllerName,
+                    endpointsName,
+                    modelsPackages,
+                    routes,
+                  )
+                http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+              case Server.AkkaHttp =>
+                val akkaHttpEndpoints =
+                  createAkkaHttpEndpoints(
+                    nonEmptyPackage,
+                    controllerName,
+                    endpointsName,
+                    modelsPackages,
+                    routes,
+                  )
+                akkaHttpEndpoints.foreach(
+                  writeToFile(outputPath, _, s"${controllerName}AkkaHttpEndpoints"),
+                )
+              case Server.NoServer => ()
+            }
+        }
+      case None => logger.error("please provide a package to tapiro")
+      }
   }
 
   private[this] def createTapirEndpoints(
@@ -179,7 +185,7 @@ object Util {
       Files.createDirectories(endpointsPath.getParent)
       Files.write(endpointsPath, (disclaimer + endpoints).getBytes)
 
-      println(s"generated tapir file ${endpointsPath.toAbsolutePath} 🤖")
+      logger.info(s"generated tapir file ${endpointsPath.toAbsolutePath} 🤖")
     } catch {
       case NonFatal(e) => e.printStackTrace()
     }

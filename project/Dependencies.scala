@@ -183,6 +183,8 @@ object Dependencies {
     scalameta,
     scalafmtCore,
     circeCore,
+    logback,
+    scalaLogging,
     pprint
   )
 
