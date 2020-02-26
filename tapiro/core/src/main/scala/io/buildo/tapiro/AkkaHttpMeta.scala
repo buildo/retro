@@ -33,10 +33,10 @@ object AkkaHttpMeta {
     """
   }
 
-  val routes = (head: Route, tail: List[Route]) => {
+  val routes = (controllerName: Lit.String, head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    q"List(..$rest).foldLeft[Route]($first)(_ ~ _)"
+    q"pathPrefix($controllerName) { List(..$rest).foldLeft[Route]($first)(_ ~ _) }"
   }
 
   val endpoints = (routes: List[Route]) =>

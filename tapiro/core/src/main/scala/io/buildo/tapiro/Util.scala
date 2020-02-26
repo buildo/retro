@@ -136,7 +136,7 @@ class Util(logger: ManagedLogger) {
               Term.Name(endpointsName),
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(routes),
-              Http4sMeta.routes(head, tail),
+              Http4sMeta.routes(Lit.String(controllerName), head, tail),
             ),
           ),
         )
@@ -163,7 +163,7 @@ class Util(logger: ManagedLogger) {
               Term.Name(endpointsName),
               Meta.codecsImplicits(tapiroRoutes),
               AkkaHttpMeta.endpoints(routes),
-              AkkaHttpMeta.routes(head, tail),
+              AkkaHttpMeta.routes(Lit.String(controllerName), head, tail),
             ),
           ),
         )
