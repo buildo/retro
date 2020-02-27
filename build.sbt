@@ -182,6 +182,8 @@ lazy val docs = project
       "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
       "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`).value,
       "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
+      "SBT_TAPIRO_SNAPSHOT_VERSION" -> version.in(`sbt-tapiro`).value,
+      "SBT_TAPIRO_STABLE_VERSION" -> version.in(`sbt-tapiro`).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)

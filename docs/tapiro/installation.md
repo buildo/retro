@@ -12,7 +12,7 @@ title: Installation
 To start using `sbt-tapiro` simply add this line in `project/plugins.sbt`
 
 ```scala
-addSbtPlugin("io.buildo" %% "sbt-tapiro" % "@SBT_BUILDO_STABLE_VERSION@")
+addSbtPlugin("io.buildo" %% "sbt-tapiro" % "@SBT_TAPIRO_STABLE_VERSION@")
 ```
 
 ### Snapshot releases
@@ -23,7 +23,7 @@ The latest snapshot version is `@SBT_BUILDO_SNAPSHOT_VERSION@` and you can use
 it to try the latest unreleased features. For example:
 
 ```scala
-addSbtPlugin("io.buildo" %% "sbt-tapiro" % "@SBT_BUILDO_SNAPSHOT_VERSION@")
+addSbtPlugin("io.buildo" %% "sbt-tapiro" % "@SBT_TAPIRO_SNAPSHOT_VERSION@")
 resolvers += Resolver.sonatypeRepo("snapshots")
 ```
 
