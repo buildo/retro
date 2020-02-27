@@ -36,7 +36,7 @@ object Dependencies {
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.9"
-    val sbtLogging = "1.3.2"
+    val sbtLogging = "1.3.3"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
