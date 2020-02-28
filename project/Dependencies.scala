@@ -193,6 +193,7 @@ object Dependencies {
 
   val docsDependencies = List(
     plantuml,
+    tapir
   )
 
 }
