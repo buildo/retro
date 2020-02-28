@@ -55,7 +55,7 @@ An `AuthToken` type argument is expected in each controller and is added as auth
 
 `trait Cats[F[_], AuthToken]`
 
-The acutal implementation of the `AuthToken` is left to the user. All tapiro requires is a proper tapir `PlainCodec` such as:
+The actual implementation of the `AuthToken` is left to the user. All tapiro requires is a proper tapir `PlainCodec` such as:
 
 ```scala mdoc
 import sttp.tapir._
