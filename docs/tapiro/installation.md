@@ -3,7 +3,7 @@ id: installation
 title: Installation
 ---
 
-`tapiro` can be installed as an sbt-plugin.
+`tapiro` can be installed as an Sbt plugin.
 
 `sbt-tapiro` is an Sbt plugin that uses `tapiro` to generate http/json routes parsing scala traits definitions.
 
