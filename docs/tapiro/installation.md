@@ -46,20 +46,7 @@ lazy val application = project
 
 You can now run it with `sbt application/tapiro`.
 
-In order to use `tapiro` you also need to add the macro paradise plugin (for
-Scala 2.12) or to enable the `-Ymacro-annotations` compiler flag (for Scala
-2.13).
-
-> 💡**PROTIP**: This is done automatically for you if you use `sbt-buildo`
-
 ```scala
-// Scala 2.12
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
-
-// Scala 2.13
-scalacOptions += "-Ymacro-annotations"
-```
-
 ## Dependencies
 
 The generated code comes with library dependencies.
