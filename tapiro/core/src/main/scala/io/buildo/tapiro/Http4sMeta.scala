@@ -23,6 +23,7 @@ object Http4sMeta {
       import cats.implicits._
       import cats.data.NonEmptyList
       import org.http4s._
+      import org.http4s.server.Router
       import sttp.tapir.server.http4s._
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
 
@@ -35,10 +36,10 @@ object Http4sMeta {
     """
   }
 
-  val routes = (head: Route, tail: List[Route]) => {
+  val routes = (controllerName: Lit.String, head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    q"NonEmptyList($first, List(..$rest)).reduceK"
+    q"Router($controllerName -> NonEmptyList($first, List(..$rest)).reduceK)"
   }
 
   val endpoints = (routes: List[Route]) =>

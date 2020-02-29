@@ -8,8 +8,8 @@ object Dependencies {
     val circe = "0.12.0-M1"
     val scalatest = "3.0.5"
     val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.2.2"
-    val mockito = "1.10.19"
+    val scalacheckMagnolia = "0.3.2"
+    val mockito = "1.9.5"
     val akka = "2.5.18"
     val akkaHttp = "10.1.3"
     val akkaPersistence = "2.5.15.1"
@@ -35,7 +35,8 @@ object Dependencies {
     val scalameta = "4.1.10"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
-    val pprint = "0.5.5"
+    val pprint = "0.5.9"
+    val sbtLogging = "1.3.3"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -78,6 +79,7 @@ object Dependencies {
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
   val pprint = "com.lihaoyi" %% "pprint" % V.pprint
+  val sbtLogging = "org.scala-sbt" %% "util-logging" % V.sbtLogging
 
   val enumeroDependencies = List(
     scalatest,
@@ -180,6 +182,7 @@ object Dependencies {
   )
 
   val tapiroCoreDependencies = List(
+    sbtLogging,
     scalameta,
     scalafmtCore,
     circeCore,
