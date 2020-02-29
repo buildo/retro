@@ -27,8 +27,8 @@ lazy val root = (project in file("."))
       "io.circe" %% "circe-parser",
     ).map(_ % circeVersion),
     tapiro / tapiroModelsPaths := List(""),
-    tapiro / tapiroRoutesPaths := NonEmptyList("", Nil),
+    tapiro / tapiroRoutesPaths := List(""),
     tapiro / tapiroOutputPath := "endpoints",
-    tapiro / tapiroEndpointsPackages := NonEmptyList("endpoints", Nil),
+    tapiro / tapiroEndpointsPackages := List("endpoints"),
     tapiro / tapiroServer := Server.Http4s,
   )
