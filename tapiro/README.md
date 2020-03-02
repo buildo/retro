@@ -7,7 +7,13 @@ Run `sbt assembly`
 
 ## How to use
 
-`java -jar tapiro.jar -f {input metarpheus path} -t {endpoint file path} -p {module_package}`
+`java -jar tapiro.jar -f FROM -t TO -p PACKAGE`
+
+where
+
+* `FROM` is the absolute or relative path to the Scala sources
+* `TO` is the absolute or relative path where tapiro outputs Scala code
+* `PACKAGE` is the package name tapiro output code belongs to
 
 ## Example
 
