@@ -32,6 +32,8 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 To use the code generator, you need to add this to your `build.sbt`.
 
 ```scala
+import _root_.io.buildo.tapiro.Server
+
 lazy val application = project
   .settings(
     libraryDependencies ++= applicationDependencies ++ tapiroDependencies,
