@@ -14,7 +14,7 @@ Here is a checklist of what you need to do:
     `trait AccountController` -> `trait AccountController[AuthToken]`
 4. Modify controllers so that wiro `Auth` is replaced with AuthToken and move as last argument
     `def read(token: Auth, arg: Int)` -> `def read(arg: Int, token: AuthToken)`
-5. Add **/*Endpoints.scala linguist-generated to repository's .gitattributes to hide tapiro generated code from github diff's
+5. Add `**/*Endpoints.scala linguist-generated` to repository's `.gitattributes` to hide tapiro generated code from github diff's
 6. Add required codecs
 This is a valid codec for wiro.Auth:
 
