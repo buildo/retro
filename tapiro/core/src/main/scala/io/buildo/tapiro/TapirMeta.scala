@@ -116,19 +116,22 @@ object TapirMeta {
 
   private[this] val withError =
     (endpoints: meta.Term, routeError: TapiroRouteError) =>
-      Term.Apply(
-        Term.Select(endpoints, Term.Name("errorOut")),
-        List(
-          routeError match {
-            case TapiroRouteError.TaggedUnionError(taggedUnion) =>
-              listErrors(taggedUnion)
-            case TapiroRouteError.OtherError(MetarpheusType.Name("String")) =>
-              Term.Name("stringBody")
-            case TapiroRouteError.OtherError(t) =>
-              Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
-          },
-        ),
-      )
+      routeError match {
+        case TapiroRouteError.OtherError(t) if typeNameString(t) == "Unit" => endpoints
+        case _ => Term.Apply(
+          Term.Select(endpoints, Term.Name("errorOut")),
+          List(
+            routeError match {
+              case TapiroRouteError.TaggedUnionError(taggedUnion) =>
+                listErrors(taggedUnion)
+              case TapiroRouteError.OtherError(MetarpheusType.Name("String")) =>
+                Term.Name("stringBody")
+              case TapiroRouteError.OtherError(t) =>
+                Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
+            },
+          ),
+        )
+      }
 
   private[this] val listErrors = (taggedUnion: TaggedUnion) =>
     Term.Apply(
