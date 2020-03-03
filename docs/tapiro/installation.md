@@ -19,7 +19,7 @@ addSbtPlugin("io.buildo" %% "sbt-tapiro" % "@SBT_TAPIRO_STABLE_VERSION@")
 
 We publish a snapshot version on every merge on master.
 
-The latest snapshot version is `@SBT_BUILDO_SNAPSHOT_VERSION@` and you can use
+The latest snapshot version is `@SBT_TAPIRO_SNAPSHOT_VERSION@` and you can use
 it to try the latest unreleased features. For example:
 
 ```scala
