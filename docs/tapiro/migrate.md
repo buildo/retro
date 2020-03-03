@@ -11,7 +11,7 @@ Here is a checklist of what you need to do:
 1. Install the plugin (as described in the [guide](installation.md))
 2. Configure your `build.sbt` (as described in the [guide](installation.md))
 3. Add `AuthToken` type parameter to controllers
-    `trait AccountController` -> `trait AccountController[AuthToken]`
+    `trait AccountController[F]` -> `trait AccountController[F[_], AuthToken]`
 4. Modify controllers so that wiro `Auth` is replaced with AuthToken and move as last argument
     `def read(token: Auth, arg: Int)` -> `def read(arg: Int, token: AuthToken)`
 5. Add `**/*Endpoints.scala linguist-generated` to repository's `.gitattributes` to automatically collapse tapiro generated code in GitHub diffs
