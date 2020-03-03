@@ -82,6 +82,9 @@ object Dependencies {
   val pprint = "com.lihaoyi" %% "pprint" % V.pprint
   val sbtLogging = "org.scala-sbt" %% "util-logging" % V.sbtLogging
   val tapir = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
+  val tapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.tapir
+  val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
+  val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
 
   val enumeroDependencies = List(
     scalatest,
@@ -193,7 +196,10 @@ object Dependencies {
 
   val docsDependencies = List(
     plantuml,
-    tapir
+    tapir,
+    tapirJsonCirce,
+    tapirCore,
+    tapirHttp4s
   )
 
 }
