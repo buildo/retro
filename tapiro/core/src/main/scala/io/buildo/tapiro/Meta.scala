@@ -21,6 +21,7 @@ object Meta {
     }.distinct
     //no json codec for Unit in tapir
       .filter(t => typeNameString(t) != "Unit")
+      .filter(t => typeNameString(t) != "AuthToken")
       .map(toScalametaType)
       ++ taggedUnionErrorMembers(routes))
       .map(t => t"JsonCodec[$t]")
