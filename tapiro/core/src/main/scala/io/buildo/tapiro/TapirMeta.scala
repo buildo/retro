@@ -147,18 +147,26 @@ object TapirMeta {
       },
     )
 
-  private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) => {
-    if (typeNameString(returnType) == "Unit") endpoint
-    else Term.Apply(
-      Term.Select(endpoint, Term.Name("out")),
-      List(
-        Term.ApplyType(
-          Term.Name("jsonBody"),
-          List(toScalametaType(returnType)),
-        ),
-      ),
-    )
-  }
+  private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) =>
+    typeNameString(returnType) match {
+      case "Unit" =>
+        endpoint
+      case "String" =>
+        Term.Apply(
+          Term.Select(endpoint, Term.Name("out")),
+          List(Term.Name("stringBody")),
+        )
+      case _ =>
+        Term.Apply(
+          Term.Select(endpoint, Term.Name("out")),
+          List(
+            Term.ApplyType(
+              Term.Name("jsonBody"),
+              List(toScalametaType(returnType)),
+            ),
+          ),
+        )
+    }
 
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
     val noDesc =

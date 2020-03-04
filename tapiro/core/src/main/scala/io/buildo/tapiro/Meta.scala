@@ -19,8 +19,8 @@ object Meta {
           route.body.map(_.tpe) :+
           route.returns)
     }.distinct
-    //no json codec for Unit, AuthToken in tapir
-      .filter(t => typeNameString(t) != "Unit")
+      .filter(t => typeNameString(t) != "Unit") //no json codec for Unit in tapir
+      .filter(t => typeNameString(t) != "String")
       .filter(t => typeNameString(t) != "AuthToken")
       .map(toScalametaType)
       ++ taggedUnionErrorMembers(routes))
