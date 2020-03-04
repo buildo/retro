@@ -19,14 +19,16 @@ object Meta {
           route.body.map(_.tpe) :+
           route.returns)
     }.distinct
-    //no json codec for Unit in tapir
+    //no json codec for Unit, AuthToken in tapir
       .filter(t => typeNameString(t) != "Unit")
+      .filter(t => typeNameString(t) != "AuthToken")
       .map(toScalametaType)
       ++ taggedUnionErrorMembers(routes))
       .map(t => t"JsonCodec[$t]")
     val plainCodecs = routes.flatMap {
       case TapiroRoute(route, _) =>
-        (if (route.method == "get") route.params.map(_.tpe) else Nil)
+        (if (route.method == "get") route.params.map(_.tpe) else Nil) ++
+          route.params.map(_.tpe).filter(typeNameString(_) == "AuthToken")
     }.distinct.map(t => t"PlainCodec[${toScalametaType(t)}]")
     val codecs = jsonCodecs ++ plainCodecs
     codecs.zipWithIndex.map(toImplicitParam.tupled)
