@@ -56,9 +56,9 @@ The generated code comes with library dependencies.
 In case akka-http version is used:
 ```scala
 val V = new {
-  val circe = "0.9.1"
-  val tapir = "0.12.19"
-  val akkaHttp = "10.1.11"
+  val circe = "@CIRCE_VERSION@"
+  val tapir = "@TAPIR_VERSION@"
+  val akkaHttp = "@AKKA_HTTP_VERSION@"
 }
 
 val tapiroDependencies = Seq(
@@ -74,8 +74,8 @@ In case http4s is used:
 
 ```scala
 val V = new {
-  val circe = "0.9.1"
-  val tapir = "0.12.19"
+  val circe = "@CIRCE_VERSION@"
+  val tapir = "@TAPIR_VERSION@"
 }
 
 val tapiroDependencies = Seq(

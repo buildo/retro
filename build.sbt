@@ -176,6 +176,9 @@ lazy val docs = project
     moduleName := "retro-docs",
     libraryDependencies ++= docsDependencies,
     mdocVariables := Map(
+      "CIRCE_VERSION" -> V.circe,
+      "AKKA_HTTP_VERSION" -> V.akkaHttp,
+      "TAPIR_VERSION" -> V.tapir,
       "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
       "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value,
