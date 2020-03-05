@@ -36,9 +36,13 @@ Here you have an example implementation of the `Cats` controller definied in the
 ```scala mdoc
 import cats.effect._
 
-class CatsImpl[F[_]](implicit F: Sync[F]) extends Cats[F, String] {
-  override def findCutestCat(): F[Either[Error, Cat]] = F.delay(Right(Cat("Cheshire")))
-  override def doSomethingWithTheCat(catId: Int, token: String): F[Either[Error, Unit]] = F.delay(Right(()))
+object Cats {
+  def create[F[_]](implicit F: Sync[F]) = new Cats[F, String] {
+    override def findCutestCat(): F[Either[Error, Cat]] =
+      F.delay(Right(Cat("Cheshire")))
+    override def doSomethingWithTheCat(catId: Int, token: String): F[Either[Error, Unit]] =
+      F.delay(Right(()))
+  }
 }
 
 
