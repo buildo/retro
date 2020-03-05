@@ -68,7 +68,7 @@ import org.http4s.implicits._
 import cats.implicits._
 
 object Main extends IOApp {
-  val catsImpl = new CatsImpl[IO]()
+  val catsImpl = CatsImpl.create[IO]
   val routes = CatsHttp4sEndpoints.routes(catsImpl)
 
   override def run(args: List[String]): IO[ExitCode] =
