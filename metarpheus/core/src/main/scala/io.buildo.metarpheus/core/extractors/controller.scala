@@ -76,6 +76,9 @@ package object controller {
         tpeToIntermediate(tpe)
     }.headOption
 
+  private[this] def extractTraitType(t: Defn.Trait): intermediate.Type =
+    intermediate.Type.Apply(t.name.value, t.tparams.map(typeParamToIntermediate))
+
   def extractAllRoutes(source: Source): List[intermediate.Route] =
     source.collect { case t: Defn.Trait => t }.flatMap(t => extractRoute(source, t))
 
