@@ -24,7 +24,7 @@ object Dependencies {
     val logback = "1.2.3"
     val leveldb = "1.8"
     val mailin = "3.0.1"
-    val jakartaMail = "1.6.3"
+    val jakartaMail = "1.6.5"
     val slick = "3.3.2"
     val postgresql = "42.2.11"
     val mysql = "8.0.19"
