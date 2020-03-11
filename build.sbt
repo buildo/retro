@@ -176,12 +176,17 @@ lazy val docs = project
     moduleName := "retro-docs",
     libraryDependencies ++= docsDependencies,
     mdocVariables := Map(
+      "CIRCE_VERSION" -> V.circe,
+      "AKKA_HTTP_VERSION" -> V.akkaHttp,
+      "TAPIR_VERSION" -> V.tapir,
       "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
       "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
       "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value,
       "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
       "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`).value,
       "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
+      "SBT_TAPIRO_SNAPSHOT_VERSION" -> version.in(`sbt-tapiro`).value,
+      "SBT_TAPIRO_STABLE_VERSION" -> version.in(`sbt-tapiro`).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)

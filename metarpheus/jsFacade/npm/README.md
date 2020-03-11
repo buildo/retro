@@ -11,6 +11,7 @@ where:
 - `paths` is a list of **absolute** paths to analyze (they can be files or directories)
 - `config` [optional] is a configuration with the following (optional) keys:
   - `modelsForciblyInUse`: a list of models that are included even if unused by the exposed API.
+  - `discardRouteErrorModels` (default `false`): set to `true` to discard models that are only used for route error types
 
 and `API` is an object composed by two fields:
 
