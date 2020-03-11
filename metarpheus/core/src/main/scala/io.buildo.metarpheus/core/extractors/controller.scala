@@ -114,15 +114,7 @@ package object controller {
         // whereas we want to support bodies composed by multiple parameters each with their own Type
         // We're moving towards removing this node completely and instead merging the body params with
         // params, flagging them with a new `inBody` property.
-        body = None,
-        ctrl = List(
-          // FIXME: well this is kind of a retrocompatibility hack
-          // When parsing the routes we use the actual name of the controller variable in scope
-          // whereas here's we're deriving it from the name of the trait. They should match in the
-          // usual case, nonetheless it may introduce some diffs when migrating a project to wiro
-          controllerName.substring(0, 1).toLowerCase() + controllerName.substring(1),
-          m.name.syntax,
-        ),
+        controllerType = extractTraitType(t),
         desc = desc,
         name = List(
           // FIXME: same as a above, for the time being we preserved the `controllerName.method`

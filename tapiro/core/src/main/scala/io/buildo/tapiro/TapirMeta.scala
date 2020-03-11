@@ -44,8 +44,7 @@ object TapirMeta {
 
   private[this] val endpointType = (route: TapiroRoute) => {
     val returnType = toScalametaType(route.route.returns)
-    val argsList = route.route.params.map(p => toScalametaType(p.tpe)) ++
-      route.route.body.map(b => toScalametaType(b.tpe))
+    val argsList = route.route.params.map(p => toScalametaType(p.tpe))
     val argsType = argsList match {
       case Nil         => Type.Name("Unit")
       case head :: Nil => head
