@@ -70,8 +70,7 @@ case class Route(
   authenticated: Boolean,
   returns: Type,
   error: Option[Type],
-  body: Option[Route.Body],
-  ctrl: List[String],
+  controllerType: Type,
   desc: Option[String],
   name: List[String],
 )
@@ -93,8 +92,7 @@ case class API(models: List[Model], routes: List[Route]) {
         } ++
           route.params.map(_.tpe) ++
           List(route.returns) ++
-          (if (discardRouteErrorModels) Nil else route.error.toList) ++
-          route.body.map(b => List(b.tpe)).getOrElse(Nil)
+          (if (discardRouteErrorModels) Nil else route.error.toList)
       }
     }.toSet
 

@@ -15,8 +15,7 @@ object Meta {
           (error match {
             case TapiroRouteError.OtherError(t) => List(t)
             case _                              => Nil
-          }) ++
-          route.body.map(_.tpe) :+
+          }) :+
           route.returns)
     }.distinct
     //no json codec for Unit in tapir
