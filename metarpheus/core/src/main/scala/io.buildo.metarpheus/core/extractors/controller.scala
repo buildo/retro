@@ -94,7 +94,7 @@ package object controller {
     val pathName = t.mods.collectFirst {
       case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => n
     }
-    val segmentPathName = pathName.getOrElse(t.name.value)
+    val pathPrefix = pathName.getOrElse(t.name.value)
 
     methods.map { m =>
       val scaladoc = findRelatedComment(source, m)
@@ -104,7 +104,7 @@ package object controller {
       intermediate.Route(
         method = method,
         route = List(
-          intermediate.RouteSegment.String(segmentPathName),
+          intermediate.RouteSegment.String(pathPrefix),
           intermediate.RouteSegment.String(m.name.syntax),
         ),
         params = extractParams(m, paramsDesc, inBody = method == "post"),
