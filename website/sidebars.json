@@ -14,6 +14,14 @@
   "enumero": {
     "Getting started": ["enumero/introduction", "enumero/installation"]
   },
+  "tapiro": {
+    "Setup": ["tapiro/installation"],
+    "Getting started": [
+      "tapiro/introduction",
+      "tapiro/rpc",
+      "tapiro/migrate"
+    ]
+  },
   "sbt-buildo": {
     "Getting started": ["sbt-buildo/introduction"]
   },
