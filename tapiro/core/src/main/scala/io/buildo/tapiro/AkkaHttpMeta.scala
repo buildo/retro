@@ -15,7 +15,6 @@ object AkkaHttpMeta {
     routes: Term,
   ) => {
     val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken](statusCodes)"
-    val akkaHttpEndpointsName = Term.Name(s"${controllerName.syntax}AkkaHttpEndpoints")
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}

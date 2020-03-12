@@ -15,7 +15,6 @@ object Http4sMeta {
     routes: Term,
   ) => {
     val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken](statusCodes)"
-    val httpsEndpointsName = Term.Name(s"${controllerName.syntax}Http4sEndpoints")
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
