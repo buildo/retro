@@ -29,6 +29,7 @@ const siteConfig = {
     { doc: "toctoc/installation", label: "toctoc" },
     { doc: "enumero/introduction", label: "enumero" },
     { doc: "sbt-buildo/introduction", label: "sbt-buildo" },
+    { doc: "tapiro/introduction", label: "tapiro" },
     { search: true },
     { href: "https://github.com/buildo/retro", label: "GitHub", external: true }
   ],

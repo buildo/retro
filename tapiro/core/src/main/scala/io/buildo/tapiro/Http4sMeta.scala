@@ -39,7 +39,8 @@ object Http4sMeta {
   val routes = (controllerName: Lit.String, head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    q"Router($controllerName -> NonEmptyList($first, List(..$rest)).reduceK)"
+    val route: Lit.String = Lit.String("/" + controllerName.value)
+    q"Router($route -> NonEmptyList($first, List(..$rest)).reduceK)"
   }
 
   val endpoints = (routes: List[Route]) =>
