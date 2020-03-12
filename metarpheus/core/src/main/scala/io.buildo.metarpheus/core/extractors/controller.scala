@@ -90,9 +90,11 @@ package object controller {
         m
     }
 
-    val (controllerName, name) = t.mods.collectFirst {
-      case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => (t.name.value, n)
-    }.getOrElse((t.name.value, t.name.value))
+    val controllerName = t.name.value
+    val pathName = t.mods.collectFirst {
+      case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => n
+    }
+    val segmentPathName = pathName.getOrElse(t.name.value)
 
     methods.map { m =>
       val scaladoc = findRelatedComment(source, m)
@@ -102,18 +104,14 @@ package object controller {
       intermediate.Route(
         method = method,
         route = List(
-          intermediate.RouteSegment.String(name),
+          intermediate.RouteSegment.String(segmentPathName),
           intermediate.RouteSegment.String(m.name.syntax),
         ),
         params = extractParams(m, paramsDesc, inBody = method == "post"),
         authenticated = extractAuthenticated(m),
         returns = extractReturnType(m),
         error = extractErrorType(m),
-        // FIXME: this is the only case in which we don't preserve the retro-compatibility
-        // This is because intermediate.Body is too limiting as it assumes the body has a single Type
-        // whereas we want to support bodies composed by multiple parameters each with their own Type
-        // We're moving towards removing this node completely and instead merging the body params with
-        // params, flagging them with a new `inBody` property.
+        pathName = pathName,
         controllerType = extractTraitType(t),
         desc = desc,
         name = List(

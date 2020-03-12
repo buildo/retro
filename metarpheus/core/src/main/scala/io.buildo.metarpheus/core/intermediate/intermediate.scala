@@ -70,6 +70,7 @@ case class Route(
   authenticated: Boolean,
   returns: Type,
   error: Option[Type],
+  pathName: Option[String],
   controllerType: Type,
   desc: Option[String],
   name: List[String],
