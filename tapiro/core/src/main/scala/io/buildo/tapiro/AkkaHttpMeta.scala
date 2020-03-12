@@ -14,18 +14,19 @@ object AkkaHttpMeta {
     akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken]()"
+    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken](statusCodes)"
     val akkaHttpEndpointsName = Term.Name(s"${controllerName.syntax}AkkaHttpEndpoints")
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
       import sttp.tapir.server.akkahttp._
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
+      import sttp.model.StatusCode
       import akka.http.scaladsl.server._
       import akka.http.scaladsl.server.Directives._
 
       object $akkaHttpEndpointsName {
-        def routes[AuthToken](controller: $controllerName[AuthToken])(..$implicits): Route = {
+        def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode)(..$implicits): Route = {
           ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
       }

@@ -28,7 +28,7 @@ object TapirMeta {
       }
 
       object $name {
-        def create[AuthToken](statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits) = new ${Init(
+        def create[AuthToken](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
       Type.Name(name.value),
       Name.Anonymous(),
       Nil,
