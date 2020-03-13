@@ -10,7 +10,7 @@ object Dependencies {
     val scalacheck = "1.14.0"
     val scalacheckMagnolia = "0.3.2"
     val mockito = "1.9.5"
-    val akka = "2.5.18"
+    val akka = "2.5.30"
     val akkaHttp = "10.1.3"
     val akkaPersistence = "2.5.15.1"
     val akkaHttpCirce = "1.25.2"
@@ -24,10 +24,10 @@ object Dependencies {
     val logback = "1.2.3"
     val leveldb = "1.8"
     val mailin = "3.0.1"
-    val jakartaMail = "1.6.3"
-    val slick = "3.3.0"
-    val postgresql = "42.2.5"
-    val mysql = "8.0.15"
+    val jakartaMail = "1.6.5"
+    val slick = "3.3.2"
+    val postgresql = "42.2.11"
+    val mysql = "8.0.19"
     val ldap = "4.0.10"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
@@ -37,7 +37,7 @@ object Dependencies {
     val plantuml = "8059"
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
-    val tapir = "0.12.23"
+    val tapir = "0.12.24"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
