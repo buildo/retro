@@ -138,7 +138,7 @@
 
 <span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> authCodec: <span class="hljs-type">PlainCodec</span>[<span class="hljs-type">CustomAuth</span>] = <span class="hljs-type">Codec</span>.stringPlainCodecUtf8
   .mapDecode(decodeAuth)(encodeAuth)
-<span class="hljs-comment">// authCodec: PlainCodec[CustomAuth] = sttp.tapir.Codec$$anon$1@612c451f</span>
+<span class="hljs-comment">// authCodec: PlainCodec[CustomAuth] = sttp.tapir.Codec$$anon$1@6ab00fe</span>
 </code></pre>
 <p>The user will find the decoded token as the last argument of the method in the trait.</p>
 <pre><code class="hljs css language-scala"><span class="hljs-meta">@command</span> <span class="hljs-comment">//translate this to a POST</span>
