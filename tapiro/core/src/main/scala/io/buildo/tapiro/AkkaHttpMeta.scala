@@ -26,7 +26,7 @@ object AkkaHttpMeta {
       import akka.http.scaladsl.server.Directives._
 
       object $akkaHttpEndpointsName {
-        def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode)(..$implicits): Route = {
+        def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): Route = {
           ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
       }
