@@ -13,4 +13,5 @@ run:
   dir: retro
   path: sbt
   args:
+    - -batch
     - "; enumeroCore/test; enumeroCirce/test"

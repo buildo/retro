@@ -116,19 +116,22 @@ object TapirMeta {
 
   private[this] val withError =
     (endpoints: meta.Term, routeError: TapiroRouteError) =>
-      Term.Apply(
-        Term.Select(endpoints, Term.Name("errorOut")),
-        List(
-          routeError match {
-            case TapiroRouteError.TaggedUnionError(taggedUnion) =>
-              listErrors(taggedUnion)
-            case TapiroRouteError.OtherError(MetarpheusType.Name("String")) =>
-              Term.Name("stringBody")
-            case TapiroRouteError.OtherError(t) =>
-              Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
-          },
-        ),
-      )
+      routeError match {
+        case TapiroRouteError.OtherError(t) if typeNameString(t) == "Unit" => endpoints
+        case _ => Term.Apply(
+          Term.Select(endpoints, Term.Name("errorOut")),
+          List(
+            routeError match {
+              case TapiroRouteError.TaggedUnionError(taggedUnion) =>
+                listErrors(taggedUnion)
+              case TapiroRouteError.OtherError(MetarpheusType.Name("String")) =>
+                Term.Name("stringBody")
+              case TapiroRouteError.OtherError(t) =>
+                Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
+            },
+          ),
+        )
+      }
 
   private[this] val listErrors = (taggedUnion: TaggedUnion) =>
     Term.Apply(
@@ -145,15 +148,25 @@ object TapirMeta {
     )
 
   private[this] val withOutput = (endpoint: meta.Term, returnType: MetarpheusType) =>
-    Term.Apply(
-      Term.Select(endpoint, Term.Name("out")),
-      List(
-        Term.ApplyType(
-          Term.Name("jsonBody"),
-          List(toScalametaType(returnType)),
-        ),
-      ),
-    )
+    typeNameString(returnType) match {
+      case "Unit" =>
+        endpoint
+      case "String" =>
+        Term.Apply(
+          Term.Select(endpoint, Term.Name("out")),
+          List(Term.Name("stringBody")),
+        )
+      case _ =>
+        Term.Apply(
+          Term.Select(endpoint, Term.Name("out")),
+          List(
+            Term.ApplyType(
+              Term.Name("jsonBody"),
+              List(toScalametaType(returnType)),
+            ),
+          ),
+        )
+    }
 
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
     val noDesc =
