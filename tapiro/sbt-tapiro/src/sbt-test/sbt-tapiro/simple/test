@@ -1,4 +1,13 @@
 # check if endpoints gets created
 > tapiro
-$ exists "src/main/scala/endpoints/ControllerEndpoints.scala"
-$ exists "src/main/scala/endpoints/ControllerHttp4sEndpoints.scala"
+$ exists "src/main/scala/endpoints/ExampleControllerEndpoints.scala"
+$ exists "src/main/scala/endpoints/ExampleControllerHttp4sEndpoints.scala"
+
+# compile and start server
+> reStart
+> waitIsUp localhost:8080
+
+# check that the endpoints respond as expected
+# NOTE(gabro): the single quotes surrounding the commands are a workaround for https://github.com/sbt/sbt/issues/4870
+> 'curlExpect -s -X GET  localhost:8080/ExampleController/queryExample?intParam=1&stringParam=abc               {"name":"abc","double":1.0}'
+> 'curlExpect -s -X POST localhost:8080/ExampleController/commandExample -d "{\"name\":\"abc\",\"double\":1.0}" abc'
