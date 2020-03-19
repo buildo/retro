@@ -147,6 +147,7 @@ lazy val tapiroCore = project
     name := "tapiro-core",
     libraryDependencies ++= tapiroCoreDependencies,
     dynverTagPrefix := "tapiro-",
+    testFrameworks += new TestFramework("munit.Framework"),
   )
   .dependsOn(metarpheusCore.jvm)
 

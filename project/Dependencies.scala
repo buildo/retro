@@ -38,6 +38,7 @@ object Dependencies {
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
     val tapir = "0.12.24"
+    val munit = "0.6.0-M1"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -85,6 +86,8 @@ object Dependencies {
   val tapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.tapir
   val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
+  val munit = "org.scalameta" %% "munit" % V.munit
+  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.13.1"
 
   val enumeroDependencies = List(
     scalatest,
@@ -188,18 +191,21 @@ object Dependencies {
 
   val tapiroCoreDependencies = List(
     sbtLogging,
+    log4j,
     scalameta,
     scalafmtCore,
     circeCore,
-    pprint
-  )
+    pprint,
+  ) ++ List(
+    munit,
+  ).map(_ % Test)
 
   val docsDependencies = List(
     plantuml,
     tapir,
     tapirJsonCirce,
     tapirCore,
-    tapirHttp4s
+    tapirHttp4s,
   )
 
 }

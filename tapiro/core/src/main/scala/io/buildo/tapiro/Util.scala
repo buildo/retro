@@ -13,12 +13,9 @@ import scala.meta._
 import scala.util.control.NonFatal
 import java.nio.file.Paths
 import java.nio.file.Files
-
 import cats.data.NonEmptyList
-
 import MetarpheusHelper._
-
-import sbt.internal.util.ManagedLogger
+import org.apache.logging.log4j.LogManager
 
 sealed trait Server
 object Server {
@@ -35,8 +32,10 @@ object TapiroRouteError {
 
 case class TapiroRoute(route: Route, error: TapiroRouteError)
 
-class Util(logger: ManagedLogger) {
+class Util() {
   import Formatter.format
+
+  val logger = LogManager.getLogger("io.buildo.tapiro")
 
   def createFiles(
     routesPaths: List[String],
@@ -66,7 +65,8 @@ class Util(logger: ManagedLogger) {
         controllersRoutes.foreach {
           case (controllerName, routes) =>
             val endpointsName = s"${controllerName}Endpoints"
-            val tapirEndpoints = createTapirEndpoints(endpointsName, routes, nonEmptyPackage, modelsPackages)
+            val tapirEndpoints =
+              createTapirEndpoints(endpointsName, routes, nonEmptyPackage, modelsPackages)
             writeToFile(outputPath, tapirEndpoints, endpointsName)
 
             server match {
@@ -79,7 +79,9 @@ class Util(logger: ManagedLogger) {
                     modelsPackages,
                     routes,
                   )
-                http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+                http4sEndpoints.foreach(
+                  writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"),
+                )
               case Server.AkkaHttp =>
                 val akkaHttpEndpoints =
                   createAkkaHttpEndpoints(
@@ -95,8 +97,9 @@ class Util(logger: ManagedLogger) {
               case Server.NoServer => ()
             }
         }
-      case None => logger.error("please provide a package to tapiro")
-      }
+      case None =>
+        logger.error("please provide a package to tapiro")
+    }
   }
 
   private[this] def createTapirEndpoints(
