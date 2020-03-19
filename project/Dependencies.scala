@@ -88,7 +88,7 @@ object Dependencies {
   val munit = "org.scalameta" %% "munit" % V.munit
 
   val enumeroDependencies = List(
-    scalatest,
+    munit,
     mockito,
   ).map(_ % Test)
 
@@ -96,7 +96,7 @@ object Dependencies {
     circeCore,
   ) ++ List(
     circeParser,
-    scalatest,
+    munit,
   ).map(_ % Test)
 
   val mailoDependencies = List(

@@ -1,8 +1,6 @@
 import io.buildo.enumero.annotations.{enum, indexedEnum}
 
-import org.scalatest.{Matchers, WordSpec}
-
-class CaseEnumMacroSpec extends WordSpec with Matchers {
+class CaseEnumMacroSuite extends munit.FunSuite {
   @enum trait Planet {
     Mercury
     Venus
@@ -14,43 +12,39 @@ class CaseEnumMacroSpec extends WordSpec with Matchers {
     object Ale
   }
 
-  "@enum annotation" should {
-    "produce a valid CaseEnum-style ADT" in {
-      Planet.Earth shouldBe a[Product]
-      Planet.Earth shouldBe a[Serializable]
-      Planet.Earth shouldBe a[Planet]
-      Planet.Mercury should not be a[Planet.Earth.type]
-      Planet.Earth shouldBe Planet.Earth
-    }
+  test("@enum annotation should produce a valid CaseEnum-style ADT") {
+    assert(Planet.Earth.isInstanceOf[Product])
+    assert(Planet.Earth.isInstanceOf[Serializable])
+    assert(Planet.Earth.isInstanceOf[Planet])
+    assertEquals(Planet.Earth, Planet.Earth)
+  }
 
-    "produce a valid CaseEnum-style ADT (alternative syntax)" in {
-      Beer.Lager shouldBe a[Product]
-      Beer.Lager shouldBe a[Serializable]
-      Beer.Lager shouldBe a[Beer]
-      Beer.Ale should not be a[Beer.Lager.type]
-      Beer.Lager shouldBe Beer.Lager
-    }
+  test("@enum annotation should produce a valid CaseEnum-style ADT (alternative syntax)") {
+    assert(Beer.Lager.isInstanceOf[Product])
+    assert(Beer.Lager.isInstanceOf[Serializable])
+    assert(Beer.Lager.isInstanceOf[Beer])
+    assertEquals(Beer.Lager, Beer.Lager)
+  }
 
-    "allow accessing the values of the enumeration" in {
-      val typecheck: Set[Planet] = Planet.values
-      Planet.values shouldBe Set(Planet.Mercury, Planet.Venus, Planet.Earth)
-    }
+  test("@enum annotation should allow accessing the values of the enumeration") {
+    (Planet.values: Set[Planet]) // typecheck
+    assertEquals(Planet.values, Set(Planet.Mercury, Planet.Venus, Planet.Earth))
+  }
 
-    "allow printing / parsing the values of the enumeration" in {
-      Planet.caseFromString("Earth") shouldBe Some(Planet.Earth)
-      Planet.caseFromString("Nope") shouldBe None
-      Planet.caseToString(Planet.Earth) shouldBe "Earth"
-      "Planet.caseToString(Beer.Lager)" shouldNot typeCheck
-    }
+  test("@enum annotation should allow printing / parsing the values of the enumeration") {
+    assertEquals(Planet.caseFromString("Earth"), Option(Planet.Earth: Planet))
+    assertEquals(Planet.caseFromString("Nope"), None: Option[Planet])
+    assertEquals(Planet.caseToString(Planet.Earth), "Earth")
+    compileErrors("Planet.caseToString(Beer.Lager)")
+  }
 
-    "allow accessing the enumeration name" in {
-      Planet.name shouldBe "Planet"
-    }
+  test("@enum annotation should allow accessing the enumeration name") {
+    assertEquals(Planet.name, "Planet")
   }
 
 }
 
-class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
+class IndexedCaseEnumMacroSpec extends munit.FunSuite {
   @indexedEnum trait Planet {
     type Index = Int
     Mercury { 1 }
@@ -64,26 +58,24 @@ class IndexedCaseEnumMacroSpec extends WordSpec with Matchers {
     Ale { 2 }
   }
 
-  "@indexedEnum annotation" should {
-    "produce a valid IndexedCaseEnum-style ADT" in {
-      val typecheck: Int = 3: Planet#Index
-      Planet.Earth shouldBe a[Product]
-      Planet.Earth shouldBe a[Serializable]
-      Planet.Earth shouldBe a[Planet]
-      Planet.Mercury should not be a[Planet.Earth.type]
-      Planet.Earth shouldBe Planet.Earth
-      Planet.Earth.index shouldBe 3
-    }
+  test("@indexedEnum annotation should produce a valid IndexedCaseEnum-style ADT") {
+    val _: Int = 3: Planet#Index // typecheck
+    assert(Planet.Earth.isInstanceOf[Product])
+    assert(Planet.Earth.isInstanceOf[Serializable])
+    assert(Planet.Earth.isInstanceOf[Planet])
+    assertEquals(Planet.Earth, Planet.Earth)
+    assertEquals(Planet.Earth.index, 3)
+  }
 
-    "produce a valid IndexedCaseEnum-style ADT (alternative syntax)" in {
-      val typecheck: Int = 2: Planet#Index
-      Beer.Lager shouldBe a[Product]
-      Beer.Lager shouldBe a[Serializable]
-      Beer.Lager shouldBe a[Beer]
-      Beer.Ale should not be a[Beer.Lager.type]
-      Beer.Lager shouldBe Beer.Lager
-      Beer.Ale.index shouldBe 2
-    }
+  test(
+    "@indexedEnum annotation should produce a valid IndexedCaseEnum-style ADT (alternative syntax)",
+  ) {
+    val _: Int = 2: Planet#Index // typecheck
+    assert(Beer.Lager.isInstanceOf[Product])
+    assert(Beer.Lager.isInstanceOf[Serializable])
+    assert(Beer.Lager.isInstanceOf[Beer])
+    assertEquals(Beer.Lager, Beer.Lager)
+    assertEquals(Beer.Ale.index, 2)
   }
 
 }

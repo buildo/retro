@@ -19,6 +19,7 @@ inThisBuild(
         url("https://github.com/gabro"),
       ),
     ),
+    testFrameworks += new TestFramework("munit.Framework"),
   ),
 )
 
@@ -118,7 +119,6 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "metarpheus-core",
     dynverTagPrefix := "metarpheus-",
-    testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= metarpheusCoreDependencies,
   )
 
