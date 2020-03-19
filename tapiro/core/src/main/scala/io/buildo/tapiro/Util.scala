@@ -12,12 +12,9 @@ import scala.meta._
 import scala.util.control.NonFatal
 import java.nio.file.Paths
 import java.nio.file.Files
-
 import cats.data.NonEmptyList
-
 import MetarpheusHelper._
-
-import sbt.internal.util.ManagedLogger
+import org.apache.logging.log4j.LogManager
 
 import Meta.typeNameString
 
@@ -36,8 +33,10 @@ object TapiroRouteError {
 
 case class TapiroRoute(route: Route, error: TapiroRouteError)
 
-class Util(logger: ManagedLogger) {
+class Util() {
   import Formatter.format
+
+  val logger = LogManager.getLogger("io.buildo.tapiro")
 
   def createFiles(
     routesPaths: List[String],

@@ -16,7 +16,7 @@ lazy val root = (project in file("."))
       "com.softwaremill.sttp.tapir" %% "tapir-core" % "0.12.15",
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.apache.logging.log4j" % "log4j-core" % "2.13.1",
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
