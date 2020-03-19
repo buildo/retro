@@ -2,12 +2,12 @@ import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
-val scala212 = "2.12.8"
-val scala213 = "2.13.0-RC2"
+val scala212 = "2.12.10"
+val scala213 = "2.13.1"
 
 inThisBuild(
   List(
-    scalaVersion := "2.12.8",
+    scalaVersion := scala212,
     // crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/buildo/retro")),
@@ -118,15 +118,8 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "metarpheus-core",
     dynverTagPrefix := "metarpheus-",
-  )
-  .jvmSettings(
+    testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= metarpheusCoreDependencies,
-  )
-  .jsSettings(
-    libraryDependencies ++= metarpheusCoreDependencies.map { dep =>
-      if (dep.configurations == Some(Test.name)) dep
-      else dep.cross(ScalaJSCrossVersion.binary)
-    },
   )
 
 lazy val metarpheusJsFacade = project
@@ -135,7 +128,6 @@ lazy val metarpheusJsFacade = project
   .settings(
     name := "metarpheus-js-facade",
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     libraryDependencies ++= metarpheusJsFacadeDependencies.map(_.cross(ScalaJSCrossVersion.binary)),
     dynverTagPrefix := "metarpheus-",
   )
