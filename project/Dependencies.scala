@@ -5,7 +5,7 @@ import scala.language.reflectiveCalls
 object Dependencies {
 
   val V = new {
-    val circe = "0.12.0-M1"
+    val circe = "0.13.0"
     val scalatest = "3.0.5"
     val scalacheck = "1.14.0"
     val scalacheckMagnolia = "0.3.2"
@@ -32,12 +32,13 @@ object Dependencies {
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.1.10"
+    val scalameta = "4.3.6"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
     val tapir = "0.12.24"
+    val munit = "0.6.0-M1"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -75,7 +76,6 @@ object Dependencies {
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
   val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
-  val diff = "ai.x" %% "diff" % "2.0"
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
@@ -85,6 +85,7 @@ object Dependencies {
   val tapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.tapir
   val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
+  val munit = "org.scalameta" %% "munit" % V.munit
 
   val enumeroDependencies = List(
     scalatest,
@@ -176,8 +177,7 @@ object Dependencies {
   val metarpheusCoreDependencies = List(
     scalameta,
   ) ++ List(
-    scalatest,
-    diff,
+    munit,
   ).map(_ % Test)
 
   val metarpheusJsFacadeDependencies = List(
@@ -191,7 +191,7 @@ object Dependencies {
     scalameta,
     scalafmtCore,
     circeCore,
-    pprint
+    pprint,
   )
 
   val docsDependencies = List(
@@ -199,7 +199,7 @@ object Dependencies {
     tapir,
     tapirJsonCirce,
     tapirCore,
-    tapirHttp4s
+    tapirHttp4s,
   )
 
 }

@@ -2,13 +2,9 @@ package io.buildo.metarpheus
 package core
 package test
 
-import org.scalatest._
-import ai.x.diff.DiffShow
-import ai.x.diff.conversions._
-
 import extractors._
 
-class ModelSuite extends FunSuite {
+class ModelSuite extends munit.FunSuite {
   lazy val parsed = {
     import scala.meta._
     Fixtures.models.parse[Source].get
@@ -173,15 +169,6 @@ class ModelSuite extends FunSuite {
           `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
-          name = "IgnoreMe",
-          members = List(
-            CaseClass.Member(name = "ignore", tpe = Type.Name("String"), desc = None),
-          ),
-          desc = None,
-          isValueClass = false,
-          `package` = List("io", "buildo", "baseexample", "models"),
-        ),
-        CaseClass(
           name = "DuplicateName",
           members = List(
             CaseClass.Member(
@@ -191,6 +178,16 @@ class ModelSuite extends FunSuite {
             ),
           ),
           desc = Some("The name is already in use"),
+          isValueClass = false,
+          `package` = List("io", "buildo", "baseexample", "models"),
+        ),
+        CaseClass(
+          name = "IgnoreMe",
+          members = List(
+            CaseClass.Member(name = "ignore", tpe = Type.Name("String"), desc = None),
+          ),
+          desc = None,
+          isValueClass = false,
           `package` = List("io", "buildo", "baseexample", "models"),
         ),
         CaseClass(
@@ -216,8 +213,8 @@ class ModelSuite extends FunSuite {
           `package` = List("io", "buildo", "baseexample", "models"),
         ),
       )
-    val comparison = DiffShow.diff[List[Model]](expected, result)
-    assert(comparison.isIdentical, comparison.string)
+
+    assertEquals(result.sortBy(_.name), expected.sortBy(_.name))
   }
 
 }

@@ -31,7 +31,7 @@ class CaseEnumIndexSpec extends WordSpec with Matchers {
       }
 
       implicit def fakeBinaryPickler[T <: IndexedCaseEnum { type Index = Int }](
-        implicit instance: CaseEnumIndex[T]
+        implicit instance: CaseEnumIndex[T],
       ) = new FakeBinaryPickler[T] {
 
         def pickle(c: T)(picklerState: { def writeInt(int: Int) }): Unit = {
