@@ -8,23 +8,18 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtTapiro)
   .settings(
     version := "0.1",
-    scalaVersion := "2.12.8",
+    scalaVersion := "2.12.10",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % "1.2.0",
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % "0.12.15",
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % "0.12.15",
-      "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % "0.12.15",
-      "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % "0.12.15",
-      "com.softwaremill.sttp.tapir" %% "tapir-sttp-client" % "0.12.15",
       "com.softwaremill.sttp.tapir" %% "tapir-core" % "0.12.15",
-      "org.http4s" %% "http4s-dsl" % http4sVersion,
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-      "org.http4s" %% "http4s-blaze-client" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
-      "io.circe" %% "circe-parser",
     ).map(_ % circeVersion),
     tapiro / tapiroModelsPaths := List(""),
     tapiro / tapiroRoutesPaths := List(""),
