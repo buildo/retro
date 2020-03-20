@@ -38,7 +38,7 @@ object Dependencies {
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
     val tapir = "0.12.24"
-    val munit = "0.6.0-M1"
+    val munit = "0.6.0+2-bcd627f4-SNAPSHOT"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -86,6 +86,7 @@ object Dependencies {
   val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
+  val munitScalaCheck = "org.scalameta" %% "munitscalacheck" % V.munit
 
   val enumeroDependencies = List(
     munit,
@@ -128,7 +129,8 @@ object Dependencies {
     bcrypt,
     catsCore,
   ) ++ List(
-    scalatest,
+    munit,
+    munitScalaCheck,
     scalacheck,
     scalacheckMagnolia,
     slf4jNop,
@@ -142,7 +144,7 @@ object Dependencies {
     catsEffect,
     monixCatnap,
   ) ++ List(
-    scalatest,
+    munit,
     slf4jNop,
   ).map(_ % Test)
 
@@ -153,7 +155,7 @@ object Dependencies {
     catsEffect,
     monixCatnap,
   ) ++ List(
-    scalatest,
+    munit,
     slf4jNop,
   ).map(_ % Test)
 
@@ -169,9 +171,10 @@ object Dependencies {
     circeCore,
     circeGeneric,
   ) ++ List(
-    scalatest,
     scalacheck,
     scalacheckMagnolia,
+    munit,
+    munitScalaCheck,
   ).map(_ % Test)
 
   val metarpheusCoreDependencies = List(

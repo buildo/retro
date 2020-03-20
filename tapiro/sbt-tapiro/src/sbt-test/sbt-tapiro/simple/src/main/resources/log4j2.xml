@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Appenders>
+  <Console name="STDOUT" target="SYSTEM_OUT" />
+</Appenders>
+<Configuration>
+  <Loggers>
+    <Logger name="io.buildo.tapiro" level="info">
+      <AppenderRef ref="STDOUT"/>
+    </Logger>
+  </Loggers>
+</Configuration>

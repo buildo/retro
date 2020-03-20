@@ -2,18 +2,14 @@ package io.buildo.toctoc
 package core
 package authentication
 
-import org.scalatest._
-import org.scalatest.prop._
-import org.scalactic.TypeCheckedTripleEquals
+import org.scalacheck.Prop.forAll
 import org.scalacheck.magnolia._
+import cats.implicits._
 import cats.effect.IO
 import cats.data.EitherT
 import java.time.Duration
 
-final class TokenBasedRecoveryFlowSpec
-    extends PropSpec
-    with PropertyChecks
-    with TypeCheckedTripleEquals {
+final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIOSupport {
 
   import TokenBasedAuthentication._
   import TokenBasedRecovery._
@@ -26,17 +22,9 @@ final class TokenBasedRecoveryFlowSpec
 
   val recoveryFlow = TokenBasedRecoveryFlow.create(loginDomain, tokenDomain, Duration.ofDays(1))
 
-  def check[A](test: => IO[Either[A, Assertion]]): Assertion =
-    test
-      .unsafeRunSync()
-      .fold(
-        error => fail(error.toString()),
-        assertion => assertion,
-      )
-
   property("recovery works for existing users") {
     forAll { (s: UserSubject, username: String, password: String) =>
-      check {
+      await {
         (for {
           registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
           (f, token) = registerResult
@@ -46,7 +34,7 @@ final class TokenBasedRecoveryFlowSpec
           authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
           (_, subject) = authenticateResult
         } yield {
-          assertResult(s.ref)(subject.ref)
+          assertEquals(subject.ref, s.ref)
         }).value
       }
     }
@@ -54,23 +42,23 @@ final class TokenBasedRecoveryFlowSpec
 
   property("recovery returns InvalidCredential for non existing users") {
     forAll { (s: UserSubject, password: String) =>
-      check {
+      await {
         (for {
           registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
           (f, token) = registerResult
           result <- EitherT(f.recoverLogin(token, password) { _ =>
             IO(None)
           })
-        } yield result).leftMap {
-          assertResult(AuthenticationError.InvalidCredential)(_)
-        }.swap.value
+        } yield result).void.leftMap { e =>
+          assertEquals(e, AuthenticationError.InvalidCredential)
+        }.value
       }
     }
   }
 
   property("successful recovery invalidates all existing credentials for a subject") {
     forAll { (s: UserSubject, username: String, password: String) =>
-      check {
+      await {
         (for {
           registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
           (f, token1) = registerResult
@@ -80,9 +68,9 @@ final class TokenBasedRecoveryFlowSpec
           authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
           (_, subject) = authenticateResult
           recoverResult <- EitherT(f.recoverLogin(token1, password)(_ => IO(Some(username))))
-        } yield recoverResult).leftMap {
-          assertResult(AuthenticationError.InvalidCredential)(_)
-        }.swap.value
+        } yield recoverResult).void.leftMap { e =>
+          assertEquals(e, AuthenticationError.InvalidCredential)
+        }.value
       }
     }
   }

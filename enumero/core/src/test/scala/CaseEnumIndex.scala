@@ -16,7 +16,7 @@ class CaseEnumIndexSuite extends munit.FunSuite {
 
     for ((co, index) <- pairs) {
       assertEquals(converter.caseToIndex(co), index)
-      assertEquals(converter.caseFromIndex(index), Option(co))
+      assertEquals(converter.caseFromIndex(index), Some(co))
     }
   }
 
@@ -51,11 +51,11 @@ class CaseEnumIndexSuite extends munit.FunSuite {
     object unpicklerState {
       def getInt(): Int = 3
     }
-    assertEquals(binaryPickler.unpickle(unpicklerState), Option(Planet.Earth: Planet))
+    assertEquals(binaryPickler.unpickle(unpicklerState), Some(Planet.Earth))
   }
 
   test("CaseEnumIndex should retrieve a typeclass instance using apply") {
-    assertEquals(CaseEnumIndex[Planet].caseFromIndex(1), Option(Planet.Mercury: Planet))
+    assertEquals(CaseEnumIndex[Planet].caseFromIndex(1), Some(Planet.Mercury))
   }
 
 }

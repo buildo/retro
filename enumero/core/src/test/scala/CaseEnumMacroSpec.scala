@@ -32,8 +32,8 @@ class CaseEnumMacroSuite extends munit.FunSuite {
   }
 
   test("@enum annotation should allow printing / parsing the values of the enumeration") {
-    assertEquals(Planet.caseFromString("Earth"), Option(Planet.Earth: Planet))
-    assertEquals(Planet.caseFromString("Nope"), None: Option[Planet])
+    assertEquals(Planet.caseFromString("Earth"), Some(Planet.Earth))
+    assertEquals(Planet.caseFromString("Nope"), None)
     assertEquals(Planet.caseToString(Planet.Earth), "Earth")
     compileErrors("Planet.caseToString(Beer.Lager)")
   }

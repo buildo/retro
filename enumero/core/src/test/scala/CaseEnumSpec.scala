@@ -16,7 +16,7 @@ class CaseEnumSpec extends munit.FunSuite {
 
     for ((co, str) <- pairs) {
       assertEquals(serialization.caseToString(co), str)
-      assertEquals(serialization.caseFromString(str), Option(co))
+      assertEquals(serialization.caseFromString(str), Some(co))
     }
   }
 
@@ -41,21 +41,16 @@ class CaseEnumSpec extends munit.FunSuite {
 
     assertEquals(
       implicitly[FakeJsonSerializer[Planet]].fromString("Mercury"),
-      Right(Planet.Mercury): Either[String, Planet],
+      Right(Planet.Mercury),
     )
     assertEquals(
       implicitly[FakeJsonSerializer[Planet]].fromString("Wrong"),
-      Left(
-        "Wrong is not a valid Planet. Valid values are: Mercury, Venus, Earth",
-      ): Either[String, Planet],
+      Left("Wrong is not a valid Planet. Valid values are: Mercury, Venus, Earth"),
     )
   }
 
   test("retrieve a typeclass instance using apply") {
-    assertEquals(
-      CaseEnumSerialization[Planet].caseFromString("Mercury"),
-      Option(Planet.Mercury: Planet),
-    )
+    assertEquals(CaseEnumSerialization[Planet].caseFromString("Mercury"), Some(Planet.Mercury))
   }
 
 }
