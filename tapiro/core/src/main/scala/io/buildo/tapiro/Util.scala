@@ -20,6 +20,8 @@ import MetarpheusHelper._
 
 import sbt.internal.util.ManagedLogger
 
+import Meta.typeNameString
+
 sealed trait Server
 object Server {
   case object AkkaHttp extends Server
@@ -54,7 +56,7 @@ class Util(logger: ManagedLogger) {
         }
         val controllersRoutes =
           routes.groupBy(
-            route => route.route.route.collect { case RouteSegment.String(str) => str }.head,
+            route => (route.route.controllerType, route.route.pathName)
           )
         val modelsPackages = models.map {
           case c: CaseClass   => c.`package`
@@ -64,33 +66,38 @@ class Util(logger: ManagedLogger) {
           case head :: tail => NonEmptyList(head, tail)
         }
         controllersRoutes.foreach {
-          case (controllerName, routes) =>
-            val endpointsName = s"${controllerName}Endpoints"
-            val tapirEndpoints = createTapirEndpoints(endpointsName, routes, nonEmptyPackage, modelsPackages)
-            writeToFile(outputPath, tapirEndpoints, endpointsName)
+          case ((controllerType, pathName), routes) =>
+            val controllerName = typeNameString(controllerType)
+            val pathNameOrController = pathName.getOrElse(controllerName)
+            val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
+            val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
+            val tapirEndpoints = createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
+            writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
 
             server match {
               case Server.Http4s =>
                 val http4sEndpoints =
                   createHttp4sEndpoints(
                     nonEmptyPackage,
+                    pathNameOrController,
                     controllerName,
-                    endpointsName,
+                    httpEndpointsName,
                     modelsPackages,
                     routes,
                   )
-                http4sEndpoints.foreach(writeToFile(outputPath, _, s"${controllerName}Http4sEndpoints"))
+                http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
               case Server.AkkaHttp =>
                 val akkaHttpEndpoints =
                   createAkkaHttpEndpoints(
                     nonEmptyPackage,
+                    pathNameOrController,
                     controllerName,
-                    endpointsName,
+                    httpEndpointsName,
                     modelsPackages,
                     routes,
                   )
                 akkaHttpEndpoints.foreach(
-                  writeToFile(outputPath, _, s"${controllerName}AkkaHttpEndpoints"),
+                  writeToFile(outputPath, _, httpEndpointsName),
                 )
               case Server.NoServer => ()
             }
@@ -100,7 +107,7 @@ class Util(logger: ManagedLogger) {
   }
 
   private[this] def createTapirEndpoints(
-    endpointsName: String,
+    tapirEndpointsName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
     modelsPackages: List[NonEmptyList[String]],
@@ -109,7 +116,7 @@ class Util(logger: ManagedLogger) {
       TapirMeta.`class`(
         Meta.packageFromList(`package`),
         modelsPackages.toSet.map(Meta.packageFromList),
-        Term.Name(endpointsName),
+        Term.Name(tapirEndpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
       ),
@@ -118,8 +125,9 @@ class Util(logger: ManagedLogger) {
 
   private[this] def createHttp4sEndpoints(
     `package`: NonEmptyList[String],
+    pathName: String,
     controllerName: String,
-    endpointsName: String,
+    httpEndpointsName: String,
     modelsPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
@@ -133,10 +141,10 @@ class Util(logger: ManagedLogger) {
               Meta.packageFromList(`package`),
               modelsPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
-              Term.Name(endpointsName),
+              Term.Name(httpEndpointsName),
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(routes),
-              Http4sMeta.routes(Lit.String(controllerName), head, tail),
+              Http4sMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),
         )
@@ -145,8 +153,9 @@ class Util(logger: ManagedLogger) {
 
   private[this] def createAkkaHttpEndpoints(
     `package`: NonEmptyList[String],
+    pathName: String,
     controllerName: String,
-    endpointsName: String,
+    httpEndpointsName: String,
     modelsPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
@@ -160,10 +169,10 @@ class Util(logger: ManagedLogger) {
               Meta.packageFromList(`package`),
               modelsPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
-              Term.Name(endpointsName),
+              Term.Name(httpEndpointsName),
               Meta.codecsImplicits(tapiroRoutes),
               AkkaHttpMeta.endpoints(routes),
-              AkkaHttpMeta.routes(Lit.String(controllerName), head, tail),
+              AkkaHttpMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),
         )

@@ -12,7 +12,7 @@ object TapirMeta {
   val `class` = (
     `package`: Term.Ref,
     imports: Set[Term.Ref],
-    name: Term.Name,
+    tapirEndpointsName: Term.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
   ) =>
@@ -23,13 +23,13 @@ object TapirMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
 
-      trait ${Type.Name(name.value)}[AuthToken] {
+      trait ${Type.Name(tapirEndpointsName.value)}[AuthToken] {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
       }
 
-      object $name {
+      object $tapirEndpointsName {
         def create[AuthToken](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
-      Type.Name(name.value),
+      Type.Name(tapirEndpointsName.value),
       Name.Anonymous(),
       Nil,
     )}[AuthToken] { ..${body.map(

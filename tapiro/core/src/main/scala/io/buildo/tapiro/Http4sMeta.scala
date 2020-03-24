@@ -9,12 +9,12 @@ object Http4sMeta {
     `package`: Term.Ref,
     imports: Set[Term.Ref],
     controllerName: Type.Name,
-    endpointsName: Term.Name,
+    httpEndpointsName: Term.Name,
     implicits: List[Term.Param],
     http4sEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken](statusCodes)"
+    val tapirEndpoints = q"val endpoints = $httpEndpointsName.create[AuthToken](statusCodes)"
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
@@ -27,7 +27,7 @@ object Http4sMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
 
-      object $httpsEndpointsName {
+      object $httpEndpointsName {
         def routes[F[_]: Sync, AuthToken](controller: $controllerName[F, AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): HttpRoutes[F] = {
           ..${tapirEndpoints +: http4sEndpoints :+ routes}
         }
@@ -36,10 +36,10 @@ object Http4sMeta {
     """
   }
 
-  val routes = (controllerName: Lit.String, head: Route, tail: List[Route]) => {
+  val routes = (pathName: Lit.String, head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    val route: Lit.String = Lit.String("/" + controllerName.value)
+    val route: Lit.String = Lit.String("/" + pathName.value)
     q"Router($route -> NonEmptyList($first, List(..$rest)).reduceK)"
   }
 
