@@ -9,12 +9,13 @@ object AkkaHttpMeta {
     `package`: Term.Ref,
     imports: Set[Term.Ref],
     controllerName: Type.Name,
+    tapirEndpointsName: Term.Name,
     httpEndpointsName: Term.Name,
     implicits: List[Term.Param],
     akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $httpEndpointsName.create[AuthToken](statusCodes)"
+    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
