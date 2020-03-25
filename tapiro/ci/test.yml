@@ -10,4 +10,5 @@ inputs:
   - name: retro
 
 run:
-  path: retro/tapiro/ci/test.sh
+  dir: retro
+  path: tapiro/ci/test.sh
