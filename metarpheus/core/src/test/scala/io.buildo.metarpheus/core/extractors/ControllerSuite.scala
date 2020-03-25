@@ -57,6 +57,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("String")),
             desc = Some("get campings matching the requested coolness and size"),
             name = List("campingController", "getByCoolnessAndSize"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -85,6 +86,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("String")),
             desc = Some("get campings matching the requested size and distance"),
             name = List("campingController", "getBySizeAndDistance"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -107,6 +109,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("String")),
             desc = Some("get a camping by id"),
             name = List("campingController", "getById"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -129,6 +132,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("String")),
             desc = Some("get a camping by typed id"),
             name = List("campingController", "getByTypedId"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -151,6 +155,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("String")),
             desc = Some("get campings based on whether they're close to a beach"),
             name = List("campingController", "getByHasBeach"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "post",
@@ -174,6 +179,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("CreateCampingError")),
             desc = Some("create a camping"),
             name = List("campingController", "create"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -197,6 +203,7 @@ class ControllerSuite extends FunSuite {
             error = None,
             desc = None,
             name = List("campingController", "taglessFinalRouteV1"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
           Route(
             method = "get",
@@ -220,6 +227,7 @@ class ControllerSuite extends FunSuite {
             error = Some(Type.Name("Exception")),
             desc = None,
             name = List("campingController", "taglessFinalRouteV2"),
+            controllerPackage = List("io", "buildo", "baseexample", "controllers"),
           ),
         ).toString,
     )

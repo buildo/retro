@@ -120,6 +120,7 @@ package object controller {
           controllerName.substring(0, 1).toLowerCase() + controllerName.substring(1),
           m.name.syntax,
         ),
+        controllerPackage = extractPackage(source),
       )
     }
   }
