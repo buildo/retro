@@ -55,7 +55,7 @@ class Util(logger: ManagedLogger) {
         }
         val controllersRoutes =
           routes.groupBy(
-            route => (route.route.controllerType, route.route.pathName)
+            route => (route.route.controllerType, route.route.pathName),
           )
         val modelsPackages = models.map {
           case c: CaseClass   => c.`package`
@@ -70,7 +70,8 @@ class Util(logger: ManagedLogger) {
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
-            val tapirEndpoints = createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
+            val tapirEndpoints =
+              createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
             writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
 
             val routesPackages = routes
@@ -109,7 +110,7 @@ class Util(logger: ManagedLogger) {
             }
         }
       case None => logger.error("please provide a package to tapiro")
-      }
+    }
   }
 
   private[this] def createTapirEndpoints(
