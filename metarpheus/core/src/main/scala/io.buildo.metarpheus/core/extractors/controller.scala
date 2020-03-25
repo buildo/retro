@@ -76,6 +76,9 @@ package object controller {
         tpeToIntermediate(tpe)
     }.headOption
 
+  private[this] def extractTraitType(t: Defn.Trait): intermediate.Type =
+    intermediate.Type.Apply(t.name.value, t.tparams.map(typeParamToIntermediate))
+
   def extractAllRoutes(source: Source): List[intermediate.Route] =
     source.collect { case t: Defn.Trait => t }.flatMap(t => extractRoute(source, t))
 
@@ -87,9 +90,11 @@ package object controller {
         m
     }
 
-    val (controllerName, name) = t.mods.collectFirst {
-      case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => (t.name.value, n)
-    }.getOrElse((t.name.value, t.name.value))
+    val controllerName = t.name.value
+    val pathName = t.mods.collectFirst {
+      case Mod.Annot(Init(Name("path"), _, Seq(Seq(Lit.String(n))))) => n
+    }
+    val pathPrefix = pathName.getOrElse(t.name.value)
 
     methods.map { m =>
       val scaladoc = findRelatedComment(source, m)
@@ -99,27 +104,15 @@ package object controller {
       intermediate.Route(
         method = method,
         route = List(
-          intermediate.RouteSegment.String(name),
+          intermediate.RouteSegment.String(pathPrefix),
           intermediate.RouteSegment.String(m.name.syntax),
         ),
         params = extractParams(m, paramsDesc, inBody = method == "post"),
         authenticated = extractAuthenticated(m),
         returns = extractReturnType(m),
         error = extractErrorType(m),
-        // FIXME: this is the only case in which we don't preserve the retro-compatibility
-        // This is because intermediate.Body is too limiting as it assumes the body has a single Type
-        // whereas we want to support bodies composed by multiple parameters each with their own Type
-        // We're moving towards removing this node completely and instead merging the body params with
-        // params, flagging them with a new `inBody` property.
-        body = None,
-        ctrl = List(
-          // FIXME: well this is kind of a retrocompatibility hack
-          // When parsing the routes we use the actual name of the controller variable in scope
-          // whereas here's we're deriving it from the name of the trait. They should match in the
-          // usual case, nonetheless it may introduce some diffs when migrating a project to wiro
-          controllerName.substring(0, 1).toLowerCase() + controllerName.substring(1),
-          m.name.syntax,
-        ),
+        pathName = pathName,
+        controllerType = extractTraitType(t),
         desc = desc,
         name = List(
           // FIXME: same as a above, for the time being we preserved the `controllerName.method`

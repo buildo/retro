@@ -9,13 +9,13 @@ object AkkaHttpMeta {
     `package`: Term.Ref,
     imports: Set[Term.Ref],
     controllerName: Type.Name,
-    endpointsName: Term.Name,
+    tapirEndpointsName: Term.Name,
+    httpEndpointsName: Term.Name,
     implicits: List[Term.Param],
     akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $endpointsName.create[AuthToken](statusCodes)"
-    val akkaHttpEndpointsName = Term.Name(s"${controllerName.syntax}AkkaHttpEndpoints")
+    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
@@ -25,7 +25,7 @@ object AkkaHttpMeta {
       import akka.http.scaladsl.server._
       import akka.http.scaladsl.server.Directives._
 
-      object $akkaHttpEndpointsName {
+      object $httpEndpointsName {
         def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): Route = {
           ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
@@ -34,10 +34,10 @@ object AkkaHttpMeta {
     """
   }
 
-  val routes = (controllerName: Lit.String, head: Route, tail: List[Route]) => {
+  val routes = (pathName: Lit.String, head: Route, tail: List[Route]) => {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
-    q"pathPrefix($controllerName) { List(..$rest).foldLeft[Route]($first)(_ ~ _) }"
+    q"pathPrefix($pathName) { List(..$rest).foldLeft[Route]($first)(_ ~ _) }"
   }
 
   val endpoints = (routes: List[Route]) =>

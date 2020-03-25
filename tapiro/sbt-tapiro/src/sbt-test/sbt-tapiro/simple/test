@@ -1,7 +1,7 @@
 # check if endpoints gets created
 > tapiro
-$ exists "src/main/scala/endpoints/ExampleControllerEndpoints.scala"
-$ exists "src/main/scala/endpoints/ExampleControllerHttp4sEndpoints.scala"
+$ exists "src/main/scala/endpoints/ExampleControllerTapirEndpoints.scala"
+$ exists "src/main/scala/endpoints/ExampleControllerHttpEndpoints.scala"
 
 # compile and start server
 > reStart
