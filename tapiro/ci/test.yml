@@ -10,8 +10,4 @@ inputs:
   - name: retro
 
 run:
-  dir: retro
-  path: sbt
-  args:
-    - -batch
-    - ;tapiroCore/compile ;sbt-tapiro/scripted # TODO(claudio): compile to test once we have them
+  path: retro/tapiro/ci/test.sh
