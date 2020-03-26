@@ -5,7 +5,6 @@ import io.buildo.metarpheus.core.intermediate.{
   CaseClass,
   CaseEnum,
   Route,
-  RouteSegment,
   TaggedUnion,
   Type => MetarpheusType,
 }
@@ -56,7 +55,7 @@ class Util(logger: ManagedLogger) {
         }
         val controllersRoutes =
           routes.groupBy(
-            route => (route.route.controllerType, route.route.pathName)
+            route => (route.route.controllerType, route.route.pathName),
           )
         val modelsPackages = models.map {
           case c: CaseClass   => c.`package`
@@ -71,9 +70,15 @@ class Util(logger: ManagedLogger) {
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
-            val tapirEndpoints = createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
+            val tapirEndpoints =
+              createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
             writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
 
+            val routesPackages = routes
+              .map(_.route.controllerPackage)
+              .collect {
+                case head :: tail => NonEmptyList(head, tail)
+              }
             server match {
               case Server.Http4s =>
                 val http4sEndpoints =
@@ -83,7 +88,7 @@ class Util(logger: ManagedLogger) {
                     controllerName,
                     tapirEndpointsName,
                     httpEndpointsName,
-                    modelsPackages,
+                    modelsPackages ++ routesPackages,
                     routes,
                   )
                 http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
@@ -95,7 +100,7 @@ class Util(logger: ManagedLogger) {
                     controllerName,
                     tapirEndpointsName,
                     httpEndpointsName,
-                    modelsPackages,
+                    modelsPackages ++ routesPackages,
                     routes,
                   )
                 akkaHttpEndpoints.foreach(
@@ -105,19 +110,19 @@ class Util(logger: ManagedLogger) {
             }
         }
       case None => logger.error("please provide a package to tapiro")
-      }
+    }
   }
 
   private[this] def createTapirEndpoints(
     tapirEndpointsName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
-    modelsPackages: List[NonEmptyList[String]],
+    requiredPackages: List[NonEmptyList[String]],
   ): String = {
     format(
       TapirMeta.`class`(
         Meta.packageFromList(`package`),
-        modelsPackages.toSet.map(Meta.packageFromList),
+        requiredPackages.toSet.map(Meta.packageFromList),
         Term.Name(tapirEndpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
@@ -131,7 +136,7 @@ class Util(logger: ManagedLogger) {
     controllerName: String,
     tapirEndpointsName: String,
     httpEndpointsName: String,
-    modelsPackages: List[NonEmptyList[String]],
+    requiredPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
     val routes = tapiroRoutes.map(_.route)
@@ -142,7 +147,7 @@ class Util(logger: ManagedLogger) {
           format(
             Http4sMeta.`class`(
               Meta.packageFromList(`package`),
-              modelsPackages.toSet.map(Meta.packageFromList),
+              requiredPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
               Term.Name(httpEndpointsName),
@@ -161,7 +166,7 @@ class Util(logger: ManagedLogger) {
     controllerName: String,
     tapirEndpointsName: String,
     httpEndpointsName: String,
-    modelsPackages: List[NonEmptyList[String]],
+    requiredPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
     val routes = tapiroRoutes.map(_.route)
@@ -172,7 +177,7 @@ class Util(logger: ManagedLogger) {
           format(
             AkkaHttpMeta.`class`(
               Meta.packageFromList(`package`),
-              modelsPackages.toSet.map(Meta.packageFromList),
+              requiredPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
               Term.Name(httpEndpointsName),

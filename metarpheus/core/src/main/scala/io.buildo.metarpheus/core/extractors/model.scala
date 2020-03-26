@@ -7,26 +7,6 @@ import scala.meta.contrib._
 
 package object model {
 
-  private def flattenPackage(pkg: Pkg): List[String] =
-    pkg.ref match {
-      case Term.Name(name) => List(name)
-      case s: Term.Select  => flattenSelect(s)
-    }
-
-  private def flattenSelect(s: Term.Select): List[String] =
-    s.qual match {
-      case sel: Term.Select => flattenSelect(sel) ++ List(s.name.value)
-      case Term.Name(n)     => List(n, s.name.value)
-    }
-
-  private def extractPackage(source: Source): List[String] =
-    source.collect {
-      case pkg: Pkg => flattenPackage(pkg)
-    }.flatten match {
-      case Nil => List("_root_")
-      case x   => x
-    }
-
   def extractCaseClassDefns(source: scala.meta.Source): List[CaseClassDefnInfo] = {
     source.collect {
       case c: Defn.Class if c.hasMod(Mod.Case()) => c

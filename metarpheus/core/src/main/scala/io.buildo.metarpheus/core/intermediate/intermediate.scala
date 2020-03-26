@@ -74,6 +74,7 @@ case class Route(
   controllerType: Type,
   desc: Option[String],
   name: List[String],
+  controllerPackage: List[String],
 )
 
 object Route {

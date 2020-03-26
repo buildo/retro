@@ -25,7 +25,7 @@ class ApiSuite extends FunSuite {
       case Route(_, List(
         RouteSegment.String("campings"),
         RouteSegment.String("getByCoolnessAndSize"),
-      ), _, _, _, _, _, _, _, _) => ()
+      ), _, _, _, _, _, _, _, _, _) => ()
       // format: on
     }.isDefined)
 

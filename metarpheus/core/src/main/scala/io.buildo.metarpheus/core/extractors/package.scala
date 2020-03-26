@@ -122,4 +122,24 @@ package object extractors {
 
       (Some(desc.mkString(" ")), getTags(Nil, tagLines))
     }.getOrElse((None, List()))
+
+  private[extractors] def flattenPackage(pkg: scala.meta.Pkg): List[String] =
+    pkg.ref match {
+      case Term.Name(name) => List(name)
+      case s: Term.Select  => flattenSelect(s)
+    }
+
+  private[extractors] def flattenSelect(s: Term.Select): List[String] =
+    s.qual match {
+      case sel: Term.Select => flattenSelect(sel) ++ List(s.name.value)
+      case Term.Name(n)     => List(n, s.name.value)
+    }
+
+  private[extractors] def extractPackage(source: scala.meta.Source): List[String] =
+    source.collect {
+      case pkg: scala.meta.Pkg => flattenPackage(pkg)
+    }.flatten match {
+      case Nil => List("_root_")
+      case x   => x
+    }
 }
