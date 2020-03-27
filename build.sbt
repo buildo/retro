@@ -2,7 +2,7 @@ import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
-val scala212 = "2.12.10"
+val scala212 = "2.12.11"
 val scala213 = "2.13.1"
 
 inThisBuild(
