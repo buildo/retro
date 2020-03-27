@@ -3,11 +3,16 @@ package mailo
 import mailo.data.S3MailData
 import mailo.http.MailgunClient
 import akka.actor.ActorSystem
+import akka.testkit.TestKit
 
 class MailoSpec extends munit.FunSuite {
   implicit val ec = munitExecutionContext
   implicit val system = ActorSystem()
   val mailer = Mailo(new S3MailData, new MailgunClient, DeliveryGuarantee.AtMostOnce)
+
+  override def afterAll: Unit = {
+    TestKit.shutdownActorSystem(system)
+  }
 
   test("email should be correctly sent") {
     mailer
