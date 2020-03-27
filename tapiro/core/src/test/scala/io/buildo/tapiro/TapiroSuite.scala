@@ -127,7 +127,7 @@ class TapiroSuite extends munit.FunSuite {
       FileLayout.mapFromString(expectedLayout).map {
         case (path, content) =>
           val filePath = path.split("/").foldLeft(projectRoot)(_.resolve(_))
-          assertNoDiff(Files.readString(filePath.toNIO), content)
+          assertNoDiff(new String(Files.readAllBytes(filePath.toNIO)), content)
       }
 
     }
