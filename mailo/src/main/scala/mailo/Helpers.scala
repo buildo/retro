@@ -3,7 +3,6 @@ package mailo
 import java.io.{PrintWriter, StringWriter}
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import mailo.data.S3MailData
 import mailo.http.MailgunClient
 
@@ -12,8 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class S3MailgunMailo(
   implicit
   system: ActorSystem,
-  materializer: ActorMaterializer,
-  ec: ExecutionContext
+  ec: ExecutionContext,
 ) {
   private[this] val s3 = new S3MailData()
   private[this] val mailgun = new MailgunClient()
@@ -29,16 +27,13 @@ class S3MailgunMailo(
     templateName: String,
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
-    tags: List[String] = Nil
+    tags: List[String] = Nil,
   ): Future[Either[MailError, MailResponse]] =
     mailgunS3Mailo.send(Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags))
 }
 
 class S3SendinblueMailo(
-  implicit
-  system: ActorSystem,
-  materializer: ActorMaterializer,
-  ec: ExecutionContext
+  implicit ec: ExecutionContext,
 ) {
   import data.S3MailData
   import http.SendinblueClient
@@ -57,10 +52,10 @@ class S3SendinblueMailo(
     templateName: String,
     params: Map[String, String],
     attachments: List[Attachment] = Nil,
-    tags: List[String] = Nil
+    tags: List[String] = Nil,
   ): Future[Either[MailError, MailResponse]] =
     sendinblueS3Mailo.send(
-      Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags)
+      Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags),
     )
 }
 
