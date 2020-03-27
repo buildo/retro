@@ -6,13 +6,11 @@ object Dependencies {
 
   val V = new {
     val circe = "0.13.0"
-    val scalatest = "3.0.5"
     val scalacheck = "1.14.0"
     val scalacheckMagnolia = "0.3.2"
     val mockito = "1.9.5"
     val akka = "2.6.4"
     val akkaHttp = "10.1.3"
-    val akkaPersistence = "2.5.15.1"
     val akkaHttpCirce = "1.25.2"
     val awscala = "0.5.+"
     val cats = "1.6.0"
@@ -38,14 +36,13 @@ object Dependencies {
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
     val tapir = "0.12.24"
-    val munit = "0.6.0+2-bcd627f4-SNAPSHOT"
+    val munit = "0.7.1"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
   val circeParser = "io.circe" %% "circe-parser" % V.circe
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
-  val scalatest = "org.scalatest" %% "scalatest" % V.scalatest
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
   val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
@@ -64,7 +61,6 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % V.logback
   val levelDb = "org.fusesource.leveldbjni" % "leveldbjni-all" % V.leveldb
   val mailin = "com.sendinblue" % "sib-api-v3-sdk" % V.mailin
-  val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistence
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % V.akka
   val jakartaMail = "com.sun.mail" % "jakarta.mail" % V.jakartaMail
   val slick = "com.typesafe.slick" %% "slick" % V.slick
@@ -86,7 +82,7 @@ object Dependencies {
   val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
-  val munitScalaCheck = "org.scalameta" %% "munitscalacheck" % V.munit
+  val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
 
   val enumeroDependencies = List(
     munit,
@@ -119,10 +115,9 @@ object Dependencies {
     levelDb,
     jakartaMail,
   ) ++ List(
-    scalatest,
+    munit,
     logback,
     akkaTestkit,
-    akkaPersistenceInMemory,
   ).map(_ % Test)
 
   val toctocCoreDependencies = List(
