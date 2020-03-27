@@ -125,6 +125,8 @@ class Util() {
         Term.Name(tapirEndpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
+        routes.flatMap(TapirMeta.routeClassDeclarations),
+        routes.flatMap(TapirMeta.routeCodecDeclarations),
       ),
     )
   }

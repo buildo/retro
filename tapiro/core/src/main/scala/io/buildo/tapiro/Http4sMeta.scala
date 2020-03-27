@@ -1,6 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.Route
+import io.buildo.metarpheus.core.intermediate.{Route, Type => MetarpheusType}
 
 import scala.meta._
 
@@ -22,6 +22,7 @@ object Http4sMeta {
       import cats.effect._
       import cats.implicits._
       import cats.data.NonEmptyList
+      import io.circe.{ Decoder, Encoder }
       import org.http4s._
       import org.http4s.server.Router
       import sttp.tapir.server.http4s._
@@ -45,16 +46,25 @@ object Http4sMeta {
   }
 
   val endpoints = (routes: List[Route]) =>
-    routes.flatMap { route =>
+    routes.map { route =>
       val name = Term.Name(route.name.last)
       val endpointsName = Term.Select(Term.Name("endpoints"), name)
       val controllersName = Term.Select(Term.Name("controller"), name)
       val controllerContent =
-        if (route.params.length <= 1) Some(controllersName)
-        else Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
-      controllerContent.map { content =>
-        val toRoutes = Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(content))
-        q"val ${Pat.Var(name)} = $toRoutes"
-      }
+        route.method match {
+          case "get" =>
+            if (route.params.length <= 1) controllersName
+            else Term.Select(Term.Eta(controllersName), Term.Name("tupled"))
+          case "post" =>
+            val fields = route.params
+              .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
+              .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
+            q"x => $controllersName(..${fields.map(f => q"x.$f")})"
+          case _ =>
+            throw new Exception("method not supported")
+        }
+      val toRoutes =
+        Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(controllerContent))
+      q"val ${Pat.Var(name)} = $toRoutes"
     }
 }
