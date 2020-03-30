@@ -53,7 +53,8 @@ object Http4sMeta {
       val controllerContent =
         route.method match {
           case "get" =>
-            if (route.params.length <= 1) controllersName
+            if (route.params.length == 0) q"_ => $controllersName()"
+            else if (route.params.length == 1) controllersName
             else Term.Select(Term.Eta(controllersName), Term.Name("tupled"))
           case "post" =>
             val fields = route.params
