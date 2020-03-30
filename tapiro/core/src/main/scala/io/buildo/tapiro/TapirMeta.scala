@@ -168,11 +168,6 @@ object TapirMeta {
     typeNameString(returnType) match {
       case "Unit" =>
         endpoint
-      case "String" =>
-        Term.Apply(
-          Term.Select(endpoint, Term.Name("out")),
-          List(Term.Name("stringBody")),
-        )
       case _ =>
         Term.Apply(
           Term.Select(endpoint, Term.Name("out")),
