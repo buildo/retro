@@ -45,26 +45,24 @@ object Http4sMeta {
     q"Router($route -> NonEmptyList($first, List(..$rest)).reduceK)"
   }
 
-  val endpoints = (routes: List[Route]) =>
+  val endpoints = (routes: List[TapiroRoute]) =>
     routes.map { route =>
-      val name = Term.Name(route.name.last)
+      val name = Term.Name(route.route.name.last)
       val endpointsName = q"endpoints.$name"
       val controllersName = q"controller.$name"
       val controllerContent =
         route.method match {
-          case "get" =>
-            route.params.length match {
+          case RouteMethod.GET =>
+            route.route.params.length match {
               case 0 => q"_ => $controllersName()"
               case 1 => controllersName
               case _ => q"($controllersName _).tupled"
             }
-          case "post" =>
-            val fields = route.params
+          case RouteMethod.POST =>
+            val fields = route.route.params
               .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
               .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
             q"x => $controllersName(..${fields.map(f => q"x.$f")})"
-          case _ =>
-            throw new Exception("method not supported")
         }
       val toRoutes = q"$endpointsName.toRoutes($controllerContent)"
       q"val ${Pat.Var(name)} = $toRoutes"

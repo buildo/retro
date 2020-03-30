@@ -9,10 +9,10 @@ import cats.data.NonEmptyList
 object Meta {
   val codecsImplicits = (routes: List[TapiroRoute]) => {
     val jsonCodecs = (routes.flatMap {
-      case TapiroRoute(route, error) =>
+      case TapiroRoute(route, _, error) =>
         ((error match {
-          case TapiroRouteError.OtherError(t) => List(t)
-          case _                              => Nil
+          case RouteError.OtherError(t) => List(t)
+          case _                        => Nil
         }) :+
           route.returns)
     }.distinct
@@ -21,14 +21,18 @@ object Meta {
       ++ taggedUnionErrorMembers(routes))
       .map(t => t"JsonCodec[$t]")
     val plainCodecs = routes.flatMap {
-      case TapiroRoute(route, _) =>
-        (if (route.method == "get") route.params.map(_.tpe) else Nil) ++
-          route.params.map(_.tpe).filter(typeNameString(_) == "AuthToken")
+      case TapiroRoute(route, method, _) =>
+        (method match {
+          case RouteMethod.GET => route.params.map(_.tpe)
+          case _               => Nil
+        }) ++ route.params.map(_.tpe).filter(typeNameString(_) == "AuthToken")
     }.distinct.map(t => t"PlainCodec[${toScalametaType(t)}]")
     val circeCodecs = routes.flatMap {
-      case TapiroRoute(route, _) =>
-        if (route.method == "post") route.params.map(_.tpe).filterNot(isAuthToken)
-        else Nil
+      case TapiroRoute(route, method, _) =>
+        method match {
+          case RouteMethod.POST => route.params.map(_.tpe).filterNot(isAuthToken)
+          case _                => Nil
+        }
     }.distinct.flatMap { t =>
       List(t"Decoder[${toScalametaType(t)}]", t"Encoder[${toScalametaType(t)}]")
     }
@@ -40,7 +44,7 @@ object Meta {
 
   private[this] val taggedUnionErrorMembers = (routes: List[TapiroRoute]) => {
     val taggedUnions = routes.collect {
-      case TapiroRoute(_, TapiroRouteError.TaggedUnionError(tu)) => tu
+      case TapiroRoute(_, _, RouteError.TaggedUnionError(tu)) => tu
     }.distinct
     taggedUnions.flatMap { taggedUnion =>
       taggedUnion.values.map(taggedUnionMemberType(taggedUnion))
