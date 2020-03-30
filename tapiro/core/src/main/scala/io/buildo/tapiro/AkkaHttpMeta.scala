@@ -44,14 +44,16 @@ object AkkaHttpMeta {
   val endpoints = (routes: List[Route]) =>
     routes.map { route =>
       val name = Term.Name(route.name.last)
-      val endpointsName = Term.Select(Term.Name("endpoints"), name)
-      val controllersName = Term.Select(Term.Name("controller"), name)
+      val endpointsName = q"endpoints.$name"
+      val controllersName = q"controller.$name"
       val controllerContent =
         route.method match {
           case "get" =>
-            if (route.params.length == 0) q"_ => $controllersName()"
-            else if (route.params.length == 1) controllersName
-            else Term.Select(Term.Eta(controllersName), Term.Name("tupled"))
+            route.params.length match {
+              case 0 => q"_ => $controllersName()"
+              case 1 => controllersName
+              case _ => q"($controllersName _).tupled"
+            }
           case "post" =>
             val fields = route.params
               .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
@@ -60,8 +62,7 @@ object AkkaHttpMeta {
           case _ =>
             throw new Exception("method not supported")
         }
-      val toRoute =
-        Term.Apply(Term.Select(endpointsName, Term.Name("toRoute")), List(controllerContent))
+      val toRoute = q"$endpointsName.toRoute($controllerContent)"
       q"val ${Pat.Var(name)} = $toRoute"
     }
 }
