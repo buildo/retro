@@ -25,7 +25,7 @@ object Meta {
         (method match {
           case RouteMethod.GET => route.params.map(_.tpe)
           case _               => Nil
-        }) ++ route.params.map(_.tpe).filter(typeNameString(_) == "AuthToken")
+        }) ++ route.params.map(_.tpe).filter(isAuthToken)
     }.distinct.map(t => t"PlainCodec[${toScalametaType(t)}]")
     val circeCodecs = routes.flatMap {
       case TapiroRoute(route, method, _) =>
