@@ -5,15 +5,13 @@ import scala.language.reflectiveCalls
 object Dependencies {
 
   val V = new {
-    val circe = "0.12.0-M1"
-    val scalatest = "3.0.5"
+    val circe = "0.13.0"
     val scalacheck = "1.14.0"
     val scalacheckMagnolia = "0.3.2"
     val mockito = "1.9.5"
     val akka = "2.6.4"
-    val akkaHttp = "10.1.3"
-    val akkaPersistence = "2.5.15.1"
-    val akkaHttpCirce = "1.25.2"
+    val akkaHttp = "10.1.11"
+    val akkaHttpCirce = "1.31.0"
     val awscala = "0.5.+"
     val cats = "1.6.0"
     val catsEffect = "1.3.0"
@@ -32,19 +30,19 @@ object Dependencies {
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.1.10"
+    val scalameta = "4.3.6"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
     val tapir = "0.12.24"
+    val munit = "0.7.1"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
   val circeParser = "io.circe" %% "circe-parser" % V.circe
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
-  val scalatest = "org.scalatest" %% "scalatest" % V.scalatest
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
   val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
@@ -63,7 +61,6 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % V.logback
   val levelDb = "org.fusesource.leveldbjni" % "leveldbjni-all" % V.leveldb
   val mailin = "com.sendinblue" % "sib-api-v3-sdk" % V.mailin
-  val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistence
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % V.akka
   val jakartaMail = "com.sun.mail" % "jakarta.mail" % V.jakartaMail
   val slick = "com.typesafe.slick" %% "slick" % V.slick
@@ -75,7 +72,6 @@ object Dependencies {
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
   val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
-  val diff = "ai.x" %% "diff" % "2.0"
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
   val plantuml = "net.sourceforge.plantuml" % "plantuml" % V.plantuml
@@ -85,9 +81,11 @@ object Dependencies {
   val tapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.tapir
   val tapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
+  val munit = "org.scalameta" %% "munit" % V.munit
+  val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
 
   val enumeroDependencies = List(
-    scalatest,
+    munit,
     mockito,
   ).map(_ % Test)
 
@@ -95,7 +93,7 @@ object Dependencies {
     circeCore,
   ) ++ List(
     circeParser,
-    scalatest,
+    munit,
   ).map(_ % Test)
 
   val mailoDependencies = List(
@@ -117,17 +115,17 @@ object Dependencies {
     levelDb,
     jakartaMail,
   ) ++ List(
-    scalatest,
+    munit,
     logback,
     akkaTestkit,
-    akkaPersistenceInMemory,
   ).map(_ % Test)
 
   val toctocCoreDependencies = List(
     bcrypt,
     catsCore,
   ) ++ List(
-    scalatest,
+    munit,
+    munitScalaCheck,
     scalacheck,
     scalacheckMagnolia,
     slf4jNop,
@@ -141,7 +139,7 @@ object Dependencies {
     catsEffect,
     monixCatnap,
   ) ++ List(
-    scalatest,
+    munit,
     slf4jNop,
   ).map(_ % Test)
 
@@ -152,7 +150,7 @@ object Dependencies {
     catsEffect,
     monixCatnap,
   ) ++ List(
-    scalatest,
+    munit,
     slf4jNop,
   ).map(_ % Test)
 
@@ -168,16 +166,16 @@ object Dependencies {
     circeCore,
     circeGeneric,
   ) ++ List(
-    scalatest,
     scalacheck,
     scalacheckMagnolia,
+    munit,
+    munitScalaCheck,
   ).map(_ % Test)
 
   val metarpheusCoreDependencies = List(
     scalameta,
   ) ++ List(
-    scalatest,
-    diff,
+    munit,
   ).map(_ % Test)
 
   val metarpheusJsFacadeDependencies = List(
@@ -191,7 +189,7 @@ object Dependencies {
     scalameta,
     scalafmtCore,
     circeCore,
-    pprint
+    pprint,
   )
 
   val docsDependencies = List(
@@ -199,7 +197,7 @@ object Dependencies {
     tapir,
     tapirJsonCirce,
     tapirCore,
-    tapirHttp4s
+    tapirHttp4s,
   )
 
 }

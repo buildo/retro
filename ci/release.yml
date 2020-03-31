@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: hseeberger/scala-sbt
-    tag: 8u181_2.12.8_1.2.8
+    tag: 8u242_1.3.8_2.12.10
 
 inputs:
   - name: retro

@@ -9,7 +9,7 @@ object Type {
   case class Apply(name: String, args: Seq[Type]) extends Type
 }
 
-sealed trait Model {
+sealed trait Model extends Product with Serializable {
   val name: String
 }
 case class CaseClass(

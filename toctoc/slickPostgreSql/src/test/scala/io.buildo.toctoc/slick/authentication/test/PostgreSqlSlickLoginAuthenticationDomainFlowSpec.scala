@@ -7,20 +7,13 @@ import core.authentication.TokenBasedAuthentication._
 import login.PostgreSqlSlickLoginAuthenticationDomain
 import token.PostgreSqlSlickAccessTokenAuthenticationDomain
 
-import org.scalatest._
-import org.scalatest.FlatSpec
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
 import cats.effect.IO
 import java.time.Duration
 
-class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
-    extends FlatSpec
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll
-    with EitherValues
-    with Matchers {
+class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
 
   val schemaName = Some("public")
   val loginTableName = "login"
@@ -43,7 +36,7 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
     IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync
   }
 
-  override def afterEach() = {
+  override def afterEach(context: AfterEach) = {
     IO.fromFuture(IO(db.run(schema.truncate))).unsafeRunSync
   }
 
@@ -58,67 +51,67 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec
   val subject = UserSubject("test")
   val subject2 = UserSubject("test2")
 
-  "unregistered login credentials" should "not be accepted when exchanging for token" in {
-    authFlow.exchangeForTokens(login).unsafeRunSync shouldBe 'left
+  test("unregistered login credentials should not be accepted when exchanging for token") {
+    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
   }
 
-  "registered login credentials" should "be accepted when exchanging for token" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.exchangeForTokens(login).unsafeRunSync shouldBe 'right
+  test("registered login credentials should be accepted when exchanging for token") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isRight)
   }
 
-  "token obtained by login" should "be validated" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.value
-    authFlow.validateToken(token).unsafeRunSync.right.value shouldBe subject
+  test("token obtained by login should be validated") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
+    assertEquals(authFlow.validateToken(token).unsafeRunSync.right.get, subject)
   }
 
-  "multiple login with same values" should "not be accepted in registration" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'left
+  test("multiple login with same values should not be accepted in registration") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isLeft)
   }
 
-  "multiple login with different values" should "be accepted in registration" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync shouldBe 'right
-    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.value
-    authFlow.validateToken(token2).unsafeRunSync.right.value shouldBe subject2
+  test("multiple login with different values should be accepted in registration") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
+    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
+    assertEquals(authFlow.validateToken(token2).unsafeRunSync.right.get, subject2)
   }
 
-  "single token unregistration" should "unregister only the specific token" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync shouldBe 'right
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.value
-    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.value
+  test("single token unregistration should unregister only the specific token") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
+    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
+    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
     authFlow.unregisterToken(token).unsafeRunSync
-    authFlow.validateToken(token).unsafeRunSync shouldBe 'left
-    authFlow.validateToken(token2).unsafeRunSync shouldBe 'right
+    assert(authFlow.validateToken(token).unsafeRunSync.isLeft)
+    assert(authFlow.validateToken(token2).unsafeRunSync.isRight)
   }
 
-  "token unregistration" should "unregister all subject's tokens" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync shouldBe 'right
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.value
-    val token2 = authFlow.exchangeForTokens(login).unsafeRunSync.right.value
-    val token3 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.value
+  test("token unregistration should unregister all subject's tokens") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
+    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
+    val token2 = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
+    val token3 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
     authFlow.unregisterAllSubjectTokens(subject).unsafeRunSync
-    authFlow.validateToken(token).unsafeRunSync shouldBe 'left
-    authFlow.validateToken(token2).unsafeRunSync shouldBe 'left
-    authFlow.validateToken(token3).unsafeRunSync shouldBe 'right
+    assert(authFlow.validateToken(token).unsafeRunSync.isLeft)
+    assert(authFlow.validateToken(token2).unsafeRunSync.isLeft)
+    assert(authFlow.validateToken(token3).unsafeRunSync.isRight)
   }
 
-  "single subject credentials unregistration" should "take effect" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
+  test("single subject credentials unregistration should take effect") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
     authFlow.unregisterLogin(login).unsafeRunSync
-    authFlow.exchangeForTokens(login).unsafeRunSync shouldBe 'left
+    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
   }
 
-  "subject credentials unregistration" should "take effect" in {
-    authFlow.registerSubjectLogin(subject, login).unsafeRunSync shouldBe 'right
-    authFlow.registerSubjectLogin(subject, login3).unsafeRunSync shouldBe 'right
+  test("subject credentials unregistration should take effect") {
+    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
+    assert(authFlow.registerSubjectLogin(subject, login3).unsafeRunSync.isRight)
     authFlow.unregisterAllSubjectLogins(subject).unsafeRunSync
-    authFlow.exchangeForTokens(login).unsafeRunSync shouldBe 'left
-    authFlow.exchangeForTokens(login3).unsafeRunSync shouldBe 'left
+    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
+    assert(authFlow.exchangeForTokens(login3).unsafeRunSync.isLeft)
   }
 
 }

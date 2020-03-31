@@ -2,11 +2,11 @@ package mailo.data
 
 import awscala.s3.{Bucket, S3}
 import awscala.Credentials
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
 import com.amazonaws.regions.RegionUtils
 import cats.syntax.either._
 import cats.syntax.traverse._
-import cats.instances.map._
 import cats.instances.either._
 import alleycats.std.all._
 import mailo.data.S3MailDataError._
@@ -15,13 +15,12 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 import mailo.{MailError, MailRawContent}
 
-import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 class S3MailData(
   implicit
   ec: ExecutionContext,
-  conf: com.typesafe.config.Config = ConfigFactory.load()
+  conf: Config = ConfigFactory.load(),
 ) extends MailData {
   type EitherMailError[A] = Either[MailError, A]
 
@@ -30,7 +29,7 @@ class S3MailData(
     secret: String,
     bucket: String,
     regionName: String,
-    partialsFolder: String
+    partialsFolder: String,
   )
 
   private[S3MailData] val s3Config = S3Config(
@@ -38,7 +37,7 @@ class S3MailData(
     secret = conf.getString(s"mailo.s3.secret"),
     bucket = conf.getString(s"mailo.s3.bucket"),
     regionName = conf.getString(s"mailo.s3.region"),
-    partialsFolder = conf.getString(s"mailo.s3.partialsFolder")
+    partialsFolder = conf.getString(s"mailo.s3.partialsFolder"),
   )
 
   private[S3MailData] implicit val region = RegionUtils.getRegion(s3Config.regionName)
@@ -53,7 +52,8 @@ class S3MailData(
       //filtering partial objects dropping initial chars
       partialObjects <- {
         val result: EitherMailError[Map[String, String]] = (partials
-          .map(n => n.drop(folder.length + 1) -> getObject(n)).toMap)
+          .map(n => n.drop(folder.length + 1) -> getObject(n))
+          .toMap)
           .sequence[EitherMailError, String]
         result
       }
@@ -72,20 +72,20 @@ class S3MailData(
       case None    => ObjectNotFound.asLeft[Set[String]]
     }) match {
       case Success(result) => result
-      case Failure(e) => S3InternalError(e.getMessage).asLeft[Set[String]]
+      case Failure(e)      => S3InternalError(e.getMessage).asLeft[Set[String]]
     }
   }
 
   private[this] def getObject(name: String): Either[MailError, String] =
-     Try(bucket match {
-        case Some(b) =>
-          b.getObject(name) match {
-            case Some(o) => convertStreamToString(o.content).asRight[MailError]
-            case None    => ObjectNotFound.asLeft[String]
-          }
-        case None => BucketNotFound.asLeft[String]
-     }) match {
-       case Success(result) => result
-       case Failure(e) => S3InternalError(e.getMessage).asLeft[String]
-     }
+    Try(bucket match {
+      case Some(b) =>
+        b.getObject(name) match {
+          case Some(o) => convertStreamToString(o.content).asRight[MailError]
+          case None    => ObjectNotFound.asLeft[String]
+        }
+      case None => BucketNotFound.asLeft[String]
+    }) match {
+      case Success(result) => result
+      case Failure(e)      => S3InternalError(e.getMessage).asLeft[String]
+    }
 }

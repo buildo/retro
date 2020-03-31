@@ -2,8 +2,7 @@ package io.buildo.toctoc.circe
 
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication._
 
-import org.scalatest._
-import org.scalatest.prop._
+import org.scalacheck.Prop.forAll
 import org.scalacheck.magnolia._
 import io.circe.syntax._
 import io.circe.Json
@@ -12,7 +11,7 @@ import org.scalacheck.Gen
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 
-final class CirceSupportSpec extends PropSpec with PropertyChecks {
+final class CirceSupportSpec extends munit.ScalaCheckSuite {
 
   implicit val arbAccessToken: Arbitrary[AccessToken] = Arbitrary {
     for {
@@ -23,12 +22,13 @@ final class CirceSupportSpec extends PropSpec with PropertyChecks {
 
   property("encodes AccessToken correctly") {
     forAll { (token: AccessToken) =>
-      assertResult(
+      assertEquals(
+        token.asJson,
         Json.obj(
           "value" -> token.value.asJson,
           "expiresAt" -> token.expiresAt.asJson,
         ),
-      )(token.asJson)
+      )
     }
   }
 
@@ -38,18 +38,19 @@ final class CirceSupportSpec extends PropSpec with PropertyChecks {
         "value" -> token.value.asJson,
         "expiresAt" -> token.expiresAt.asJson,
       )
-      assertResult(json.as[AccessToken].right.get)(token)
+      assertEquals(token, json.as[AccessToken].right.get)
     }
   }
 
   property("encodes Login correctly") {
     forAll { (login: Login) =>
-      assertResult(
+      assertEquals(
+        login.asJson,
         Json.obj(
           "username" -> login.username.asJson,
           "password" -> login.password.asJson,
         ),
-      )(login.asJson)
+      )
     }
   }
 
@@ -59,7 +60,7 @@ final class CirceSupportSpec extends PropSpec with PropertyChecks {
         "username" -> login.username.asJson,
         "password" -> login.password.asJson,
       )
-      assertResult(json.as[Login].right.get)(login)
+      assertEquals(login, json.as[Login].right.get)
     }
   }
 

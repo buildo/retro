@@ -1,12 +1,10 @@
 import io.buildo.enumero._
 import io.buildo.enumero.circe._
-import io.circe.{DecodingFailure, Json}
 import io.circe.syntax._
-import io.circe.parser._
+import io.circe.parser.parse
 
-import org.scalatest.{Matchers, WordSpec}
+class CirceSupportSuite extends munit.FunSuite {
 
-class CirceSupportSpec extends WordSpec with Matchers {
   sealed trait Planet extends CaseEnum
   object Planet {
     case object Mercury extends Planet
@@ -17,36 +15,35 @@ class CirceSupportSpec extends WordSpec with Matchers {
   val planetMap = Map[Planet, Int](
     Planet.Mercury -> 12,
     Planet.Venus -> 812763,
-    Planet.Earth -> 0
+    Planet.Earth -> 0,
   )
 
-  val planetMapJson: Json = parse("""
+  val planetMapJson = parse("""
       {
         "Mercury": 12,
         "Venus": 812763,
         "Earth": 0
       }
-    """).getOrElse(Json.Null)
+    """).right.get
 
-  "CirceSupport handles encoding of a map with CaseEnum keys" in {
+  test("CirceSupport handles encoding a map with CaseEnum keys") {
     val encodedJson = planetMap.asJson
-
-    encodedJson shouldBe planetMapJson
+    assertEquals(encodedJson, planetMapJson)
   }
 
-  "CirceSupport handles dencoding of a json with CaseEnum keys" in {
-    planetMapJson.as[Map[Planet, Int]].getOrElse(Json.Null) shouldBe planetMap
+  test("CirceSupport handles decoding a json with CaseEnum keys") {
+    assertEquals(planetMapJson.as[Map[Planet, Int]].right.get, planetMap)
   }
 
-  "CirceSupport handles dencoding of a json with wrong CaseEnum keys" in {
-    parse("""
+  test("CirceSupport handles decoding a json with wrong CaseEnum keys") {
+    val decodeResult = parse("""
       {
         "Mercury": 12,
         "Venus": 812763,
         "wrongKey": 0
       }
-    """)
-      .getOrElse(Json.Null)
-      .as[Map[Planet, Int]] shouldBe a[Left[_, DecodingFailure]]
+    """).right.get
+      .as[Map[Planet, Int]]
+    assert(decodeResult.isLeft)
   }
 }

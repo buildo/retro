@@ -1,8 +1,7 @@
 import io.buildo.enumero._
+import scala.language.reflectiveCalls
 
-import org.scalatest.{Matchers, WordSpec}
-
-class CaseEnumIndexSpec extends WordSpec with Matchers {
+class CaseEnumIndexSuite extends munit.FunSuite {
   sealed trait Planet extends IndexedCaseEnum { type Index = Int }
   object Planet {
     case object Mercury extends Planet { val index = 1 }
@@ -10,57 +9,53 @@ class CaseEnumIndexSpec extends WordSpec with Matchers {
     case object Earth extends Planet { val index = 3 }
   }
 
-  "CaseEnumIndexMacro" should {
-    "construct a sensible CaseEnumIndex" in {
-      val converter = CaseEnumIndex.caseEnumIndex[Planet]
+  test("CaseEnumIndexMacro should construct a sensible CaseEnumIndex") {
+    val converter = CaseEnumIndex.caseEnumIndex[Planet]
 
-      val pairs = List(Planet.Mercury -> 1, Planet.Venus -> 2, Planet.Earth -> 3)
+    val pairs = List(Planet.Mercury -> 1, Planet.Venus -> 2, Planet.Earth -> 3)
 
-      for ((co, index) <- pairs) {
-        converter.caseToIndex(co).shouldBe(index)
-        converter.caseFromIndex(index).shouldBe(Some(co))
-      }
+    for ((co, index) <- pairs) {
+      assertEquals(converter.caseToIndex(co), index)
+      assertEquals(converter.caseFromIndex(index), Some(co))
     }
   }
 
-  "CaseEnumIndex" should {
-    "provide the typeclass instance" in {
-      trait FakeBinaryPickler[T] {
-        def pickle(c: T)(picklerState: { def writeInt(int: Int) }): Unit
-        def unpickle(unpicklerState: { def getInt(): Int }): Option[T]
-      }
-
-      implicit def fakeBinaryPickler[T <: IndexedCaseEnum { type Index = Int }](
-        implicit instance: CaseEnumIndex[T]
-      ) = new FakeBinaryPickler[T] {
-
-        def pickle(c: T)(picklerState: { def writeInt(int: Int) }): Unit = {
-          picklerState.writeInt(instance.caseToIndex(c))
-        }
-        def unpickle(unpicklerState: { def getInt(): Int }): Option[T] = {
-          instance.caseFromIndex(unpicklerState.getInt())
-        }
-      }
-
-      object picklerState {
-        var value: Int = 0
-        def writeInt(int: Int): Unit = {
-          value = int
-        }
-      }
-      val binaryPickler = implicitly[FakeBinaryPickler[Planet]]
-      binaryPickler.pickle(Planet.Venus)(picklerState)
-      picklerState.value.shouldBe(2)
-
-      object unpicklerState {
-        def getInt(): Int = 3
-      }
-      binaryPickler.unpickle(unpicklerState).shouldBe(Some(Planet.Earth))
+  test("CaseEnumIndex should provide the typeclass instance") {
+    trait FakeBinaryPickler[T] {
+      def pickle(c: T)(picklerState: { def writeInt(int: Int): Unit }): Unit
+      def unpickle(unpicklerState: { def getInt(): Int }): Option[T]
     }
 
-    "retrieve a typeclass instance using apply" in {
-      CaseEnumIndex[Planet].caseFromIndex(1) shouldBe Some(Planet.Mercury)
+    implicit def fakeBinaryPickler[T <: IndexedCaseEnum { type Index = Int }](
+      implicit instance: CaseEnumIndex[T],
+    ) = new FakeBinaryPickler[T] {
+
+      def pickle(c: T)(picklerState: { def writeInt(int: Int): Unit }): Unit = {
+        picklerState.writeInt(instance.caseToIndex(c))
+      }
+      def unpickle(unpicklerState: { def getInt(): Int }): Option[T] = {
+        instance.caseFromIndex(unpicklerState.getInt())
+      }
     }
 
+    object picklerState {
+      var value: Int = 0
+      def writeInt(int: Int): Unit = {
+        value = int
+      }
+    }
+    val binaryPickler = implicitly[FakeBinaryPickler[Planet]]
+    binaryPickler.pickle(Planet.Venus)(picklerState)
+    assertEquals(picklerState.value, 2)
+
+    object unpicklerState {
+      def getInt(): Int = 3
+    }
+    assertEquals(binaryPickler.unpickle(unpicklerState), Some(Planet.Earth))
   }
+
+  test("CaseEnumIndex should retrieve a typeclass instance using apply") {
+    assertEquals(CaseEnumIndex[Planet].caseFromIndex(1), Some(Planet.Mercury))
+  }
+
 }

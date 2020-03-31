@@ -33,7 +33,7 @@ object JSFacade {
     try {
       val result = Metarpheus.run(paths.toList, config)
       val printer = Printer.noSpaces.copy(dropNullValues = true)
-      js.JSON.parse(printer.pretty(result.asJson))
+      js.JSON.parse(printer.print(result.asJson))
     } catch {
       case NonFatal(e) => throw js.JavaScriptException(e.getMessage)
     }

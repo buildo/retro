@@ -2,11 +2,9 @@ package io.buildo.metarpheus
 package core
 package test
 
-import org.scalatest._
-
 import extractors._
 
-class ApiSuite extends FunSuite {
+class ApiSuite extends munit.FunSuite {
   lazy val parsed = {
     import scala.meta._
     List(
