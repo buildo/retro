@@ -1,3 +1,6 @@
+// Derived from
+// https://github.com/scalameta/metals/blob/71ea70fd735b45169dafbb3543ecf2f90bb1ac61/tests/unit/src/main/scala/tests/FileLayout.scala
+// See NOTICE.md for licensing
 package io.buildo.tapiro
 
 import java.nio.charset.Charset
@@ -6,7 +9,6 @@ import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import scala.meta.io.AbsolutePath
 
-//TODO(gabro): add Metals notice
 object FileLayout {
 
   def mapFromString(layout: String): Map[String, String] = {
