@@ -10,4 +10,4 @@ $ exists "src/main/scala/endpoints/ExampleControllerHttpEndpoints.scala"
 # check that the endpoints respond as expected
 # NOTE(gabro): the single quotes surrounding the commands are a workaround for https://github.com/sbt/sbt/issues/4870
 > 'curlExpect -s -X GET  localhost:8080/ExampleController/queryExample?intParam=1&stringParam=abc               {"name":"abc","double":1.0}'
-> 'curlExpect -s -X POST localhost:8080/ExampleController/commandExample -d "{\"name\":\"abc\",\"double\":1.0}" abc'
+> 'curlExpect -s -X POST localhost:8080/ExampleController/commandExample -d "{\"body\": {\"name\":\"abc\",\"double\":1.0}}" "\"abc\""'
