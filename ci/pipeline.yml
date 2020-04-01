@@ -107,7 +107,7 @@ resources:
   icon: docker
   source:
     repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.11_1.3.8
+    tag: 8u201_2.12.11_1.3.9
 
 jobs:
 
