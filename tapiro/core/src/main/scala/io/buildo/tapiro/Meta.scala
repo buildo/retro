@@ -3,53 +3,49 @@ package io.buildo.tapiro
 import io.buildo.metarpheus.core.intermediate.{TaggedUnion, Type => MetarpheusType}
 
 import scala.meta._
+import scala.meta.contrib._
 
 import cats.data.NonEmptyList
 
 object Meta {
   val codecsImplicits = (routes: List[TapiroRoute]) => {
-    val jsonCodecs = (routes.flatMap {
-      case TapiroRoute(route, _, error) =>
-        ((error match {
-          case RouteError.OtherError(t) => List(t)
-          case _                        => Nil
-        }) :+
-          route.returns)
-    }.distinct
-      .filter(t => typeNameString(t) != "Unit") //no json codec for Unit in tapir
-      .map(toScalametaType)
-      ++ taggedUnionErrorMembers(routes))
-      .map(t => t"JsonCodec[$t]")
-    val plainCodecs = routes.flatMap {
-      case TapiroRoute(route, method, _) =>
-        (method match {
-          case RouteMethod.GET => route.params.map(_.tpe)
-          case _               => Nil
-        }) ++ route.params.map(_.tpe).filter(isAuthToken)
-    }.distinct.map(t => t"PlainCodec[${toScalametaType(t)}]")
-    val circeCodecs = routes.flatMap {
-      case TapiroRoute(route, method, _) =>
-        method match {
-          case RouteMethod.POST => route.params.map(_.tpe).filterNot(isAuthToken)
-          case _                => Nil
+    val notUnit = (t: MetarpheusType) => t != MetarpheusType.Name("Unit")
+    val toDecoder = (t: Type) => t"Decoder[$t]"
+    val toEncoder = (t: Type) => t"Encoder[$t]"
+    val toJsonCodec = (t: Type) => t"JsonCodec[$t]"
+    val toPlainCodec = (t: Type) => t"PlainCodec[$t]"
+    val routeRequiredImplicits = (route: TapiroRoute) => {
+      val (authParamTypes, nonAuthParamTypes) =
+        route.route.params.map(_.tpe).partition(isAuthToken)
+      val inputImplicits =
+        route.method match {
+          case RouteMethod.GET =>
+            nonAuthParamTypes.map(toScalametaType).map(toPlainCodec)
+          case RouteMethod.POST =>
+            nonAuthParamTypes.map(toScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
         }
-    }.distinct.flatMap { t =>
-      List(t"Decoder[${toScalametaType(t)}]", t"Encoder[${toScalametaType(t)}]")
+      val outputImplicits =
+        List(route.route.returns).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+      val errorImplicits =
+        route.error match {
+          case RouteError.TaggedUnionError(tu) =>
+            tu.values.map(taggedUnionMemberType(tu)).map(toJsonCodec)
+          case RouteError.OtherError(t) =>
+            List(t).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+        }
+      val authImplicits = authParamTypes.map(toScalametaType).map(toPlainCodec)
+      inputImplicits ++ outputImplicits ++ errorImplicits ++ authImplicits
     }
-    val codecs = jsonCodecs ++ plainCodecs ++ circeCodecs
-    codecs.zipWithIndex.map(toImplicitParam.tupled)
+    deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
   }
+
+  private[this] val deduplicate: List[Type] => List[Type] = (ts: List[Type]) =>
+    ts match {
+      case Nil          => Nil
+      case head :: tail => head :: deduplicate(tail.filter(!_.isEqual(head)))
+    }
 
   private[this] val isAuthToken = (t: MetarpheusType) => t == MetarpheusType.Name("AuthToken")
-
-  private[this] val taggedUnionErrorMembers = (routes: List[TapiroRoute]) => {
-    val taggedUnions = routes.collect {
-      case TapiroRoute(_, _, RouteError.TaggedUnionError(tu)) => tu
-    }.distinct
-    taggedUnions.flatMap { taggedUnion =>
-      taggedUnion.values.map(taggedUnionMemberType(taggedUnion))
-    }
-  }
 
   private[this] val toImplicitParam = (paramType: Type, index: Int) => {
     val paramName = Term.Name(s"codec$index")
