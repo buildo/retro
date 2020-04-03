@@ -66,7 +66,15 @@ object TapirMeta {
           case l           => Type.Tuple(l)
         }
       case RouteMethod.POST =>
-        postInputType(route.route)
+        val authTokenType = route.route.params
+          .filter(_.tpe == MetarpheusType.Name(authTokenName))
+          .map(t => toScalametaType(t.tpe))
+          .headOption
+        val outputType = postInputType(route.route)
+        authTokenType match {
+          case Some(t) => Type.Tuple(List(outputType, t))
+          case None    => outputType
+        }
     }
     val error = toScalametaType(route.error match {
       case RouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
@@ -85,14 +93,9 @@ object TapirMeta {
         .Select(Term.Select(Term.Name("endpoint"), Term.Name(method)), Term.Name("in")),
       List(Lit.String(route.route.name.tail.mkString)),
     )
-    val (auth, _) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
-    val endpointsWithParams = withParams(basicEndpoint, route)
     withOutput(
       withError(
-        auth match {
-          case Nil => endpointsWithParams
-          case _   => withAuth(endpointsWithParams)
-        },
+        withParams(basicEndpoint, route),
         route.error,
       ),
       route.route.returns,
@@ -114,14 +117,19 @@ object TapirMeta {
     )
 
   private[this] val withParams = (endpoint: meta.Term, route: TapiroRoute) => {
-    route.method match {
+    val (auth, params) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
+    val endpointWithParams = route.method match {
       case RouteMethod.GET =>
-        route.route.params.foldLeft(endpoint) { (acc, param) =>
+        params.foldLeft(endpoint) { (acc, param) =>
           withParam(acc, param)
         }
       case RouteMethod.POST =>
         withBody(endpoint, route.route)
-    },
+    }
+    auth match {
+      case Nil => endpointWithParams
+      case _   => withAuth(endpointWithParams)
+    }
   }
 
   private[this] val withBody = (endpoint: meta.Term, route: Route) => {
