@@ -70,10 +70,10 @@ object TapirMeta {
           .filter(_.tpe == MetarpheusType.Name(authTokenName))
           .map(t => toScalametaType(t.tpe))
           .headOption
-        val outputType = postInputType(route.route)
+        val inputType = postInputType(route.route)
         authTokenType match {
-          case Some(t) => Type.Tuple(List(outputType, t))
-          case None    => outputType
+          case Some(t) => Type.Tuple(List(inputType, t))
+          case None    => inputType
         }
     }
     val error = toScalametaType(route.error match {
