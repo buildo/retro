@@ -80,4 +80,27 @@ object Meta {
   def packageFromList(`package`: NonEmptyList[String]): Term.Ref =
     `package`.tail
       .foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
+
+  val toEndpointImplementation = (route: TapiroRoute) => {
+    val name = Term.Name(route.route.name.last)
+    val controllersName = q"controller.$name"
+    route.method match {
+      case RouteMethod.GET =>
+        route.route.params.length match {
+          case 0 => q"_ => $controllersName()"
+          case 1 => controllersName
+          case _ => q"($controllersName _).tupled"
+        }
+      case RouteMethod.POST =>
+        val fields = route.route.params
+          .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
+          .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
+        val hasAuth = route.route.params
+          .exists(_.tpe == MetarpheusType.Name("AuthToken"))
+        if (hasAuth)
+          q"{ case (x, token) => $controllersName(..${fields.map(f => q"x.$f")}, token) }"
+        else
+          q"x => $controllersName(..${fields.map(f => q"x.$f")})"
+    }
+  }
 }

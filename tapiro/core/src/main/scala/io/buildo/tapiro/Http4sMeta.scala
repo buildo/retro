@@ -1,6 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{Route, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.Route
 
 import scala.meta._
 
@@ -48,23 +48,7 @@ object Http4sMeta {
   val endpoints = (routes: List[TapiroRoute]) =>
     routes.map { route =>
       val name = Term.Name(route.route.name.last)
-      val endpointsName = q"endpoints.$name"
-      val controllersName = q"controller.$name"
-      val controllerContent =
-        route.method match {
-          case RouteMethod.GET =>
-            route.route.params.length match {
-              case 0 => q"_ => $controllersName()"
-              case 1 => controllersName
-              case _ => q"($controllersName _).tupled"
-            }
-          case RouteMethod.POST =>
-            val fields = route.route.params
-              .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
-              .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
-            q"x => $controllersName(..${fields.map(f => q"x.$f")})"
-        }
-      val toRoutes = q"$endpointsName.toRoutes($controllerContent)"
-      q"val ${Pat.Var(name)} = $toRoutes"
+      val endpointImpl = Meta.toEndpointImplementation(route)
+      q"val ${Pat.Var(name)} = endpoints.$name.toRoutes($endpointImpl)"
     }
 }
