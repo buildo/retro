@@ -35,7 +35,7 @@ object Dependencies {
     val plantuml = "8059"
     val pprint = "0.5.9"
     val sbtLogging = "1.3.3"
-    val tapir = "0.12.28"
+    val tapir = "0.13.1"
     val munit = "0.7.1"
   }
 
