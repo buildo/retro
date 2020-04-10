@@ -31,7 +31,7 @@ object SbtTapiro extends AutoPlugin {
   override val projectSettings = inConfig(Compile)(
     Seq(
       tapiro := {
-        (new Util(streams.value.log)).createFiles(
+        new Util().createFiles(
           tapiroRoutesPaths.in(tapiro).value.map(s => (scalaSource.value / s).toString),
           tapiroModelsPaths.in(tapiro).value.map(s => (scalaSource.value / s).toString),
           (scalaSource.value / tapiroOutputPath.in(tapiro).value).toString,
