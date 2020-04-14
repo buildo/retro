@@ -5,7 +5,7 @@ import java.nio.file.Files
 class TapiroSuite extends munit.FunSuite {
 
   check(
-    "http4s",
+    "tapir and http4s endpoints",
     Server.Http4s,
     "src/main/scala/schools/endpoints",
     """
@@ -14,12 +14,19 @@ class TapiroSuite extends munit.FunSuite {
       |
       |case class School(id: Long, name: String)
       |
+      |sealed trait SchoolCreateError
+      |object SchoolCreateError {
+      |  case object DuplicateId extends SchoolCreateError
+      |}
+      |
       |sealed trait SchoolReadError
       |object SchoolReadError {
       |  case object NotFound extends SchoolReadError
       |}
       |
-      |trait SchoolController[F[_], T] {
+      |trait SchoolController[F[_], AuthToken] {
+      |  @command
+      |  def create(school: School, token: AuthToken): F[Either[SchoolCreateError, Unit]]
       |  @query
       |  def read(id: Long): F[Either[SchoolReadError, School]]
       |}
@@ -34,21 +41,56 @@ class TapiroSuite extends munit.FunSuite {
       |
       |package endpoints
       |import schools._
+      |import io.circe.{Decoder, Encoder}
+      |import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
       |import sttp.tapir._
+      |import sttp.tapir.json.circe._
       |import sttp.tapir.Codec.{JsonCodec, PlainCodec}
       |import sttp.model.StatusCode
       |
       |trait SchoolControllerTapirEndpoints[AuthToken] {
+      |
+      |  val create: Endpoint[
+      |    (CreateRequestPayload, AuthToken),
+      |    SchoolCreateError,
+      |    Unit,
+      |    Nothing
+      |  ]
       |  val read: Endpoint[Long, SchoolReadError, School, Nothing]
       |}
       |
       |object SchoolControllerTapirEndpoints {
       |
       |  def create[AuthToken](statusCodes: String => StatusCode)(
-      |      implicit codec0: JsonCodec[School],
-      |      codec1: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec2: PlainCodec[Long]
+      |      implicit codec0: Decoder[School],
+      |      codec1: Encoder[School],
+      |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
+      |      codec3: PlainCodec[AuthToken],
+      |      codec4: PlainCodec[Long],
+      |      codec5: JsonCodec[School],
+      |      codec6: JsonCodec[SchoolReadError.NotFound.type]
       |  ) = new SchoolControllerTapirEndpoints[AuthToken] {
+      |    implicit val createRequestPayloadDecoder: Decoder[CreateRequestPayload] =
+      |      deriveDecoder
+      |    implicit val createRequestPayloadEncoder: Encoder[CreateRequestPayload] =
+      |      deriveEncoder
+      |    override val create: Endpoint[
+      |      (CreateRequestPayload, AuthToken),
+      |      SchoolCreateError,
+      |      Unit,
+      |      Nothing
+      |    ] = endpoint.post
+      |      .in("create")
+      |      .in(jsonBody[CreateRequestPayload])
+      |      .in(header[AuthToken]("Authorization"))
+      |      .errorOut(
+      |        oneOf[SchoolCreateError](
+      |          statusMapping(
+      |            statusCodes("DuplicateId"),
+      |            jsonBody[SchoolCreateError.DuplicateId.type]
+      |          )
+      |        )
+      |      )
       |    override val read: Endpoint[Long, SchoolReadError, School, Nothing] =
       |      endpoint.get
       |        .in("read")
@@ -64,6 +106,7 @@ class TapiroSuite extends munit.FunSuite {
       |        .out(jsonBody[School])
       |  }
       |}
+      |case class CreateRequestPayload(school: School)
       |
       |/src/main/scala/schools/endpoints/SchoolControllerHttpEndpoints.scala
       |//----------------------------------------------------------
@@ -77,6 +120,7 @@ class TapiroSuite extends munit.FunSuite {
       |import cats.effect._
       |import cats.implicits._
       |import cats.data.NonEmptyList
+      |import io.circe.{Decoder, Encoder}
       |import org.http4s._
       |import org.http4s.server.Router
       |import sttp.tapir.server.http4s._
@@ -89,15 +133,96 @@ class TapiroSuite extends munit.FunSuite {
       |      controller: SchoolController[F, AuthToken],
       |      statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity
       |  )(
-      |      implicit codec0: JsonCodec[School],
-      |      codec1: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec2: PlainCodec[Long],
+      |      implicit codec0: Decoder[School],
+      |      codec1: Encoder[School],
+      |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
+      |      codec3: PlainCodec[AuthToken],
+      |      codec4: PlainCodec[Long],
+      |      codec5: JsonCodec[School],
+      |      codec6: JsonCodec[SchoolReadError.NotFound.type],
       |      cs: ContextShift[F]
       |  ): HttpRoutes[F] = {
       |    val endpoints =
       |      SchoolControllerTapirEndpoints.create[AuthToken](statusCodes)
+      |    val create = endpoints.create.toRoutes({
+      |      case (x, token) =>
+      |        controller.create(x.school, token)
+      |    })
       |    val read = endpoints.read.toRoutes(controller.read)
-      |    Router("/SchoolController" -> NonEmptyList(read, List()).reduceK)
+      |    Router("/SchoolController" -> NonEmptyList(create, List(read)).reduceK)
+      |  }
+      |}
+      |""".stripMargin,
+  )
+
+  check(
+    "akkaHttp endpoints",
+    Server.AkkaHttp,
+    "src/main/scala/schools/endpoints",
+    """
+      |/src/main/scala/schools/SchoolController.scala
+      |package schools
+      |
+      |case class School(id: Long, name: String)
+      |
+      |sealed trait SchoolCreateError
+      |object SchoolCreateError {
+      |  case object DuplicateId extends SchoolCreateError
+      |}
+      |
+      |sealed trait SchoolReadError
+      |object SchoolReadError {
+      |  case object NotFound extends SchoolReadError
+      |}
+      |
+      |trait SchoolController[AuthToken] {
+      |  @command
+      |  def create(school: School, token: AuthToken): Future[Either[SchoolCreateError, Unit]]
+      |  @query
+      |  def read(id: Long): Future[Either[SchoolReadError, School]]
+      |}
+      |""".stripMargin,
+    """
+      |/src/main/scala/schools/endpoints/SchoolControllerHttpEndpoints.scala
+      |//----------------------------------------------------------
+      |//  This code was generated by tapiro.
+      |//  Changes to this file may cause incorrect behavior
+      |//  and will be lost if the code is regenerated.
+      |//----------------------------------------------------------
+      |
+      |package endpoints
+      |import schools._
+      |import akka.http.scaladsl.server._
+      |import akka.http.scaladsl.server.Directives._
+      |import io.circe.{Decoder, Encoder}
+      |import sttp.tapir.server.akkahttp._
+      |import sttp.tapir.Codec.{JsonCodec, PlainCodec}
+      |import sttp.model.StatusCode
+      |
+      |object SchoolControllerHttpEndpoints {
+      |
+      |  def routes[AuthToken](
+      |      controller: SchoolController[AuthToken],
+      |      statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity
+      |  )(
+      |      implicit codec0: Decoder[School],
+      |      codec1: Encoder[School],
+      |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
+      |      codec3: PlainCodec[AuthToken],
+      |      codec4: PlainCodec[Long],
+      |      codec5: JsonCodec[School],
+      |      codec6: JsonCodec[SchoolReadError.NotFound.type]
+      |  ): Route = {
+      |    val endpoints =
+      |      SchoolControllerTapirEndpoints.create[AuthToken](statusCodes)
+      |    val create = endpoints.create.toRoute({
+      |      case (x, token) =>
+      |        controller.create(x.school, token)
+      |    })
+      |    val read = endpoints.read.toRoute(controller.read)
+      |    pathPrefix("SchoolController") {
+      |      List(read).foldLeft[Route](create)(_ ~ _)
+      |    }
       |  }
       |}
       |""".stripMargin,
