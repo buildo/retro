@@ -5,7 +5,7 @@ import java.nio.file.Files
 class TapiroSuite extends munit.FunSuite {
 
   check(
-    "tapir and http4s endpoints",
+    "tapir-http4s-endpoints",
     Server.Http4s,
     "src/main/scala/schools/endpoints",
     """
@@ -157,16 +157,14 @@ class TapiroSuite extends munit.FunSuite {
       |    })
       |    val read = endpoints.read.toRoutes(controller.read)
       |    val list = endpoints.list.toRoutes(_ => controller.list())
-      |    Router(
-      |      "/SchoolController" -> NonEmptyList(create, List(read, list)).reduceK
-      |    )
+      |    Router("/SchoolController" -> NonEmptyList.of(create, read, list).reduceK)
       |  }
       |}
       |""".stripMargin,
   )
 
   check(
-    "akkaHttp endpoints",
+    "akkaHttp-endpoints",
     Server.AkkaHttp,
     "src/main/scala/schools/endpoints",
     """

@@ -42,7 +42,7 @@ object Http4sMeta {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
     val route: Lit.String = Lit.String("/" + pathName.value)
-    q"Router($route -> NonEmptyList($first, List(..$rest)).reduceK)"
+    q"Router($route -> NonEmptyList.of($first, ..$rest).reduceK)"
   }
 
   val endpoints = (routes: List[TapiroRoute]) =>
