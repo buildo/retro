@@ -25,13 +25,19 @@ object Server {
   case object NoServer extends Server
 }
 
-sealed trait TapiroRouteError
-object TapiroRouteError {
-  case class TaggedUnionError(taggedUnion: TaggedUnion) extends TapiroRouteError
-  case class OtherError(`type`: MetarpheusType) extends TapiroRouteError
+sealed trait RouteError
+object RouteError {
+  case class TaggedUnionError(taggedUnion: TaggedUnion) extends RouteError
+  case class OtherError(`type`: MetarpheusType) extends RouteError
 }
 
-case class TapiroRoute(route: Route, error: TapiroRouteError)
+sealed trait RouteMethod
+object RouteMethod {
+  case object GET extends RouteMethod
+  case object POST extends RouteMethod
+}
+
+case class TapiroRoute(route: Route, method: RouteMethod, error: RouteError)
 
 class Util() {
   import Formatter.format
@@ -49,9 +55,8 @@ class Util() {
       case Some(nonEmptyPackage) =>
         val config = Config(Set.empty)
         val models = Metarpheus.run(modelsPaths, config).models
-        val routes: List[TapiroRoute] = Metarpheus.run(routesPaths, config).routes.map { route =>
-          TapiroRoute(route, routeError(route, models))
-        }
+        val routes: List[TapiroRoute] =
+          Metarpheus.run(routesPaths, config).routes.map(toTapiroRoute(models))
         val controllersRoutes =
           routes.groupBy(
             route => (route.route.controllerType, route.route.pathName),
@@ -125,6 +130,8 @@ class Util() {
         Term.Name(tapirEndpointsName),
         Meta.codecsImplicits(routes),
         routes.map(TapirMeta.routeToTapirEndpoint),
+        routes.flatMap(TapirMeta.routeClassDeclarations),
+        routes.flatMap(TapirMeta.routeCodecDeclarations),
       ),
     )
   }
@@ -151,7 +158,7 @@ class Util() {
               Term.Name(tapirEndpointsName),
               Term.Name(httpEndpointsName),
               Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
-              Http4sMeta.endpoints(routes),
+              Http4sMeta.endpoints(tapiroRoutes),
               Http4sMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),
@@ -181,7 +188,7 @@ class Util() {
               Term.Name(tapirEndpointsName),
               Term.Name(httpEndpointsName),
               Meta.codecsImplicits(tapiroRoutes),
-              AkkaHttpMeta.endpoints(routes),
+              AkkaHttpMeta.endpoints(tapiroRoutes),
               AkkaHttpMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),

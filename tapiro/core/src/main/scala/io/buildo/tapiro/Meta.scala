@@ -3,44 +3,49 @@ package io.buildo.tapiro
 import io.buildo.metarpheus.core.intermediate.{TaggedUnion, Type => MetarpheusType}
 
 import scala.meta._
+import scala.meta.contrib._
 
 import cats.data.NonEmptyList
 
 object Meta {
   val codecsImplicits = (routes: List[TapiroRoute]) => {
-    val jsonCodecs = (routes.flatMap {
-      case TapiroRoute(route, error) =>
-        val params: List[MetarpheusType] = route.params.map(_.tpe)
-        ((if (route.method == "post") params else Nil) ++
-          (error match {
-            case TapiroRouteError.OtherError(t) => List(t)
-            case _                              => Nil
-          }) :+
-          route.returns)
-    }.distinct
-      .filter(t => typeNameString(t) != "Unit") //no json codec for Unit in tapir
-      .filter(t => typeNameString(t) != "String")
-      .filter(t => typeNameString(t) != "AuthToken")
-      .map(toScalametaType)
-      ++ taggedUnionErrorMembers(routes))
-      .map(t => t"JsonCodec[$t]")
-    val plainCodecs = routes.flatMap {
-      case TapiroRoute(route, _) =>
-        (if (route.method == "get") route.params.map(_.tpe) else Nil) ++
-          route.params.map(_.tpe).filter(typeNameString(_) == "AuthToken")
-    }.distinct.map(t => t"PlainCodec[${toScalametaType(t)}]")
-    val codecs = jsonCodecs ++ plainCodecs
-    codecs.zipWithIndex.map(toImplicitParam.tupled)
+    val notUnit = (t: MetarpheusType) => t != MetarpheusType.Name("Unit")
+    val toDecoder = (t: Type) => t"Decoder[$t]"
+    val toEncoder = (t: Type) => t"Encoder[$t]"
+    val toJsonCodec = (t: Type) => t"JsonCodec[$t]"
+    val toPlainCodec = (t: Type) => t"PlainCodec[$t]"
+    val routeRequiredImplicits = (route: TapiroRoute) => {
+      val (authParamTypes, nonAuthParamTypes) =
+        route.route.params.map(_.tpe).partition(isAuthToken)
+      val inputImplicits =
+        route.method match {
+          case RouteMethod.GET =>
+            nonAuthParamTypes.map(toScalametaType).map(toPlainCodec)
+          case RouteMethod.POST =>
+            nonAuthParamTypes.map(toScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
+        }
+      val outputImplicits =
+        List(route.route.returns).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+      val errorImplicits =
+        route.error match {
+          case RouteError.TaggedUnionError(tu) =>
+            tu.values.map(taggedUnionMemberType(tu)).map(toJsonCodec)
+          case RouteError.OtherError(t) =>
+            List(t).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+        }
+      val authImplicits = authParamTypes.map(toScalametaType).map(toPlainCodec)
+      inputImplicits ++ outputImplicits ++ errorImplicits ++ authImplicits
+    }
+    deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
   }
 
-  private[this] val taggedUnionErrorMembers = (routes: List[TapiroRoute]) => {
-    val taggedUnions = routes.collect {
-      case TapiroRoute(_, TapiroRouteError.TaggedUnionError(tu)) => tu
-    }.distinct
-    taggedUnions.flatMap { taggedUnion =>
-      taggedUnion.values.map(taggedUnionMemberType(taggedUnion))
+  private[this] val deduplicate: List[Type] => List[Type] = (ts: List[Type]) =>
+    ts match {
+      case Nil          => Nil
+      case head :: tail => head :: deduplicate(tail.filter(!_.isEqual(head)))
     }
-  }
+
+  private[this] val isAuthToken = (t: MetarpheusType) => t == MetarpheusType.Name("AuthToken")
 
   private[this] val toImplicitParam = (paramType: Type, index: Int) => {
     val paramName = Term.Name(s"codec$index")
@@ -71,4 +76,27 @@ object Meta {
   def packageFromList(`package`: NonEmptyList[String]): Term.Ref =
     `package`.tail
       .foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
+
+  val toEndpointImplementation = (route: TapiroRoute) => {
+    val name = Term.Name(route.route.name.last)
+    val controllersName = q"controller.$name"
+    route.method match {
+      case RouteMethod.GET =>
+        route.route.params.length match {
+          case 0 => q"_ => $controllersName()"
+          case 1 => controllersName
+          case _ => q"($controllersName _).tupled"
+        }
+      case RouteMethod.POST =>
+        val fields = route.route.params
+          .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
+          .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
+        val hasAuth = route.route.params
+          .exists(_.tpe == MetarpheusType.Name("AuthToken"))
+        if (hasAuth)
+          q"{ case (x, token) => $controllersName(..${fields.map(f => q"x.$f")}, token) }"
+        else
+          q"x => $controllersName(..${fields.map(f => q"x.$f")})"
+    }
+  }
 }

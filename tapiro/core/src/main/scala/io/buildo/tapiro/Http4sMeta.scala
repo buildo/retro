@@ -22,6 +22,7 @@ object Http4sMeta {
       import cats.effect._
       import cats.implicits._
       import cats.data.NonEmptyList
+      import io.circe.{ Decoder, Encoder }
       import org.http4s._
       import org.http4s.server.Router
       import sttp.tapir.server.http4s._
@@ -41,20 +42,13 @@ object Http4sMeta {
     val first = Term.Name(head.name.last)
     val rest = tail.map(a => Term.Name(a.name.last))
     val route: Lit.String = Lit.String("/" + pathName.value)
-    q"Router($route -> NonEmptyList($first, List(..$rest)).reduceK)"
+    q"Router($route -> NonEmptyList.of($first, ..$rest).reduceK)"
   }
 
-  val endpoints = (routes: List[Route]) =>
-    routes.flatMap { route =>
-      val name = Term.Name(route.name.last)
-      val endpointsName = Term.Select(Term.Name("endpoints"), name)
-      val controllersName = Term.Select(Term.Name("controller"), name)
-      val controllerContent =
-        if (route.params.length <= 1) Some(controllersName)
-        else Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
-      controllerContent.map { content =>
-        val toRoutes = Term.Apply(Term.Select(endpointsName, Term.Name("toRoutes")), List(content))
-        q"val ${Pat.Var(name)} = $toRoutes"
-      }
+  val endpoints = (routes: List[TapiroRoute]) =>
+    routes.map { route =>
+      val name = Term.Name(route.route.name.last)
+      val endpointImpl = Meta.toEndpointImplementation(route)
+      q"val ${Pat.Var(name)} = endpoints.$name.toRoutes($endpointImpl)"
     }
 }

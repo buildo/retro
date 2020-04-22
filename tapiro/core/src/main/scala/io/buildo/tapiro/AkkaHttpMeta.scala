@@ -19,11 +19,12 @@ object AkkaHttpMeta {
     q"""
     package ${`package`} {
       ..${imports.toList.map(i => q"import $i._")}
+      import akka.http.scaladsl.server._
+      import akka.http.scaladsl.server.Directives._
+      import io.circe.{ Decoder, Encoder }
       import sttp.tapir.server.akkahttp._
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
-      import akka.http.scaladsl.server._
-      import akka.http.scaladsl.server.Directives._
 
       object $httpEndpointsName {
         def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): Route = {
@@ -40,17 +41,10 @@ object AkkaHttpMeta {
     q"pathPrefix($pathName) { List(..$rest).foldLeft[Route]($first)(_ ~ _) }"
   }
 
-  val endpoints = (routes: List[Route]) =>
-    routes.flatMap { route =>
-      val name = Term.Name(route.name.last)
-      val endpointsName = Term.Select(Term.Name("endpoints"), name)
-      val controllersName = Term.Select(Term.Name("controller"), name)
-      val controllerContent =
-        if (route.params.length <= 1) Some(controllersName)
-        else Some(Term.Select(Term.Eta(controllersName), Term.Name("tupled")))
-      controllerContent.map { content =>
-        val toRoute = Term.Apply(Term.Select(endpointsName, Term.Name("toRoute")), List(content))
-        q"val ${Pat.Var(name)} = $toRoute"
-      }
+  val endpoints = (routes: List[TapiroRoute]) =>
+    routes.map { route =>
+      val name = Term.Name(route.route.name.last)
+      val endpointImpl = Meta.toEndpointImplementation(route)
+      q"val ${Pat.Var(name)} = endpoints.$name.toRoute($endpointImpl)"
     }
 }
