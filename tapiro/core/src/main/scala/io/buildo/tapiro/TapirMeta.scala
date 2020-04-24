@@ -59,7 +59,7 @@ object TapirMeta {
     val returnType = toScalametaType(route.route.returns)
     val argsType = route.method match {
       case RouteMethod.GET =>
-        val argsList = route.route.params.map(p => toScalametaType(p.tpe))
+        val argsList = route.route.params.map(routeParamToScalametaType)
         argsList match {
           case Nil         => Type.Name("Unit")
           case head :: Nil => head
@@ -195,7 +195,7 @@ object TapirMeta {
         Term.Select(endpoint, Term.Name("in")),
         List(
           Term.Apply(
-            Term.ApplyType(Term.Name("query"), List(toScalametaType(param.tpe))),
+            Term.ApplyType(Term.Name("query"), List(routeParamToScalametaType(param))),
             List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)))),
           ),
         ),

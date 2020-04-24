@@ -1,6 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{TaggedUnion, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.{TaggedUnion, RouteParam, Type => MetarpheusType}
 
 import scala.meta._
 import scala.meta.contrib._
@@ -64,6 +64,11 @@ object Meta {
     case MetarpheusType.Apply(name, args) =>
       Type.Apply(Type.Name(name), args.map(toScalametaType).toList)
     case MetarpheusType.Name(name) => Type.Name(name)
+  }
+
+  val routeParamToScalametaType = (routeParam: RouteParam) => {
+    val t = toScalametaType(routeParam.tpe)
+    if (routeParam.required) t else t"Option[$t]"
   }
 
   val taggedUnionMemberType = (taggedUnion: TaggedUnion) =>
