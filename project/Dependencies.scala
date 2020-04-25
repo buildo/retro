@@ -34,7 +34,7 @@ object Dependencies {
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.9"
-    val tapir = "0.14.0"
+    val tapir = "0.14.3"
     val munit = "0.7.3"
   }
 
