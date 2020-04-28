@@ -1,6 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{TaggedUnion, Type => MetarpheusType}
+import io.buildo.metarpheus.core.intermediate.{TaggedUnion, RouteParam, Type => MetarpheusType}
 
 import scala.meta._
 import scala.meta.contrib._
@@ -20,20 +20,20 @@ object Meta {
       val inputImplicits =
         route.method match {
           case RouteMethod.GET =>
-            nonAuthParamTypes.map(toScalametaType).map(toPlainCodec)
+            nonAuthParamTypes.map(metarpheusTypeToScalametaType).map(toPlainCodec)
           case RouteMethod.POST =>
-            nonAuthParamTypes.map(toScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
+            nonAuthParamTypes.map(metarpheusTypeToScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
         }
       val outputImplicits =
-        List(route.route.returns).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+        List(route.route.returns).filter(notUnit).map(metarpheusTypeToScalametaType).map(toJsonCodec)
       val errorImplicits =
         route.error match {
           case RouteError.TaggedUnionError(tu) =>
             tu.values.map(taggedUnionMemberType(tu)).map(toJsonCodec)
           case RouteError.OtherError(t) =>
-            List(t).filter(notUnit).map(toScalametaType).map(toJsonCodec)
+            List(t).filter(notUnit).map(metarpheusTypeToScalametaType).map(toJsonCodec)
         }
-      val authImplicits = authParamTypes.map(toScalametaType).map(toPlainCodec)
+      val authImplicits = authParamTypes.map(metarpheusTypeToScalametaType).map(toPlainCodec)
       inputImplicits ++ outputImplicits ++ errorImplicits ++ authImplicits
     }
     deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
@@ -60,10 +60,15 @@ object Meta {
       case MetarpheusType.Name(name)     => name
     }
 
-  val toScalametaType: MetarpheusType => Type = {
+  val metarpheusTypeToScalametaType: MetarpheusType => Type = {
     case MetarpheusType.Apply(name, args) =>
-      Type.Apply(Type.Name(name), args.map(toScalametaType).toList)
+      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList)
     case MetarpheusType.Name(name) => Type.Name(name)
+  }
+
+  val routeParamToScalametaType = (routeParam: RouteParam) => {
+    val t = metarpheusTypeToScalametaType(routeParam.tpe)
+    if (routeParam.required) t else t"Option[$t]"
   }
 
   val taggedUnionMemberType = (taggedUnion: TaggedUnion) =>
