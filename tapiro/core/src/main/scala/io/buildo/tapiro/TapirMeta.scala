@@ -56,7 +56,7 @@ object TapirMeta {
     q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
 
   private[this] val endpointType = (route: TapiroRoute) => {
-    val returnType = toScalametaType(route.route.returns)
+    val returnType = metarpheusTypeToScalametaType(route.route.returns)
     val argsType = route.method match {
       case RouteMethod.GET =>
         val argsList = route.route.params.map(routeParamToScalametaType)
@@ -68,7 +68,7 @@ object TapirMeta {
       case RouteMethod.POST =>
         val authTokenType = route.route.params
           .filter(_.tpe == MetarpheusType.Name(authTokenName))
-          .map(t => toScalametaType(t.tpe))
+          .map(t => metarpheusTypeToScalametaType(t.tpe))
           .headOption
         val inputType = postInputType(route.route)
         authTokenType match {
@@ -76,7 +76,7 @@ object TapirMeta {
           case None    => inputType
         }
     }
-    val error = toScalametaType(route.error match {
+    val error = metarpheusTypeToScalametaType(route.error match {
       case RouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
       case RouteError.OtherError(t)       => t
     })
@@ -153,7 +153,7 @@ object TapirMeta {
                 case RouteError.OtherError(MetarpheusType.Name("String")) =>
                   Term.Name("stringBody")
                 case RouteError.OtherError(t) =>
-                  Term.ApplyType(Term.Name("jsonBody"), List(toScalametaType(t)))
+                  Term.ApplyType(Term.Name("jsonBody"), List(metarpheusTypeToScalametaType(t)))
               },
             ),
           )
@@ -183,7 +183,7 @@ object TapirMeta {
           List(
             Term.ApplyType(
               Term.Name("jsonBody"),
-              List(toScalametaType(returnType)),
+              List(metarpheusTypeToScalametaType(returnType)),
             ),
           ),
         )
@@ -217,7 +217,7 @@ object TapirMeta {
         val params = route.route.params
           .filterNot(_.tpe == MetarpheusType.Name(authTokenName))
           .map { p =>
-            param"${Term.Name(p.name.getOrElse(typeNameString(p.tpe)))}: ${toScalametaType(p.tpe)}"
+            param"${Term.Name(p.name.getOrElse(typeNameString(p.tpe)))}: ${metarpheusTypeToScalametaType(p.tpe)}"
           }
         List(q"case class ${postInputType(route.route)}(..$params)")
       case RouteMethod.GET =>
