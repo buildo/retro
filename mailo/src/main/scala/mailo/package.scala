@@ -9,6 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait Mailo {
   def send(mail: Mail): Future[Either[MailError, MailResult]]
+  def sendBatch(batch: BatchMail): Future[Either[MailError, MailResult]]
 }
 
 object Mailo {

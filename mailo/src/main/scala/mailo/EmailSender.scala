@@ -55,4 +55,30 @@ class EmailSender(
 
     result.value
   }
+
+  def sendBatch(batch: BatchMail) = {
+    val result = for {
+      content <- EitherT(cachingWithTTL(batch.templateName)(mailoConfig.cachingTTLSeconds.seconds) {
+        mailData.get(batch.templateName)
+      })
+      _ = logger.debug(s"retrieved ${batch.templateName} content")
+      result <- EitherT(
+        mailClient.sendBatch(
+          to = batch.to,
+          from = batch.from,
+          cc = batch.cc,
+          bcc = batch.bcc,
+          subject = batch.subject,
+          content = HTMLContent(content.template),
+          attachments = batch.attachments,
+          tags = batch.tags,
+          recipientVariables = batch.recipientVariables,
+          headers = batch.headers
+        )
+      )
+      _ = logger.info(s"email sent with id: ${result.id}")
+    } yield result
+
+    result.value
+  }
 }

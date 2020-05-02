@@ -49,3 +49,17 @@ case class Mail(
   tags: List[String] = Nil,
   headers: Map[String, String] = Map.empty
 )
+
+case class BatchMail(
+  to: List[String],
+  from: String,
+  cc: Option[String] = None,
+  bcc: Option[String] = None,
+  subject: String,
+  templateName: String,
+  params: Map[String, String],
+  attachments: List[Attachment] = Nil,
+  tags: List[String] = Nil,
+  headers: Map[String, String] = Map.empty,
+  recipientVariables: Map[String, Map[String, String]] = Map.empty,
+)

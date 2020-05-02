@@ -34,6 +34,22 @@ trait MailClient {
     implicit
     executionContext: ExecutionContext
   ): Future[Either[MailError, MailResponse]]
+
+  def sendBatch(
+    to: List[String],
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String]
+  )(
+    implicit
+    executionContext: ExecutionContext
+  ): Future[Either[MailError, MailResponse]]
 }
 
 trait MimeMailClient {

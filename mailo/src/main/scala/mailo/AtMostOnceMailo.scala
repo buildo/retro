@@ -16,4 +16,5 @@ class AtMostOnceMailo(
 ) extends Mailo with LazyLogging {
   val emailSender = new EmailSender(mailData, mailClient)
   def send(mail: Mail) = emailSender.send(mail)
+  def sendBatch(batch: BatchMail) = emailSender.sendBatch(batch)
 }
