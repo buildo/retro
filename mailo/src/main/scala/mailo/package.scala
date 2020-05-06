@@ -16,14 +16,14 @@ object Mailo {
   def apply(
     mailData: MailData,
     mailClient: MailClient,
-    deliverySemantic: DeliveryGuarantee = DeliveryGuarantee.AtMostOnce
+    deliverySemantic: DeliveryGuarantee = DeliveryGuarantee.AtMostOnce,
   )(
     implicit
     ec: ExecutionContext,
     conf: Config = ConfigFactory.load(),
-    system: ActorSystem = ActorSystem("mailo")
+    system: ActorSystem = ActorSystem("mailo"),
   ) = deliverySemantic match {
-    case DeliveryGuarantee.AtMostOnce => new AtMostOnceMailo(mailData, mailClient)
+    case DeliveryGuarantee.AtMostOnce  => new AtMostOnceMailo(mailData, mailClient)
     case DeliveryGuarantee.AtLeastOnce => new AtLeastOnceMailo(mailData, mailClient)
   }
 }

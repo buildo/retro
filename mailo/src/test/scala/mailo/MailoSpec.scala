@@ -122,6 +122,21 @@ class MailoSpec extends munit.FunSuite {
       }
   }
 
+  test("batch email should be correctly sent") {
+    mailer
+      .sendBatch(
+        BatchMail(
+          to = List("mailo@buildo.io"),
+          from = "Mailo mailo@buildo.io",
+          subject = "Test mail",
+          templateName = "mail.html",
+          params = Map("ciao" -> "CIAOOOONE"),
+          tags = List("test"),
+          recipientVariables = Map("mailoo@build.io" -> Map("a" -> "b")),
+        ),
+      )
+      .map(value => assert(value.isRight))
+  }
   test("email should not explode sending pdf attachments") {
     import akka.http.scaladsl.model.MediaTypes._
 

@@ -122,10 +122,10 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     attachments: List[Attachment],
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
-    headers: Map[String, String]
+    headers: Map[String, String],
   )(
     implicit
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     throw new UnsupportedOperationException("unable to send batch messages in SMTP")
 }

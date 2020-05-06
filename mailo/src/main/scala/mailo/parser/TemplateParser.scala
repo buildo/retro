@@ -15,7 +15,7 @@ object HTMLParser {
 
   private[this] def replaceAllPartials(
     content: String,
-    partials: Map[String, String]
+    partials: Map[String, String],
   ): Either[MailError, String] = {
     val mockPattern = """\[\[([a-zA-Z0-9_.-]+)\]\]""".r
 
@@ -31,7 +31,7 @@ object HTMLParser {
 
   private[this] def replaceAllParams(
     document: String,
-    params: Map[String, String]
+    params: Map[String, String],
   ): Either[MailError, String] = {
     val parameterPattern = """\{\{([a-zA-Z0-9_.-]+)\}\}""".r
 
@@ -52,14 +52,14 @@ object HTMLParser {
       OverlappedParametersAndMatches(
         paramsSet -- matchesSet,
         matchesSet -- paramsSet,
-        matchesSet.intersect(paramsSet)
+        matchesSet.intersect(paramsSet),
       ).asLeft[String]
   }
 
   private[this] def unsafelyReplaceAllInDocument(
     document: String,
     values: Map[String, String],
-    pattern: Regex
+    pattern: Regex,
   ): String = {
     def replacement(m: Match): String = {
       require(m.groupCount == 1)

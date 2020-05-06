@@ -20,13 +20,14 @@ class EmailSender(
 )(
   implicit
   ec: ExecutionContext,
-  conf: Config = ConfigFactory.load()
-) extends Mailo with LazyLogging {
+  conf: Config = ConfigFactory.load(),
+) extends Mailo
+    with LazyLogging {
   implicit private[this] val scalaCache = ScalaCache(GuavaCache())
 
   private[this] case class MailoConfig(cachingTTLSeconds: Int)
   private[this] val mailoConfig = MailoConfig(
-    cachingTTLSeconds = conf.getInt("mailo.cachingTTLSeconds")
+    cachingTTLSeconds = conf.getInt("mailo.cachingTTLSeconds"),
   )
 
   def send(mail: Mail) = {
@@ -47,8 +48,8 @@ class EmailSender(
           content = HTMLContent(parsedContent),
           attachments = mail.attachments,
           tags = mail.tags,
-          headers = mail.headers
-        )
+          headers = mail.headers,
+        ),
       )
       _ = logger.info(s"email sent with id: ${result.id}")
     } yield result
@@ -73,8 +74,8 @@ class EmailSender(
           attachments = batch.attachments,
           tags = batch.tags,
           recipientVariables = batch.recipientVariables,
-          headers = batch.headers
-        )
+          headers = batch.headers,
+        ),
       )
       _ = logger.info(s"email sent with id: ${result.id}")
     } yield result
