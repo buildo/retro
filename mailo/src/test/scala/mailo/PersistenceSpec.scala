@@ -35,6 +35,22 @@ class MockedClient(val state: ConcurrentLinkedQueue[SimpleMail]) extends MailCli
       state.add(SimpleMail(subject))
       Right(MailResponse(subject, "ok"))
     }
+
+  override def sendBatch(
+    to: List[String],
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent.MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] = ???
 }
 
 class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extends MailClient {
@@ -55,6 +71,22 @@ class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extend
       state.add(SimpleMail(subject))
       Right(MailResponse(subject, "ok"))
     }
+
+  override def sendBatch(
+    to: List[String],
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent.MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] = ???
 }
 
 class MockedData extends MailData {
