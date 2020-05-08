@@ -338,6 +338,7 @@ class MailgunClient(
         List(
           Multipart.FormData.BodyPart.Strict("from", from),
           Multipart.FormData.BodyPart.Strict("subject", subject),
+          recipientVariablesForm,
         ) ++ List(
           cc.map(Multipart.FormData.BodyPart.Strict("cc", _)),
           bcc.map(Multipart.FormData.BodyPart.Strict("bcc", _)),
