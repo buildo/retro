@@ -126,13 +126,21 @@ class MailoSpec extends munit.FunSuite {
     mailer
       .sendBatch(
         BatchMail(
-          to = List("mailo@buildo.io"),
+          to = List(
+            "mailo@buildo.io",
+            "mailo+1@buildo.io",
+            "mailo+2@buildo.io",
+          ),
           from = "Mailo mailo@buildo.io",
-          subject = "Test mail",
-          templateName = "mail.html",
-          params = Map("ciao" -> "CIAOOOONE"),
+          subject = "Test mail for %recipient.name%",
+          templateName = "mail_batch.html",
+          params = Map.empty,
           tags = List("test"),
-          recipientVariables = Map("mailoo@build.io" -> Map("a" -> "b")),
+          recipientVariables = Map(
+            "mailo@buildo.io" -> Map("name" -> "mailo main", "message" -> "1"),
+            "mailo+1@buildo.io" -> Map("name" -> "mailo 1", "message" -> "2"),
+            "mailo+2@buildo.io" -> Map("name" -> "mailo 2", "message" -> "3"),
+          ),
         ),
       )
       .map(value => assert(value.isRight))
