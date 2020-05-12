@@ -93,7 +93,6 @@ class MailgunClient(
   }
 
   def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],
@@ -110,7 +109,6 @@ class MailgunClient(
     for {
       entity <- batchEntity(
         from = from,
-        to = to,
         cc = cc,
         bcc = bcc,
         subject = subject,
@@ -296,7 +294,6 @@ class MailgunClient(
 
   private[this] def batchEntity(
     from: String,
-    to: List[String],
     cc: Option[String],
     bcc: Option[String],
     subject: String,
@@ -321,7 +318,7 @@ class MailgunClient(
       HttpEntity(ContentTypes.`application/json`, ByteString(recipientVariables.asJson.noSpaces))
     val recipientVariablesForm =
       Multipart.FormData.BodyPart.Strict("recipient-variables", recipientVariablesEntity)
-    val tos = to.map(Multipart.FormData.BodyPart.Strict("to", _))
+    val tos = recipientVariables.map { case (to, _) => Multipart.FormData.BodyPart.Strict("to", to) }
 
     val attachmentsForm = attachments.map(
       attachment =>

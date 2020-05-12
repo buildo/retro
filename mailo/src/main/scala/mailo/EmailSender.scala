@@ -65,7 +65,6 @@ class EmailSender(
       _ = logger.debug(s"retrieved ${batch.templateName} content")
       result <- EitherT(
         mailClient.sendBatch(
-          to = batch.to,
           from = batch.from,
           cc = batch.cc,
           bcc = batch.bcc,

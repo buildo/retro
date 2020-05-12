@@ -51,7 +51,6 @@ case class Mail(
 )
 
 case class BatchMail(
-  to: List[String],
   from: String,
   cc: Option[String] = None,
   bcc: Option[String] = None,

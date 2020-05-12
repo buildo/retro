@@ -126,11 +126,6 @@ class MailoSpec extends munit.FunSuite {
     mailer
       .sendBatch(
         BatchMail(
-          to = List(
-            "mailo@buildo.io",
-            "mailo+1@buildo.io",
-            "mailo+2@buildo.io",
-          ),
           from = "Mailo mailo@buildo.io",
           subject = "Test mail for %recipient.name%",
           templateName = "mail_batch.html",

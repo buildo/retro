@@ -37,7 +37,6 @@ class MockedClient(val state: ConcurrentLinkedQueue[SimpleMail]) extends MailCli
     }
 
   override def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],
@@ -73,7 +72,6 @@ class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extend
     }
 
   override def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],

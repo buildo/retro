@@ -49,7 +49,6 @@ class SendinblueClient(
     throw new UnsupportedOperationException("unable to send mime messages in Sendinblue")
 
   def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],

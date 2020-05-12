@@ -113,7 +113,6 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
   }
 
   override def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],

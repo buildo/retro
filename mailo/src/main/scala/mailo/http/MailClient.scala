@@ -36,7 +36,6 @@ trait MailClient {
   ): Future[Either[MailError, MailResponse]]
 
   def sendBatch(
-    to: List[String],
     from: String,
     cc: Option[String],
     bcc: Option[String],
