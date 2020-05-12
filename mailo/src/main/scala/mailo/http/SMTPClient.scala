@@ -111,4 +111,20 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     headers.foreach(h => message.addHeader(h._1, h._2))
     internalSend(message, attachments, tags)
   }
+
+  override def sendBatch(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent.MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] =
+    throw new UnsupportedOperationException("unable to send batch messages in SMTP")
 }

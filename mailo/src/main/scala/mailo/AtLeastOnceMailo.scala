@@ -35,4 +35,6 @@ class AtLeastOnceMailo(
       .mapTo[MailResult]
       .map(Right(_))
   }
+
+  def sendBatch(batch: BatchMail): Future[Either[MailError, MailResult]] = ???
 }

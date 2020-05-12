@@ -48,6 +48,22 @@ class SendinblueClient(
   ): Future[Either[MailError, MailResponse]] =
     throw new UnsupportedOperationException("unable to send mime messages in Sendinblue")
 
+  def sendBatch(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] =
+    throw new UnsupportedOperationException("unable to send batch messages in Sendinblue")
+
   def send(
     to: String,
     from: String,
