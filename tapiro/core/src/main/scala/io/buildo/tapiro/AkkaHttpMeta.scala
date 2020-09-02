@@ -18,7 +18,7 @@ object AkkaHttpMeta {
     val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
     q"""
     package ${`package`} {
-      ..${imports.toList.map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
       import akka.http.scaladsl.server._
       import akka.http.scaladsl.server.Directives._
       import io.circe.{ Decoder, Encoder }
