@@ -30,7 +30,7 @@ object Dependencies {
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.3.13"
+    val scalameta = "4.3.24"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.5.9"
