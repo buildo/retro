@@ -16,8 +16,7 @@ package object model {
     }
   }
 
-  /**
-    * Extract the intermediate representation for a case class from the output
+  /** Extract the intermediate representation for a case class from the output
     * of extractCaseClassDefns
     */
   def extractCaseClass(caseClassDefnInfo: CaseClassDefnInfo): intermediate.CaseClass = {
@@ -28,13 +27,12 @@ package object model {
     val (classDesc, tags) = extractDescAndTagsFromComment(comment)
     // FIXME fail if unmatched parameter descriptions are found
     val paramDescs = tags.collect { case p: ParamDesc => p }
-    val members = plist.map {
-      case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
-        intermediate.CaseClass.Member(
-          name = name,
-          tpe = tpeToIntermediate(tpe),
-          desc = paramDescs.find(_.name == name).flatMap(_.desc),
-        )
+    val members = plist.map { case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
+      intermediate.CaseClass.Member(
+        name = name,
+        tpe = tpeToIntermediate(tpe),
+        desc = paramDescs.find(_.name == name).flatMap(_.desc),
+      )
     }.toList
     val typeParams = defn.tparams.map(typeParamToIntermediate).toList
     intermediate.CaseClass(
@@ -83,8 +81,7 @@ package object model {
     }
   }
 
-  /**
-    * Extract the ADT-like enumeration intermediate representation from the output of
+  /** Extract the ADT-like enumeration intermediate representation from the output of
     * of extractCaseEnumDefns
     */
   def extractCaseEnum(
@@ -113,8 +110,7 @@ package object model {
     intermediate.CaseEnum(traitName, members, desc, extractPackage(source))
   }
 
-  /**
-    * Extract the intermediate representation of the tagged union from the output
+  /** Extract the intermediate representation of the tagged union from the output
     * of extractTaggedUnionDefns
     */
   def extractTaggedUnion(

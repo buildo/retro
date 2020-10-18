@@ -16,6 +16,6 @@ object Formatter {
             newlines = Newlines(alwaysBeforeTopLevelStatements = true),
           ),
       )
-      .get,
+      .get
   }
 }

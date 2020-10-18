@@ -25,7 +25,7 @@ object DynVerPlugin extends AutoPlugin {
     val dynverGitPreviousStableVersion =
       settingKey[Option[GitDescribeOutput]]("The last stable tag")
     val dynverSeparator = settingKey[String](
-      "The separator to use between tag and distance, and the hash and dirty timestamp"
+      "The separator to use between tag and distance, and the hash and dirty timestamp",
     )
     val dynverTagPrefix = settingKey[String]("Prefix for matching the git tag")
     val dynverCheckVersion = taskKey[Boolean]("Checks if version and dynver match")
@@ -34,10 +34,10 @@ object DynVerPlugin extends AutoPlugin {
 
     // Would be nice if this were an 'upstream' key
     val isVersionStable = settingKey[Boolean](
-      "The version string identifies a specific point in version control, so artifacts built from this version can be safely cached"
+      "The version string identifies a specific point in version control, so artifacts built from this version can be safely cached",
     )
     val previousStableVersion = settingKey[Option[String]](
-      "The last stable version as seen from the current commit (does not include the current commit's version/tag)"
+      "The last stable version as seen from the current commit (does not include the current commit's version/tag)",
     )
   }
   import autoImport._
@@ -61,7 +61,7 @@ object DynVerPlugin extends AutoPlugin {
     dynverInstance := DynVer(
       dynverTagPrefix.value,
       Option((baseDirectory in ThisBuild).value),
-      dynverSeparator.value
+      dynverSeparator.value,
     ),
     dynverGitDescribeOutput := dynverInstance.value.getGitDescribeOutput(dynverCurrentDate.value),
     dynverSonatypeSnapshots := false,
@@ -84,9 +84,9 @@ object DynVerPlugin extends AutoPlugin {
       val v = version.value
       if (dynverGitDescribeOutput.value.hasNoTags)
         throw new MessageOnlyException(
-          s"Failed to derive version from git tags. Maybe run `git fetch --unshallow`? Version: $v"
+          s"Failed to derive version from git tags. Maybe run `git fetch --unshallow`? Version: $v",
         )
-    }
+    },
   )
 }
 
@@ -128,7 +128,7 @@ final case class GitDescribeOutput(
   prefix: GitTagPrefix,
   ref: GitRef,
   commitSuffix: GitCommitSuffix,
-  dirtySuffix: GitDirtySuffix
+  dirtySuffix: GitDirtySuffix,
 ) {
   def version(sep: String): String = {
     val dirtySuffix = this.dirtySuffix.withSeparator(sep)
@@ -183,7 +183,7 @@ object GitDescribeOutput
       GitTagPrefix(prefix),
       GitRef(ref),
       commit,
-      GitDirtySuffix(if (dirty eq null) "" else dirty)
+      GitDirtySuffix(if (dirty eq null) "" else dirty),
     )
   }
 
@@ -235,18 +235,17 @@ sealed case class DynVer(prefix: String, wd: Option[File], separator: String) {
   def getGitDescribeOutput(d: Date): Option[GitDescribeOutput] = {
     val process = Process(
       s"git describe --long --tags --abbrev=8 --match ${prefix}v[0-9]* --always --dirty=+${timestamp(d)}",
-      wd
+      wd,
     )
     Try(process !! impl.NoProcessLogger).toOption
       .map(_.replaceAll("-([0-9]+)-g([0-9a-f]{8})", "+$1-$2"))
       .map(GitDescribeOutput.parse)
       .filter(_.prefix.value == prefix)
-      .flatMap(
-        output =>
-          if (output.hasNoTags)
-            getDistanceToFirstCommit()
-              .map(dist => output.copy(commitSuffix = output.commitSuffix.copy(distance = dist)))
-          else Some(output)
+      .flatMap(output =>
+        if (output.hasNoTags)
+          getDistanceToFirstCommit()
+            .map(dist => output.copy(commitSuffix = output.commitSuffix.copy(distance = dist)))
+        else Some(output),
       )
   }
 

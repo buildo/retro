@@ -20,8 +20,8 @@ class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
   tableName: String = "login_auth_domain",
   schemaName: Option[String] = None,
-)(
-  implicit F: Sync[F],
+)(implicit
+  F: Sync[F],
 ) extends LoginDomain[F]
     with BCryptHashing {
 
@@ -43,8 +43,8 @@ class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
       db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
     }.futureLift
       .as(this.asRight[AuthenticationError])
-      .handleError {
-        case _ => AuthenticationError.InvalidCredential.asLeft
+      .handleError { case _ =>
+        AuthenticationError.InvalidCredential.asLeft
       }
       .widen
 

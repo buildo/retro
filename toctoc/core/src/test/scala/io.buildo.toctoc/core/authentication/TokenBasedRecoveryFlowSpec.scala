@@ -51,7 +51,7 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
           })
         } yield result).void.leftMap { e =>
           assertEquals(e, AuthenticationError.InvalidCredential)
-        }.value
+        }.swap.value
       }
     }
   }
@@ -70,7 +70,7 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
           recoverResult <- EitherT(f.recoverLogin(token1, password)(_ => IO(Some(username))))
         } yield recoverResult).void.leftMap { e =>
           assertEquals(e, AuthenticationError.InvalidCredential)
-        }.value
+        }.swap.value
       }
     }
   }

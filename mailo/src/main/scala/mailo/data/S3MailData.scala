@@ -16,8 +16,7 @@ import mailo.{MailError, MailRawContent}
 
 import scala.util.{Failure, Success, Try}
 
-class S3MailData(
-  implicit
+class S3MailData(implicit
   ec: ExecutionContext,
   conf: Config = ConfigFactory.load(),
 ) extends MailData {

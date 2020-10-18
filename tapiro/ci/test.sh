@@ -4,4 +4,4 @@ set -e
 
 apk add --no-cache curl
 
-sbt -batch ';tapiroCore/test ;sbt-tapiro/scripted'
+sbt -batch ';+tapiroCore/test ;sbt-tapiro/scripted'

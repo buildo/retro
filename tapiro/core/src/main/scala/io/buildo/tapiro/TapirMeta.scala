@@ -136,7 +136,7 @@ object TapirMeta {
     Term.Apply(
       Term.Select(endpoint, Term.Name("in")),
       List(Term.ApplyType(Term.Name("jsonBody"), List(postInputType(route)))),
-    ),
+    )
   }
 
   private[this] val withError =

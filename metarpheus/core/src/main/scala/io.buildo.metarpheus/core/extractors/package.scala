@@ -19,8 +19,7 @@ package object extractors {
     intermediate.API(models, routes)
   }
 
-  /**
-    * Extract all terms from a sequence of applications of an infix operator
+  /** Extract all terms from a sequence of applications of an infix operator
     * (which translates to nested `ApplyInfix`es).
     * e.g. getAllInfix(t1 + t2 + t3 + t4, "+") results in List(t1, t2, t3, t4)
     */
@@ -75,8 +74,7 @@ package object extractors {
   ): Option[scala.meta.Token] =
     AssociatedComments(source.tokens).leading(t).headOption
 
-  /**
-    * Extract route description and tags (such as @param) from route comment
+  /** Extract route description and tags (such as @param) from route comment
     */
   private[extractors] def extractDescAndTagsFromComment(
     token: Option[scala.meta.Token],
@@ -136,8 +134,8 @@ package object extractors {
     }
 
   private[extractors] def extractPackage(source: scala.meta.Source): List[String] =
-    source.collect {
-      case pkg: scala.meta.Pkg => flattenPackage(pkg)
+    source.collect { case pkg: scala.meta.Pkg =>
+      flattenPackage(pkg)
     }.flatten match {
       case Nil => List("_root_")
       case x   => x

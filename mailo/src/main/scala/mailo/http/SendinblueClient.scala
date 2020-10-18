@@ -19,8 +19,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.mail.internet.MimeMessage
 
-class SendinblueClient(
-  implicit conf: Config = ConfigFactory.load(),
+class SendinblueClient(implicit
+  conf: Config = ConfigFactory.load(),
 ) extends MailClient
     with MimeMailClient
     with LazyLogging {
@@ -42,8 +42,7 @@ class SendinblueClient(
     tags: List[String] = List.empty,
     attachments: List[Attachment] = List.empty,
     headers: Map[String, String] = Map.empty,
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     throw new UnsupportedOperationException("unable to send mime messages in Sendinblue")
@@ -58,8 +57,7 @@ class SendinblueClient(
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     throw new UnsupportedOperationException("unable to send batch messages in Sendinblue")
@@ -74,8 +72,7 @@ class SendinblueClient(
     attachments: List[Attachment],
     tags: List[String],
     headers: Map[String, String] = Map.empty,
-  )(
-    implicit
+  )(implicit
     executionContext: scala.concurrent.ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     for {

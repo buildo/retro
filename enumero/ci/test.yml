@@ -14,4 +14,4 @@ run:
   path: sbt
   args:
     - -batch
-    - "; enumeroCore/test; enumeroCirce/test"
+    - "; +enumeroCore/test; +enumeroCirce/test"

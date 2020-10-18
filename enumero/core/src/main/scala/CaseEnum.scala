@@ -3,8 +3,7 @@ package io.buildo.enumero
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-/**
-  * Marker trait for ADTs representing enumerations
+/** Marker trait for ADTs representing enumerations
   *
   * The convention requires the following structure for the enumeration:
   * ```
@@ -17,14 +16,12 @@ import scala.reflect.macros.blackbox.Context
   */
 trait CaseEnum extends Product with Serializable
 
-/**
-  * Typeclass with conversions to and from strings for ADTs representing enumerations
+/** Typeclass with conversions to and from strings for ADTs representing enumerations
   */
 trait CaseEnumSerialization[T <: CaseEnum] {
   def caseToString(value: T): String
 
-  /**
-    * @return Some(T) if the string corresponds to one of the enumeration elements,
+  /** @return Some(T) if the string corresponds to one of the enumeration elements,
     *         None otherwise
     */
   def caseFromString(str: String): Option[T]

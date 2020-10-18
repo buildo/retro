@@ -7,8 +7,7 @@ import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Macro annotation that transforms a trait with only bare,
+/** Macro annotation that transforms a trait with only bare,
   * empty objects as members to an ADT following the CaseEnum
   * convention (see the CaseEnum trait).
   *
@@ -76,8 +75,7 @@ object EnumMacro {
   }
 }
 
-/**
-  * Macro annotation that transforms a trait enclosing a single type
+/** Macro annotation that transforms a trait enclosing a single type
   * alias and a set of objects to an ADT following the IndexedCaseEnum
   * convention (see the IndexedCaseEnum trait).
   *
@@ -114,13 +112,14 @@ object IndexedEnumMacro {
     import c.universe._
 
     def modifiedClass(classDecl: ClassDef) = {
-      val (enumName, body) = try {
-        val q"trait $enumName { ..$body }" = classDecl
-        (enumName, body)
-      } catch {
-        case _: MatchError =>
-          c.abort(c.enclosingPosition, "Annotation is only supported on objects")
-      }
+      val (enumName, body) =
+        try {
+          val q"trait $enumName { ..$body }" = classDecl
+          (enumName, body)
+        } catch {
+          case _: MatchError =>
+            c.abort(c.enclosingPosition, "Annotation is only supported on objects")
+        }
       val typeAliasTree :: memberTrees = body
       val members = memberTrees.map {
         case Apply(Ident(memberName: TermName), List(expression)) =>

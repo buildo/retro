@@ -22,10 +22,15 @@ object Meta {
           case RouteMethod.GET =>
             nonAuthParamTypes.map(metarpheusTypeToScalametaType).map(toPlainCodec)
           case RouteMethod.POST =>
-            nonAuthParamTypes.map(metarpheusTypeToScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
+            nonAuthParamTypes
+              .map(metarpheusTypeToScalametaType)
+              .flatMap(t => List(toDecoder(t), toEncoder(t)))
         }
       val outputImplicits =
-        List(route.route.returns).filter(notUnit).map(metarpheusTypeToScalametaType).map(toJsonCodec)
+        List(route.route.returns)
+          .filter(notUnit)
+          .map(metarpheusTypeToScalametaType)
+          .map(toJsonCodec)
       val errorImplicits =
         route.error match {
           case RouteError.TaggedUnionError(tu) =>
@@ -75,7 +80,7 @@ object Meta {
     (member: TaggedUnion.Member) => {
       if (member.params.isEmpty)
         Type.Singleton(Term.Select(Term.Name(taggedUnion.name), Term.Name(member.name)))
-      else Type.Select(Term.Name(taggedUnion.name), Type.Name(member.name)),
+      else Type.Select(Term.Name(taggedUnion.name), Type.Name(member.name))
     }
 
   def packageFromList(`package`: NonEmptyList[String]): Term.Ref =

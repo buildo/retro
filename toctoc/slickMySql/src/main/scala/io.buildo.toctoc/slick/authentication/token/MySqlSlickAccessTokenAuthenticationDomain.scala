@@ -21,8 +21,8 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,
-)(
-  implicit F: Sync[F],
+)(implicit
+  F: Sync[F],
 ) extends AccessTokenDomain[F] {
 
   class AccessTokenTable(tag: Tag)

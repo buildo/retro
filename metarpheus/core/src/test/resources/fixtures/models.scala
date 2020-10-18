@@ -4,8 +4,7 @@ package models
 
 case class CampingName(s: String) extends AnyVal
 
-/**
-  * Represents a camping site
+/** Represents a camping site
   * @param name
   * @param size number of tents
   * @param location camping location
@@ -20,8 +19,7 @@ case class Camping[A](
   a: A,
 )
 
-/**
-  *  Represents a swan
+/**  Represents a swan
   *  @param color color of the swan
   */
 case class Swan(color: String)
@@ -76,8 +74,7 @@ object Surface {
 sealed trait CreateCampingError
 object CreateCampingError {
 
-  /**
-    *  The name is already in use
+  /**  The name is already in use
     *  @param names suggestions for names that are not in use
     */
   case class DuplicateName(names: SuggestedNames) extends CreateCampingError

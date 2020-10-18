@@ -56,12 +56,12 @@ object CiReleasePlugin extends AutoPlugin {
       println("Running ci-release.\n")
       setupGpg()
       val extracted = Project.extract(currentState)
-      val (releaseProjects, snapshotProjects) = extracted.structure.allProjectRefs.partition {
-        projectRef =>
+      val (releaseProjects, snapshotProjects) =
+        extracted.structure.allProjectRefs.partition { projectRef =>
           val prefix = extracted.get(dynverTagPrefix.in(projectRef))
           val v = extracted.get(version.in(projectRef))
           tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
-      }
+        }
 
       if (snapshotProjects.length > 0) {
         println("Publishing snapshot version of:")
@@ -72,10 +72,10 @@ object CiReleasePlugin extends AutoPlugin {
         println(releaseProjects.map(_.project).mkString("  - ", "\n  - ", "\n"))
       }
 
-      val publishSignedCommands = releaseProjects.foldLeft(List.empty[String]) {
-        (state, projectRef) =>
+      val publishSignedCommands =
+        releaseProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
           s"+${projectRef.project}/publishSigned" :: state
-      }
+        }
       val publishCommands = snapshotProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
         s"+${projectRef.project}/publish" :: state
       }

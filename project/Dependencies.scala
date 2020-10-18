@@ -62,7 +62,8 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % V.logback
   val levelDb = "org.fusesource.leveldbjni" % "leveldbjni-all" % V.leveldb
   val mailin = "com.sendinblue" % "sib-api-v3-sdk" % V.mailin
-  val akkaPersistenceInMemory = "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistenceInMemory
+  val akkaPersistenceInMemory =
+    "com.github.dnvriend" %% "akka-persistence-inmemory" % V.akkaPersistenceInMemory
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % V.akka
   val jakartaMail = "com.sun.mail" % "jakarta.mail" % V.jakartaMail
   val slick = "com.typesafe.slick" %% "slick" % V.slick

@@ -18,21 +18,19 @@ class FSMailData(directory: File, loadPartials: Boolean) extends MailData {
     Try(
       directory.listFiles(f => f.isDirectory && f.getName.equalsIgnoreCase("partials")).headOption,
     ).map(
-        _.map(
-          partials =>
-            partials
-              .listFiles(f => f.isFile)
-              .map(file => {
-                val buffer = scala.io.Source.fromFile(file)
-                val template = Try(buffer.mkString)
-                buffer.close()
-                template.map(content => (file.getName, content))
-              })
-              .flatMap(_.toOption)
-              .toMap, //convert all tries to an option, remove none and create a map with the remainings
-        ),
-      )
-      .toOption
+      _.map(partials =>
+        partials
+          .listFiles(f => f.isFile)
+          .map(file => {
+            val buffer = scala.io.Source.fromFile(file)
+            val template = Try(buffer.mkString)
+            buffer.close()
+            template.map(content => (file.getName, content))
+          })
+          .flatMap(_.toOption)
+          .toMap, //convert all tries to an option, remove none and create a map with the remainings
+      ),
+    ).toOption
       .flatten
       .getOrElse(Map.empty[String, String])
   }
@@ -53,9 +51,7 @@ class FSMailData(directory: File, loadPartials: Boolean) extends MailData {
       directory
         .listFiles()
         .find(f => f.getName == name)
-        .map(
-          templateFile => parseTemplateFile(templateFile),
-        )
+        .map(templateFile => parseTemplateFile(templateFile))
         .getOrElse(Left(TemplateNotFound(directory.getAbsolutePath.concat(s"/$name"))))
   }
 

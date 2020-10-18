@@ -8,7 +8,8 @@ curlExpect := {
   println("Executing: curl " + curlArgs.mkString(" "))
   val process = Process("curl", curlArgs)
   val expected = args.last
-  val out = (process !!)
+  val out = process !!
+
   if (out.trim != expected) sys.error(s"Expected $expected, but got $out")
   ()
 }

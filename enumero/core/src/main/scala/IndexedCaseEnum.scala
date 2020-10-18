@@ -3,8 +3,7 @@ package io.buildo.enumero
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-/**
-  * Marker trait for ADTs representing enumerations with an associated value ("index")
+/** Marker trait for ADTs representing enumerations with an associated value ("index")
   *
   * The convention requires the following structure for the enumeration:
   * ```

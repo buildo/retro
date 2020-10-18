@@ -8,8 +8,7 @@ import mailo.http.MailgunClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class S3MailgunMailo(
-  implicit
+class S3MailgunMailo(implicit
   system: ActorSystem,
   ec: ExecutionContext,
 ) {
@@ -32,8 +31,8 @@ class S3MailgunMailo(
     mailgunS3Mailo.send(Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags))
 }
 
-class S3SendinblueMailo(
-  implicit ec: ExecutionContext,
+class S3SendinblueMailo(implicit
+  ec: ExecutionContext,
 ) {
   import data.S3MailData
   import http.SendinblueClient

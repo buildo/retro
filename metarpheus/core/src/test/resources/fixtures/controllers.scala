@@ -12,8 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @path("campings")
 trait CampingController {
 
-  /**
-    * get campings matching the requested coolness and size
+  /** get campings matching the requested coolness and size
     * @param coolness how cool it is
     * @param size the number of tents
     * @param nickname a friendly name for the camping
@@ -25,37 +24,32 @@ trait CampingController {
     nickname: String,
   ): Future[Either[String, List[Camping]]]
 
-  /**
-    * get campings matching the requested size and distance
+  /** get campings matching the requested size and distance
     * @param size the number of tents
     * @param distance how distant it is
     */
   @query
   def getBySizeAndDistance(size: Int, distance: Int): Future[Either[String, List[Camping]]]
 
-  /**
-    * get a camping by id
+  /** get a camping by id
     * @param id camping id
     */
 
   @query
   def getById(id: Int, token: Auth): Future[Either[String, Camping]]
 
-  /**
-    * get a camping by typed id
+  /** get a camping by typed id
     */
   @query
   def getByTypedId(token: Auth, id: `Id`[Camping]): Future[Either[String, Camping]]
 
-  /**
-    * get campings based on whether they're close to a beach
+  /** get campings based on whether they're close to a beach
     * @param hasBeach whether there's a beach
     */
   @query
   def getByHasBeach(hasBeach: Boolean): Future[Either[String, List[Camping]]]
 
-  /**
-    * create a camping
+  /** create a camping
     */
   @command
   def create(
@@ -77,8 +71,7 @@ trait CampingController {
   ): F[E[Exception, String]]
 }
 
-class CampingControllerImpl(
-  implicit
+class CampingControllerImpl(implicit
   executionContext: ExecutionContext,
 ) extends CampingController {
 

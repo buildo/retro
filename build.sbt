@@ -8,8 +8,8 @@ val scala213 = "2.13.3"
 
 inThisBuild(
   List(
-    scalaVersion := scala212,
-    // crossScalaVersions := List(scala212, scala213),
+    scalaVersion := scala213,
+    crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/buildo/retro")),
     developers := List(
@@ -21,12 +21,15 @@ inThisBuild(
       ),
     ),
     testFrameworks += new TestFramework("munit.Framework"),
+    scalacOptions -= "-Xlint:byname-implicit",
   ),
 )
 
 lazy val `sbt-buildo` = project
   .enablePlugins(SbtPlugin)
   .settings(
+    scalaVersion := scala212,
+    crossScalaVersions := Seq(scala212),
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0"),
     dynverTagPrefix := "sbt-buildo-",
@@ -148,6 +151,8 @@ lazy val `sbt-tapiro` = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-tapiro",
+    scalaVersion := scala212,
+    crossScalaVersions := Seq(scala212),
     dynverTagPrefix := "tapiro-",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++

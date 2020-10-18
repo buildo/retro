@@ -31,10 +31,11 @@ object TokenBasedRecovery {
       (for {
         authResult <- EitherT(recoveryTokenD.authenticate(token))
         (rtd, s) = authResult
-        username <- EitherT.fromOptionF(
-          usernameForSubject(s),
-          AuthenticationError.InvalidCredential,
-        )
+        username <- EitherT
+          .fromOptionF(
+            usernameForSubject(s),
+            AuthenticationError.InvalidCredential,
+          )
         ld <- EitherT(loginD.unregister(s))
         ld2 <- EitherT(ld.register(s, Login(username, password)))
         rtd2 <- EitherT(rtd.unregister(s))
