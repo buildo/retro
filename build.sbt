@@ -29,7 +29,7 @@ lazy val `sbt-buildo` = project
   .enablePlugins(SbtPlugin)
   .settings(
     scalaVersion := scala212,
-    crossScalaVersions := Seq(scala212),
+    crossScalaVersions := Seq(),
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0"),
     dynverTagPrefix := "sbt-buildo-",
@@ -122,6 +122,8 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
   .in(file("metarpheus/core"))
   .settings(
     name := "metarpheus-core",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     dynverTagPrefix := "metarpheus-",
     libraryDependencies ++= metarpheusCoreDependencies,
   )
@@ -131,6 +133,8 @@ lazy val metarpheusJsFacade = project
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     name := "metarpheus-js-facade",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
     libraryDependencies ++= metarpheusJsFacadeDependencies.map(_.cross(ScalaJSCrossVersion.binary)),
     dynverTagPrefix := "metarpheus-",
@@ -141,6 +145,8 @@ lazy val tapiroCore = project
   .in(file("tapiro/core"))
   .settings(
     name := "tapiro-core",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     libraryDependencies ++= tapiroCoreDependencies,
     dynverTagPrefix := "tapiro-",
   )
@@ -152,7 +158,7 @@ lazy val `sbt-tapiro` = project
   .settings(
     name := "sbt-tapiro",
     scalaVersion := scala212,
-    crossScalaVersions := Seq(scala212),
+    crossScalaVersions := Seq(),
     dynverTagPrefix := "tapiro-",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
