@@ -18,7 +18,7 @@ object Http4sMeta {
     val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
     q"""
     package ${`package`} {
-      ..${imports.toList.map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
       import cats.effect._
       import cats.implicits._
       import cats.data.NonEmptyList
