@@ -29,10 +29,25 @@ trait MailClient {
     content: MailRefinedContent,
     attachments: List[Attachment],
     tags: List[String],
-    headers: Map[String, String]
+    headers: Map[String, String],
   )(
     implicit
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]]
+
+  def sendBatch(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]]
 }
 
@@ -41,9 +56,9 @@ trait MimeMailClient {
     message: MimeMessage,
     tags: List[String],
     attachments: List[Attachment],
-    headers: Map[String, String]
+    headers: Map[String, String],
   )(
     implicit
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]]
 }
