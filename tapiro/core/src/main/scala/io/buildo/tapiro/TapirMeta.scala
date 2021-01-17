@@ -25,7 +25,7 @@ object TapirMeta {
   ) =>
     q"""
     package ${`package`} {
-      ..${imports.toList.map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
       import io.circe.{ Decoder, Encoder }
       import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
       import sttp.tapir._
