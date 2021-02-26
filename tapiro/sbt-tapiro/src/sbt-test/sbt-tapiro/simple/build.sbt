@@ -8,7 +8,7 @@ lazy val root = (project in file("."))
   .enablePlugins(SbtTapiro)
   .settings(
     version := "0.1",
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.12.13",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % "1.2.0",
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % "0.12.15",
