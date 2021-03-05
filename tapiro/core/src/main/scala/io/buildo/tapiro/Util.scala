@@ -129,7 +129,7 @@ class Util() {
         requiredPackages.toSet.map(Meta.packageFromList),
         Term.Name(tapirEndpointsName),
         Meta.codecsImplicits(routes),
-        routes.map(TapirMeta.routeToTapirEndpoint),
+        routes.map(TapirMeta.routeToTapirEndpoint(Term.Name(tapirEndpointsName))),
         routes.flatMap(TapirMeta.routeClassDeclarations),
         routes.flatMap(TapirMeta.routeCodecDeclarations),
       ),

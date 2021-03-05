@@ -46,16 +46,17 @@ object TapirMeta {
           ..${postInputCodecDeclarations}
           ..${body.map(d => d.copy(mods = mod"override" :: d.mods))}
         }
-      }
 
-      ..${postInputClassDeclarations}
+        ..${postInputClassDeclarations}
+      }
     }
     """
 
-  val routeToTapirEndpoint = (route: TapiroRoute) =>
-    q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
+  val routeToTapirEndpoint = (tapirEndpointsName: Term.Name) =>
+    (route: TapiroRoute) =>
+      q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(tapirEndpointsName, route)} = ${endpointImpl(route)}"
 
-  private[this] val endpointType = (route: TapiroRoute) => {
+  private[this] val endpointType = (tapirEndpointsName: Term.Name, route: TapiroRoute) => {
     val returnType = metarpheusTypeToScalametaType(route.route.returns)
     val argsType = route.method match {
       case RouteMethod.GET =>
@@ -70,7 +71,7 @@ object TapirMeta {
           .filter(_.tpe == MetarpheusType.Name(authTokenName))
           .map(t => metarpheusTypeToScalametaType(t.tpe))
           .headOption
-        val inputType = postInputType(route.route)
+        val inputType = Type.Select(tapirEndpointsName, postInputType(route.route))
         authTokenType match {
           case Some(t) => Type.Tuple(List(inputType, t))
           case None    => inputType
