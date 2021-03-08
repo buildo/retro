@@ -4,6 +4,11 @@ resource_types:
   source:
     repository: teliaoss/github-pr-resource
 
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+
 resources:
 - type: git
   name: master
@@ -120,6 +125,23 @@ resources:
     repository: buildo/scala-sbt-alpine
     tag: 8u201_2.12.11_1.3.9
 
+- name: slack-buildo
+  type: slack-notification
+  icon: slack
+  source:
+    url: ((buildo-slack-hook))
+
+
+__put_slack_failed_job: &slack_failure
+  put: slack-buildo
+  params:
+    channel: "#backends"
+    text: |
+      The build of $BUILD_JOB_NAME failed :cry:
+      See: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+  inputs: []
+
+
 jobs:
 
 - name: sbt-buildo
@@ -129,6 +151,8 @@ jobs:
     trigger: true
   - task: compile
     file: retro/sbt-buildo/ci/compile.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: enumero
   plan:
@@ -137,6 +161,8 @@ jobs:
     trigger: true
   - task: test
     file: retro/enumero/ci/test.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: mailo
   plan:
@@ -145,6 +171,8 @@ jobs:
     trigger: true
   - task: test
     file: retro/mailo/ci/test.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: toctoc
   plan:
@@ -163,6 +191,8 @@ jobs:
   - task: test
     file: retro/toctoc/ci/test.yml
     privileged: true
+  on_failure:
+    <<: *slack_failure
 
 - name: metarpheus
   plan:
@@ -171,6 +201,8 @@ jobs:
     trigger: true
   - task: test
     file: retro/metarpheus/ci/test.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: tapiro
   plan:
@@ -179,6 +211,8 @@ jobs:
     trigger: true
   - task: test
     file: retro/tapiro/ci/test.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: docs
   plan:
@@ -187,6 +221,8 @@ jobs:
     trigger: true
   - task: build-docs
     file: retro/ci/docs.yml
+  on_failure:
+    <<: *slack_failure
 
 - name: sbt-buildo-pr
   plan:
@@ -403,4 +439,13 @@ jobs:
       PGP_SECRET: ((sonatype_pgp_secret_key))
       SONATYPE_USERNAME: ((sonatype_username))
       SONATYPE_PASSWORD: ((sonatype_password))
+  on_success:
+    put: slack-buildo
+    params:
+      channel: "#backends"
+      text: |
+        :tada: A new release has been successfully performed
+    inputs: []
+  on_failure:
+    <<: *slack_failure
 
