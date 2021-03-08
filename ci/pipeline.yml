@@ -194,18 +194,21 @@ jobs:
 
 - name: toctoc
   plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - get: postgres
-    params:
-      save: true
-  - get: mysql
-    params:
-      save: true
-  - get: scala-sbt
-    params:
-      save: true
+  - in_parallel:
+      fail_fast: true
+      steps:
+      - get: retro
+        resource: master
+        trigger: true
+      - get: postgres
+        params:
+          save: true
+      - get: mysql
+        params:
+          save: true
+      - get: scala-sbt
+        params:
+          save: true
   - task: test
     file: retro/toctoc/ci/test.yml
     privileged: true
@@ -322,19 +325,22 @@ jobs:
 
 - name: toctoc-pr
   plan:
-  - get: retro
-    resource: toctoc-pr
-    trigger: true
-    version: every
-  - get: postgres
-    params:
-      save: true
-  - get: mysql
-    params:
-      save: true
-  - get: scala-sbt
-    params:
-      save: true
+  - in_parallel:
+      fail_fast: true
+      steps:
+      - get: retro
+        resource: toctoc-pr
+        trigger: true
+        version: every
+      - get: postgres
+        params:
+          save: true
+      - get: mysql
+        params:
+          save: true
+      - get: scala-sbt
+        params:
+          save: true
   - put: toctoc-pr
     params:
       path: retro
@@ -436,19 +442,22 @@ jobs:
 
 - name: release
   plan:
-  - get: retro
-    resource: master
-    trigger: true
-    passed:
-      - sbt-buildo
-      - enumero
-      - mailo
-      - toctoc
-      - metarpheus
-      - tapiro
-      - docs
-  - get: tag
-    trigger: true
+  - in_parallel:
+      fail_fast: true
+      steps:
+      - get: retro
+        resource: master
+        trigger: true
+        passed:
+          - sbt-buildo
+          - enumero
+          - mailo
+          - toctoc
+          - metarpheus
+          - tapiro
+          - docs
+      - get: tag
+        trigger: true
   - task: release-on-sonatype
     file: retro/ci/release.yml
     params:
