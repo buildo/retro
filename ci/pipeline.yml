@@ -88,6 +88,17 @@ resources:
       - project
       - tapiro
 
+- type: pull-request
+  name: docs-pr
+  icon: source-pull
+  source:
+    repository: buildo/retro
+    access_token: ((github-token))
+    paths:
+      - build.sbt
+      - project
+      - docs
+
 - name: postgres
   type: docker-image
   icon: docker
@@ -342,6 +353,32 @@ jobs:
         path: retro
         status: success
         context: tapiro
+
+- name: docs-pr
+  plan:
+  - get: retro
+    resource: docs-pr
+    trigger: true
+    version: every
+  - put: docs-pr
+    params:
+      path: retro
+      status: pending
+      context: docs
+  - task: build-docs
+    file: retro/ci/docs.yml
+  on_failure:
+    put: docs-pr
+    params:
+      path: retro
+      status: failure
+      context: docs
+  on_success:
+    put: docs-pr
+    params:
+      path: retro
+      status: success
+      context: docs
 
 - name: release
   plan:
