@@ -65,7 +65,6 @@ Here is how to run the server:
 ```scala mdoc
 import org.http4s.server.blaze._
 import org.http4s.implicits._
-import cats.implicits._
 
 object Main extends IOApp {
   val catsImpl = Cats.create[IO]
@@ -112,7 +111,7 @@ def decodeAuth(s: String): DecodeResult[CustomAuth] = {
 
 def encodeAuth(auth: CustomAuth): String = auth.token
 
-implicit val authCodec: PlainCodec[CustomAuth] = Codec.stringPlainCodecUtf8
+implicit val authCodec: PlainCodec[CustomAuth] = Codec.string
   .mapDecode(decodeAuth)(encodeAuth)
 ```
 
