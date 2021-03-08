@@ -431,7 +431,7 @@ jobs:
       - docs
   - get: tag
     trigger: true
-  - task: release on Sonatype
+  - task: release-on-sonatype
     file: retro/ci/release.yml
     params:
       GITHUB_DEPLOY_KEY: ((private-key))
