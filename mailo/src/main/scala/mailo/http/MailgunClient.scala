@@ -13,8 +13,8 @@ import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
 
 import scala.concurrent.{ExecutionContext, Future}
-import javax.mail.Message.RecipientType
-import javax.mail.internet.MimeMessage
+import jakarta.mail.Message.RecipientType
+import jakarta.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 

@@ -17,7 +17,7 @@ import MailRefinedContent._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 
 class SendinblueClient(
   implicit conf: Config = ConfigFactory.load(),

@@ -1,6 +1,6 @@
 package mailo.http
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 import mailo.MailRefinedContent._
 import mailo.{Attachment, MailError, MailResponse}
 
