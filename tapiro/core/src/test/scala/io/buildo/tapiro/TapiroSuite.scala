@@ -53,7 +53,7 @@ class TapiroSuite extends munit.FunSuite {
       |trait SchoolControllerTapirEndpoints[AuthToken] {
       |
       |  val create: Endpoint[
-      |    (CreateRequestPayload, AuthToken),
+      |    (SchoolControllerTapirEndpoints.CreateRequestPayload, AuthToken),
       |    SchoolCreateError,
       |    Unit,
       |    Nothing
@@ -79,7 +79,7 @@ class TapiroSuite extends munit.FunSuite {
       |    implicit val createRequestPayloadEncoder: Encoder[CreateRequestPayload] =
       |      deriveEncoder
       |    override val create: Endpoint[
-      |      (CreateRequestPayload, AuthToken),
+      |      (SchoolControllerTapirEndpoints.CreateRequestPayload, AuthToken),
       |      SchoolCreateError,
       |      Unit,
       |      Nothing
@@ -111,8 +111,8 @@ class TapiroSuite extends munit.FunSuite {
       |    override val list: Endpoint[Unit, Unit, List[School], Nothing] =
       |      endpoint.get.in("list").out(jsonBody[List[School]])
       |  }
+      |  case class CreateRequestPayload(school: School)
       |}
-      |case class CreateRequestPayload(school: School)
       |
       |/src/main/scala/schools/endpoints/SchoolControllerHttpEndpoints.scala
       |//----------------------------------------------------------
