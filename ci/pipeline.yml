@@ -201,18 +201,18 @@ jobs:
       context: sbt-buildo
   - task: compile
     file: retro/sbt-buildo/ci/compile.yml
-    on_failure:
-      put: sbt-buildo-pr
-      params:
-        path: retro
-        status: failure
-        context: sbt-buildo
-    on_success:
-      put: sbt-buildo-pr
-      params:
-        path: retro
-        status: success
-        context: sbt-buildo
+  on_failure:
+    put: sbt-buildo-pr
+    params:
+      path: retro
+      status: failure
+      context: sbt-buildo
+  on_success:
+    put: sbt-buildo-pr
+    params:
+      path: retro
+      status: success
+      context: sbt-buildo
 
 - name: enumero-pr
   plan:
@@ -227,18 +227,18 @@ jobs:
       context: enumero
   - task: test
     file: retro/enumero/ci/test.yml
-    on_failure:
-      put: enumero-pr
-      params:
-        path: retro
-        status: failure
-        context: enumero
-    on_success:
-      put: enumero-pr
-      params:
-        path: retro
-        status: success
-        context: enumero
+  on_failure:
+    put: enumero-pr
+    params:
+      path: retro
+      status: failure
+      context: enumero
+  on_success:
+    put: enumero-pr
+    params:
+      path: retro
+      status: success
+      context: enumero
 
 - name: mailo-pr
   plan:
@@ -253,18 +253,18 @@ jobs:
       context: mailo
   - task: test
     file: retro/mailo/ci/test.yml
-    on_failure:
-      put: mailo-pr
-      params:
-        path: retro
-        status: failure
-        context: mailo
-    on_success:
-      put: mailo-pr
-      params:
-        path: retro
-        status: success
-        context: mailo
+  on_failure:
+    put: mailo-pr
+    params:
+      path: retro
+      status: failure
+      context: mailo
+  on_success:
+    put: mailo-pr
+    params:
+      path: retro
+      status: success
+      context: mailo
 
 - name: toctoc-pr
   plan:
@@ -289,18 +289,18 @@ jobs:
   - task: test
     file: retro/toctoc/ci/test.yml
     privileged: true
-    on_failure:
-      put: toctoc-pr
-      params:
-        path: retro
-        status: failure
-        context: toctoc
-    on_success:
-      put: toctoc-pr
-      params:
-        path: retro
-        status: success
-        context: toctoc
+  on_failure:
+    put: toctoc-pr
+    params:
+      path: retro
+      status: failure
+      context: toctoc
+  on_success:
+    put: toctoc-pr
+    params:
+      path: retro
+      status: success
+      context: toctoc
 
 - name: metarpheus-pr
   plan:
@@ -315,18 +315,18 @@ jobs:
       context: metarpheus
   - task: test
     file: retro/metarpheus/ci/test.yml
-    on_failure:
-      put: metarpheus-pr
-      params:
-        path: retro
-        status: failure
-        context: metarpheus
-    on_success:
-      put: metarpheus-pr
-      params:
-        path: retro
-        status: success
-        context: metarpheus
+  on_failure:
+    put: metarpheus-pr
+    params:
+      path: retro
+      status: failure
+      context: metarpheus
+  on_success:
+    put: metarpheus-pr
+    params:
+      path: retro
+      status: success
+      context: metarpheus
 
 - name: tapiro-pr
   plan:
@@ -341,18 +341,18 @@ jobs:
       context: tapiro
   - task: test
     file: retro/tapiro/ci/test.yml
-    on_failure:
-      put: tapiro-pr
-      params:
-        path: retro
-        status: failure
-        context: tapiro
-    on_success:
-      put: tapiro-pr
-      params:
-        path: retro
-        status: success
-        context: tapiro
+  on_failure:
+    put: tapiro-pr
+    params:
+      path: retro
+      status: failure
+      context: tapiro
+  on_success:
+    put: tapiro-pr
+    params:
+      path: retro
+      status: success
+      context: tapiro
 
 - name: docs-pr
   plan:
