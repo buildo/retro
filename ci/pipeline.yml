@@ -169,6 +169,14 @@ jobs:
   - task: test
     file: retro/tapiro/ci/test.yml
 
+- name: docs
+  plan:
+  - get: retro
+    resource: master
+    trigger: true
+  - task: build-docs
+    file: retro/ci/docs.yml
+
 - name: sbt-buildo-pr
   plan:
   - get: retro
@@ -347,6 +355,7 @@ jobs:
       - toctoc
       - metarpheus
       - tapiro
+      - docs
   - get: tag
     trigger: true
   - task: release on Sonatype
