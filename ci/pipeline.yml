@@ -123,6 +123,7 @@ resources:
       - build.sbt
       - project
       - docs
+      - ci/docs.yml
 
 - name: postgres
   type: docker-image
