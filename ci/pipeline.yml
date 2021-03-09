@@ -123,6 +123,7 @@ resources:
       - build.sbt
       - project
       - docs
+      - ci/docs.yml
 
 - name: postgres
   type: docker-image
@@ -144,6 +145,13 @@ resources:
   source:
     repository: buildo/scala-sbt-alpine
     tag: 8u201_2.12.11_1.3.9
+
+- name: hseeberger-scala-sbt
+  type: docker-image
+  icon: docker
+  source:
+    repository: hseeberger/scala-sbt
+    tag: 8u242_1.3.8_2.12.10
 
 - name: slack-buildo
   type: slack-notification
@@ -239,10 +247,15 @@ jobs:
 
 - name: docs
   plan:
-  - get: retro
-    resource: master
-    trigger: true
+  - in_parallel:
+      fail_fast: true
+      steps:
+      - get: retro
+        resource: master
+        trigger: true
+      - get: hseeberger-scala-sbt
   - task: build-docs
+    image: hseeberger-scala-sbt
     file: retro/ci/docs.yml
   on_failure:
     <<: *slack_failure
@@ -418,16 +431,21 @@ jobs:
 
 - name: docs-pr
   plan:
-  - get: retro
-    resource: docs-pr
-    trigger: true
-    version: every
+  - in_parallel:
+      fail_fast: true
+      steps:
+      - get: retro
+        resource: docs-pr
+        trigger: true
+        version: every
+      - get: hseeberger-scala-sbt
   - put: docs-pr
     params:
       path: retro
       status: pending
       context: docs
   - task: build-docs
+    image: hseeberger-scala-sbt
     file: retro/ci/docs.yml
   on_failure:
     put: docs-pr
@@ -460,7 +478,9 @@ jobs:
           - docs
       - get: tag
         trigger: true
+      - get: hseeberger-scala-sbt
   - task: release-on-sonatype
+    image: hseeberger-scala-sbt
     file: retro/ci/release.yml
     params:
       GITHUB_DEPLOY_KEY: ((private-key))
