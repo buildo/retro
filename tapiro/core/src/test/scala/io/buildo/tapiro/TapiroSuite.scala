@@ -24,9 +24,9 @@ class TapiroSuite extends munit.FunSuite {
       |  case object NotFound extends SchoolReadError
       |}
       |
-      |trait SchoolController[F[_], AuthToken] {
+      |trait SchoolController[F[_], Auth] {
       |  @command
-      |  def create(school: School, token: AuthToken): F[Either[SchoolCreateError, Unit]]
+      |  def create(school: School, token: Auth): F[Either[SchoolCreateError, Unit]]
       |  @query
       |  def read(id: Long): F[Either[SchoolReadError, School]]
       |  @query
@@ -50,10 +50,10 @@ class TapiroSuite extends munit.FunSuite {
       |import sttp.tapir.Codec.{JsonCodec, PlainCodec}
       |import sttp.model.StatusCode
       |
-      |trait SchoolControllerTapirEndpoints[AuthToken] {
+      |trait SchoolControllerTapirEndpoints[Auth] {
       |
       |  val create: Endpoint[
-      |    (SchoolControllerTapirEndpoints.CreateRequestPayload, AuthToken),
+      |    (SchoolControllerTapirEndpoints.CreateRequestPayload, Auth),
       |    SchoolCreateError,
       |    Unit,
       |    Nothing
@@ -64,29 +64,29 @@ class TapiroSuite extends munit.FunSuite {
       |
       |object SchoolControllerTapirEndpoints {
       |
-      |  def create[AuthToken](statusCodes: String => StatusCode)(
+      |  def create[Auth](statusCodes: String => StatusCode)(
       |      implicit codec0: Decoder[School],
       |      codec1: Encoder[School],
       |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
-      |      codec3: PlainCodec[AuthToken],
+      |      codec3: PlainCodec[Auth],
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
       |      codec7: JsonCodec[List[School]]
-      |  ) = new SchoolControllerTapirEndpoints[AuthToken] {
+      |  ) = new SchoolControllerTapirEndpoints[Auth] {
       |    implicit val createRequestPayloadDecoder: Decoder[CreateRequestPayload] =
       |      deriveDecoder
       |    implicit val createRequestPayloadEncoder: Encoder[CreateRequestPayload] =
       |      deriveEncoder
       |    override val create: Endpoint[
-      |      (SchoolControllerTapirEndpoints.CreateRequestPayload, AuthToken),
+      |      (SchoolControllerTapirEndpoints.CreateRequestPayload, Auth),
       |      SchoolCreateError,
       |      Unit,
       |      Nothing
       |    ] = endpoint.post
       |      .in("create")
       |      .in(jsonBody[CreateRequestPayload])
-      |      .in(header[AuthToken]("Authorization"))
+      |      .in(header[Auth]("Authorization"))
       |      .errorOut(
       |        oneOf[SchoolCreateError](
       |          statusMapping(
@@ -135,22 +135,21 @@ class TapiroSuite extends munit.FunSuite {
       |
       |object SchoolControllerHttpEndpoints {
       |
-      |  def routes[F[_]: Sync, AuthToken](
-      |      controller: SchoolController[F, AuthToken],
+      |  def routes[F[_]: Sync, Auth](
+      |      controller: SchoolController[F, Auth],
       |      statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity
       |  )(
       |      implicit codec0: Decoder[School],
       |      codec1: Encoder[School],
       |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
-      |      codec3: PlainCodec[AuthToken],
+      |      codec3: PlainCodec[Auth],
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
       |      codec7: JsonCodec[List[School]],
       |      cs: ContextShift[F]
       |  ): HttpRoutes[F] = {
-      |    val endpoints =
-      |      SchoolControllerTapirEndpoints.create[AuthToken](statusCodes)
+      |    val endpoints = SchoolControllerTapirEndpoints.create[Auth](statusCodes)
       |    val create = endpoints.create.toRoutes({
       |      case (x, token) =>
       |        controller.create(x.school, token)
@@ -183,9 +182,9 @@ class TapiroSuite extends munit.FunSuite {
       |  case object NotFound extends SchoolReadError
       |}
       |
-      |trait SchoolController[AuthToken] {
+      |trait SchoolController[Auth] {
       |  @command
-      |  def create(school: School, token: AuthToken): Future[Either[SchoolCreateError, Unit]]
+      |  def create(school: School, token: Auth): Future[Either[SchoolCreateError, Unit]]
       |  @query
       |  def read(id: Long): Future[Either[SchoolReadError, School]]
       |  @query
@@ -211,21 +210,20 @@ class TapiroSuite extends munit.FunSuite {
       |
       |object SchoolControllerHttpEndpoints {
       |
-      |  def routes[AuthToken](
-      |      controller: SchoolController[AuthToken],
+      |  def routes[Auth](
+      |      controller: SchoolController[Auth],
       |      statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity
       |  )(
       |      implicit codec0: Decoder[School],
       |      codec1: Encoder[School],
       |      codec2: JsonCodec[SchoolCreateError.DuplicateId.type],
-      |      codec3: PlainCodec[AuthToken],
+      |      codec3: PlainCodec[Auth],
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
       |      codec7: JsonCodec[List[School]]
       |  ): Route = {
-      |    val endpoints =
-      |      SchoolControllerTapirEndpoints.create[AuthToken](statusCodes)
+      |    val endpoints = SchoolControllerTapirEndpoints.create[Auth](statusCodes)
       |    val create = endpoints.create.toRoute({
       |      case (x, token) =>
       |        controller.create(x.school, token)

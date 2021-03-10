@@ -17,6 +17,7 @@ import MetarpheusHelper._
 import org.apache.logging.log4j.LogManager
 
 import Meta.typeNameString
+import _root_.io.buildo.metarpheus.core.intermediate.RouteParam
 
 sealed trait Server
 object Server {
@@ -55,8 +56,26 @@ class Util() {
       case Some(nonEmptyPackage) =>
         val config = Config(Set.empty)
         val models = Metarpheus.run(modelsPaths, config).models
+        //this is needed because Metarpheus removes auth from params when authentication type is "Auth"
+        //see https://github.com/buildo/retro/blob/dfe62fa54d4f34c1861d694ac0cd8fa82f0a8703/metarpheus/core/src/main/scala/io.buildo.metarpheus/core/extractors/controller.scala#L35
+        val routesWithAuthParams: List[Route] = Metarpheus
+          .run(routesPaths, config)
+          .routes
+          .map(r => {
+            if (r.authenticated)
+              r.copy(
+                params = r.params :+ RouteParam(
+                  Some("token"),
+                  MetarpheusType.Name("Auth"),
+                  true,
+                  None,
+                  true,
+                ),
+              )
+            else r,
+          })
         val routes: List[TapiroRoute] =
-          Metarpheus.run(routesPaths, config).routes.map(toTapiroRoute(models))
+          routesWithAuthParams.map(toTapiroRoute(models))
         val controllersRoutes =
           routes.groupBy(
             route => (route.route.controllerType, route.route.pathName),
@@ -71,11 +90,18 @@ class Util() {
         controllersRoutes.foreach {
           case ((controllerType, pathName), routes) =>
             val controllerName = typeNameString(controllerType)
+            val authTypeString = Meta.authTypeString(controllerType)
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
             val tapirEndpoints =
-              createTapirEndpoints(tapirEndpointsName, routes, nonEmptyPackage, modelsPackages)
+              createTapirEndpoints(
+                tapirEndpointsName,
+                authTypeString.getOrElse("AuthToken"),
+                routes,
+                nonEmptyPackage,
+                modelsPackages,
+              )
             writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
 
             val routesPackages = routes
@@ -91,6 +117,7 @@ class Util() {
                     pathNameOrController,
                     controllerName,
                     tapirEndpointsName,
+                    authTypeString.getOrElse("AuthToken"),
                     httpEndpointsName,
                     modelsPackages ++ routesPackages,
                     routes,
@@ -103,6 +130,7 @@ class Util() {
                     pathNameOrController,
                     controllerName,
                     tapirEndpointsName,
+                    authTypeString.getOrElse("AuthToken"),
                     httpEndpointsName,
                     modelsPackages ++ routesPackages,
                     routes,
@@ -119,6 +147,7 @@ class Util() {
 
   private[this] def createTapirEndpoints(
     tapirEndpointsName: String,
+    authTokenName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
     requiredPackages: List[NonEmptyList[String]],
@@ -128,9 +157,10 @@ class Util() {
         Meta.packageFromList(`package`),
         requiredPackages.toSet.map(Meta.packageFromList),
         Term.Name(tapirEndpointsName),
-        Meta.codecsImplicits(routes),
-        routes.map(TapirMeta.routeToTapirEndpoint(Term.Name(tapirEndpointsName))),
-        routes.flatMap(TapirMeta.routeClassDeclarations),
+        Type.Param(List(), Name(authTokenName), List(), Type.Bounds(None, None), List(), List()),
+        Meta.codecsImplicits(routes, authTokenName),
+        routes.map(TapirMeta.routeToTapirEndpoint(Term.Name(tapirEndpointsName), authTokenName)),
+        routes.flatMap(r => TapirMeta.routeClassDeclarations(r, authTokenName)),
         routes.flatMap(TapirMeta.routeCodecDeclarations),
       ),
     )
@@ -141,6 +171,7 @@ class Util() {
     pathName: String,
     controllerName: String,
     tapirEndpointsName: String,
+    authTokenName: String,
     httpEndpointsName: String,
     requiredPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
@@ -156,9 +187,11 @@ class Util() {
               requiredPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
+              Type.Name(authTokenName),
               Term.Name(httpEndpointsName),
-              Meta.codecsImplicits(tapiroRoutes) :+ param"implicit cs: ContextShift[F]",
-              Http4sMeta.endpoints(tapiroRoutes),
+              Meta
+                .codecsImplicits(tapiroRoutes, authTokenName) :+ param"implicit cs: ContextShift[F]",
+              Http4sMeta.endpoints(tapiroRoutes, authTokenName),
               Http4sMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),
@@ -171,6 +204,7 @@ class Util() {
     pathName: String,
     controllerName: String,
     tapirEndpointsName: String,
+    authTokenName: String,
     httpEndpointsName: String,
     requiredPackages: List[NonEmptyList[String]],
     tapiroRoutes: List[TapiroRoute],
@@ -186,9 +220,10 @@ class Util() {
               requiredPackages.toSet.map(Meta.packageFromList),
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
+              Type.Name(authTokenName),
               Term.Name(httpEndpointsName),
-              Meta.codecsImplicits(tapiroRoutes),
-              AkkaHttpMeta.endpoints(tapiroRoutes),
+              Meta.codecsImplicits(tapiroRoutes, authTokenName),
+              AkkaHttpMeta.endpoints(tapiroRoutes, authTokenName),
               AkkaHttpMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),

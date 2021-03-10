@@ -10,12 +10,15 @@ object Http4sMeta {
     imports: Set[Term.Ref],
     controllerName: Type.Name,
     tapirEndpointsName: Term.Name,
+    authTokenName: Type.Name,
     httpEndpointsName: Term.Name,
     implicits: List[Term.Param],
     http4sEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
+    val authTokenTypeParam: Type.Param =
+      Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
+    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[$authTokenName](statusCodes)"
     q"""
     package ${`package`} {
       ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
@@ -30,7 +33,7 @@ object Http4sMeta {
       import sttp.model.StatusCode
 
       object $httpEndpointsName {
-        def routes[F[_]: Sync, AuthToken](controller: $controllerName[F, AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): HttpRoutes[F] = {
+        def routes[F[_]: Sync, $authTokenTypeParam](controller: $controllerName[F, $authTokenName], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): HttpRoutes[F] = {
           ..${tapirEndpoints +: http4sEndpoints :+ routes}
         }
       }
@@ -45,10 +48,10 @@ object Http4sMeta {
     q"Router($route -> NonEmptyList.of($first, ..$rest).reduceK)"
   }
 
-  val endpoints = (routes: List[TapiroRoute]) =>
+  val endpoints = (routes: List[TapiroRoute], authTokenName: String) =>
     routes.map { route =>
       val name = Term.Name(route.route.name.last)
-      val endpointImpl = Meta.toEndpointImplementation(route)
+      val endpointImpl = Meta.toEndpointImplementation(route, authTokenName)
       q"val ${Pat.Var(name)} = endpoints.$name.toRoutes($endpointImpl)"
     }
 }
