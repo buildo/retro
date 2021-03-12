@@ -23,6 +23,22 @@ class SendinblueSpec extends munit.FunSuite {
       }
   }
 
+  test("email should be correctly sent to multiple recipients") {
+    mailer
+      .send(
+        to = "mailo@buildo.io,email@example.com",
+        from = "Mailo test mailo@buildo.io",
+        subject = "Test mail",
+        templateName = "mail.html",
+        params = Map("ciao" -> "CIAOOOONE"),
+        tags = List("test")
+      )
+      .map { value =>
+        assertEquals(value.map(_.message), Right("Email sent successfully."))
+      }
+  }
+
+
   test("email should not be sent if FROM is malformed") {
     mailer
       .send(
