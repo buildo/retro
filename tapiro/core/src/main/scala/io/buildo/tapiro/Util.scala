@@ -90,14 +90,14 @@ class Util() {
         controllersRoutes.foreach {
           case ((controllerType, pathName), routes) =>
             val controllerName = typeNameString(controllerType)
-            val authTypeString = Meta.authTypeString(controllerType)
+            val authTypeString = Meta.authTypeString(controllerType).getOrElse("AuthToken")
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
             val tapirEndpoints =
               createTapirEndpoints(
                 tapirEndpointsName,
-                authTypeString.getOrElse("AuthToken"),
+                authTypeString,
                 routes,
                 nonEmptyPackage,
                 modelsPackages,
@@ -117,7 +117,7 @@ class Util() {
                     pathNameOrController,
                     controllerName,
                     tapirEndpointsName,
-                    authTypeString.getOrElse("AuthToken"),
+                    authTypeString,
                     httpEndpointsName,
                     modelsPackages ++ routesPackages,
                     routes,
@@ -130,7 +130,7 @@ class Util() {
                     pathNameOrController,
                     controllerName,
                     tapirEndpointsName,
-                    authTypeString.getOrElse("AuthToken"),
+                    authTypeString,
                     httpEndpointsName,
                     modelsPackages ++ routesPackages,
                     routes,
