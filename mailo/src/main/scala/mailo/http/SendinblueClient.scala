@@ -122,11 +122,11 @@ class SendinblueClient(
     sender.setEmail(fromEmail)
     sender.setName(fromName)
 
-    val toM = new SendSmtpEmailTo()
-    toM.setEmail(to)
+    val toList: List[SendSmtpEmailTo] =
+      to.split(",").map(e => new SendSmtpEmailTo().email(e)).toList
 
     email.setSender(sender)
-    email.setTo(List(toM).asJava)
+    email.setTo(toList.asJava)
     email.setSubject(subject)
     email.setTags(tags.asJava)
     email.setHtmlContent(html)
