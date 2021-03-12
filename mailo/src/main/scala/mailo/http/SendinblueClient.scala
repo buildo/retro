@@ -122,8 +122,8 @@ class SendinblueClient(
     sender.setEmail(fromEmail)
     sender.setName(fromName)
 
-   val toList: List[SendSmtpEmailTo] =
-     to.split(",").map(e => new SendSmtpEmailTo().email(e)).toList
+    val toList: List[SendSmtpEmailTo] =
+      to.split(",").map(e => new SendSmtpEmailTo().email(e)).toList
 
     email.setSender(sender)
     email.setTo(toList.asJava)
