@@ -67,22 +67,6 @@ class SendinblueClient(
   def send(
     to: String,
     from: String,
-    cc: Option[String] = None,
-    bcc: Option[String] = None,
-    subject: String,
-    content: MailRefinedContent,
-    attachments: List[Attachment],
-    tags: List[String],
-    headers: Map[String, String] = Map.empty,
-  )(
-    implicit
-    executionContext: scala.concurrent.ExecutionContext,
-  ): Future[Either[MailError, MailResponse]] =
-    send(to, from, cc, bcc, None, subject, content, attachments, tags, headers)
-
-  def send(
-    to: String,
-    from: String,
     cc: Option[String],
     bcc: Option[String],
     replyTo: Option[String],

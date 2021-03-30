@@ -79,6 +79,7 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     from: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent.MailRefinedContent,
     attachments: List[Attachment],

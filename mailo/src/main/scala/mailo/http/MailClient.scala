@@ -25,6 +25,7 @@ trait MailClient {
     from: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],

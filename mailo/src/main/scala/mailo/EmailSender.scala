@@ -44,6 +44,7 @@ class EmailSender(
           from = mail.from,
           cc = mail.cc,
           bcc = mail.bcc,
+          replyTo = mail.replyTo,
           subject = mail.subject,
           content = HTMLContent(parsedContent),
           attachments = mail.attachments,
