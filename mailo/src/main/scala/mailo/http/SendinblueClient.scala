@@ -78,10 +78,28 @@ class SendinblueClient(
     implicit
     executionContext: scala.concurrent.ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
+    send(to, from, cc, bcc, None, subject, content, attachments, tags, headers)
+
+  def send(
+    to: String,
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    replyTo: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: scala.concurrent.ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] =
     for {
       entity <- entity(
         from = from,
         to = to,
+        replyTo = replyTo,
         subject = subject,
         content = content,
         attachments = attachments,
@@ -100,10 +118,11 @@ class SendinblueClient(
   private[this] def entity(
     from: String,
     to: String,
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
-    tags: List[String],
+    tags: List[String]
   )(implicit ec: ExecutionContext): Future[SendSmtpEmail] = Future {
     import mailo.MailRefinedContent._
     import collection.JavaConverters._
@@ -127,6 +146,11 @@ class SendinblueClient(
 
     email.setSender(sender)
     email.setTo(toList.asJava)
+
+    replyTo.map { rt =>
+      val sRt = new SendSmtpEmailReplyTo().email(rt)
+      email.setReplyTo(sRt)
+    }
     email.setSubject(subject)
     email.setTags(tags.asJava)
     email.setHtmlContent(html)

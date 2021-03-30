@@ -42,6 +42,7 @@ case class Mail(
   from: String,
   cc: Option[String] = None,
   bcc: Option[String] = None,
+  replyTo: Option[String] = None,
   subject: String,
   templateName: String,
   params: Map[String, String],
