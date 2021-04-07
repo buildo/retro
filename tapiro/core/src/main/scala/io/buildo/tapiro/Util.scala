@@ -157,7 +157,7 @@ class Util() {
         Meta.packageFromList(`package`),
         requiredPackages.toSet.map(Meta.packageFromList),
         Term.Name(tapirEndpointsName),
-        Type.Param(List(), Name(authTokenName), List(), Type.Bounds(None, None), List(), List()),
+        Type.Name(authTokenName),
         Meta.codecsImplicits(routes, authTokenName),
         routes.map(TapirMeta.routeToTapirEndpoint(Term.Name(tapirEndpointsName), authTokenName)),
         routes.flatMap(r => TapirMeta.routeClassDeclarations(r, authTokenName)),

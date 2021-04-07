@@ -16,12 +16,14 @@ object TapirMeta {
     `package`: Term.Ref,
     imports: Set[Term.Ref],
     tapirEndpointsName: Term.Name,
-    authTokenName: Type.Param,
+    authTokenName: Type.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
     postInputClassDeclarations: List[Defn.Class],
     postInputCodecDeclarations: List[Defn.Val],
-  ) =>
+  ) =>{
+   val authTokenTypeParam: Type.Param =
+      Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
     q"""
     package ${`package`} {
       ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
@@ -32,16 +34,16 @@ object TapirMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
 
-      trait ${Type.Name(tapirEndpointsName.value)}[$authTokenName] {
+      trait ${Type.Name(tapirEndpointsName.value)}[$authTokenTypeParam] {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
       }
 
       object $tapirEndpointsName {
-        def create[$authTokenName](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
+        def create[$authTokenTypeParam](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
       Type.Name(tapirEndpointsName.value),
       Name.Anonymous(),
       Nil,
-    )}[${Type.Name(authTokenName.name.value)}] {
+    )}[$authTokenName] {
           ..${postInputCodecDeclarations}
           ..${body.map(d => d.copy(mods = mod"override" :: d.mods))}
         }
@@ -50,6 +52,7 @@ object TapirMeta {
       }
     }
     """
+  }
 
   val routeToTapirEndpoint = (tapirEndpointsName: Term.Name, authTokenName: String) =>
     (route: TapiroRoute) =>
