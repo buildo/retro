@@ -194,13 +194,18 @@ object TapirMeta {
     }
 
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
+    val paramType = routeParamToScalametaType(param)
+    val arraySuffix = paramType match {
+        case Type.Apply(Type.Name("List"),_) => "[]"
+        case _ => ""
+    }
     val noDesc =
       Term.Apply(
         Term.Select(endpoint, Term.Name("in")),
         List(
           Term.Apply(
-            Term.ApplyType(Term.Name("query"), List(routeParamToScalametaType(param))),
-            List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)))),
+            Term.ApplyType(Term.Name("query"), List(paramType)),
+            List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)) ++ arraySuffix)),
           ),
         ),
       )
