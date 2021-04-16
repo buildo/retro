@@ -10,10 +10,10 @@ import cats.data.NonEmptyList
 object Meta {
   val codecsImplicits = (routes: List[TapiroRoute], authTokenName: String) => {
     val notUnit = (t: MetarpheusType) => t != MetarpheusType.Name("Unit")
-    val toDecoder = (t: Type) => t"Decoder[$t]"
-    val toEncoder = (t: Type) => t"Encoder[$t]"
-    val toJsonCodec = (t: Type) => t"JsonCodec[$t]"
-    val toPlainCodec = (t: Type) => t"PlainCodec[$t]"
+    val toDecoder = (t: Type) => t"Decoder[${extractListType(t)}]"
+    val toEncoder = (t: Type) => t"Encoder[${extractListType(t)}]"
+    val toJsonCodec = (t: Type) => t"JsonCodec[${extractListType(t)}]"
+    val toPlainCodec = (t: Type) => t"PlainCodec[${extractListType(t)}]"
     val routeRequiredImplicits = (route: TapiroRoute) => {
       val (authParamTypes, nonAuthParamTypes) =
         route.route.params.map(_.tpe).partition(isAuthToken(_, authTokenName))
@@ -37,6 +37,11 @@ object Meta {
       inputImplicits ++ outputImplicits ++ errorImplicits ++ authImplicits
     }
     deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
+  }
+
+  private[this] def extractListType(t: Type) : Type = t match {
+    case Type.Apply(Type.Name("List"),args) => args.head
+    case _ => t
   }
 
   private[this] val deduplicate: List[Type] => List[Type] = (ts: List[Type]) =>
@@ -72,7 +77,7 @@ object Meta {
 
   val metarpheusTypeToScalametaType: MetarpheusType => Type = {
     case MetarpheusType.Apply(name, args) =>
-      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList)
+      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList) 
     case MetarpheusType.Name(name) => Type.Name(name)
   }
 
