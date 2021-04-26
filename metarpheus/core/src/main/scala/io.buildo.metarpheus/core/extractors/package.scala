@@ -19,6 +19,11 @@ package object extractors {
     intermediate.API(models, routes)
   }
 
+  def extractImports(source: scala.meta.Source): List[scala.meta.Import] =
+    source.collect {
+      case imp: scala.meta.Import => imp
+  }
+
   /**
     * Extract all terms from a sequence of applications of an infix operator
     * (which translates to nested `ApplyInfix`es).

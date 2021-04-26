@@ -9,13 +9,17 @@ import scala.meta.internal.io.PlatformFileIO
 object Metarpheus {
 
   def run(paths: List[String], config: Config): intermediate.API = {
-    val files = paths
-      .flatMap(path => PlatformFileIO.listAllFilesRecursively(AbsolutePath(path)))
-      .filter(_.toString.endsWith(".scala"))
-    val parsed = files.map(File(_).parse[Source].get)
+    val parsed = parseFiles(paths)
     extractors
       .extractFullAPI(parsed = parsed)
       .stripUnusedModels(config.modelsForciblyInUse, config.discardRouteErrorModels)
   }
+
+def parseFiles(paths: List[String]) : List[Source] = {
+    val files = paths
+      .flatMap(path => PlatformFileIO.listAllFilesRecursively(AbsolutePath(path)))
+      .filter(_.toString.endsWith(".scala"))
+    files.map(File(_).parse[Source].get)
+}
 
 }
