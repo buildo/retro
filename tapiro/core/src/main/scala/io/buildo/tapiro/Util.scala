@@ -1,9 +1,7 @@
 package io.buildo.tapiro
-
+import io.buildo.metarpheus.core.extractors._
 import io.buildo.metarpheus.core.{Config, Metarpheus}
 import io.buildo.metarpheus.core.intermediate.{
-  CaseClass,
-  CaseEnum,
   Route,
   TaggedUnion,
   Type => MetarpheusType,
@@ -55,7 +53,7 @@ class Util() {
     NonEmptyList.fromList(`package`) match {
       case Some(nonEmptyPackage) =>
         val config = Config(Set.empty)
-        val models = Metarpheus.run(modelsPaths, config).models
+       val models = Metarpheus.run(modelsPaths, config).models
         //this is needed because Metarpheus removes auth from params when authentication type is "Auth"
         //see https://github.com/buildo/retro/blob/dfe62fa54d4f34c1861d694ac0cd8fa82f0a8703/metarpheus/core/src/main/scala/io.buildo.metarpheus/core/extractors/controller.scala#L35
         val routesWithAuthParams: List[Route] = Metarpheus
@@ -74,19 +72,13 @@ class Util() {
               )
             else r,
           })
-        val routes: List[TapiroRoute] =
+       val routes: List[TapiroRoute] =
           routesWithAuthParams.map(toTapiroRoute(models))
+       val imports = Metarpheus.parseFiles(routesPaths).map(extractImports).flatten.map(_.importers).flatten.toSet
         val controllersRoutes =
           routes.groupBy(
             route => (route.route.controllerType, route.route.pathName),
           )
-        val modelsPackages = models.map {
-          case c: CaseClass   => c.`package`
-          case c: CaseEnum    => c.`package`
-          case t: TaggedUnion => t.`package`
-        }.collect {
-          case head :: tail => NonEmptyList(head, tail)
-        }
         controllersRoutes.foreach {
           case ((controllerType, pathName), routes) =>
             val controllerName = typeNameString(controllerType)
@@ -94,21 +86,16 @@ class Util() {
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
+            val controllerImports = Meta.controllerImports(routes,imports)
             val tapirEndpoints =
               createTapirEndpoints(
                 tapirEndpointsName,
                 authTypeString,
                 routes,
                 nonEmptyPackage,
-                modelsPackages,
+                controllerImports,             
               )
             writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
-
-            val routesPackages = routes
-              .map(_.route.controllerPackage)
-              .collect {
-                case head :: tail => NonEmptyList(head, tail)
-              }
             server match {
               case Server.Http4s =>
                 val http4sEndpoints =
@@ -119,7 +106,7 @@ class Util() {
                     tapirEndpointsName,
                     authTypeString,
                     httpEndpointsName,
-                    modelsPackages ++ routesPackages,
+                    controllerImports,
                     routes,
                   )
                 http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
@@ -132,7 +119,7 @@ class Util() {
                     tapirEndpointsName,
                     authTypeString,
                     httpEndpointsName,
-                    modelsPackages ++ routesPackages,
+                    controllerImports,
                     routes,
                   )
                 akkaHttpEndpoints.foreach(
@@ -150,12 +137,12 @@ class Util() {
     authTokenName: String,
     routes: List[TapiroRoute],
     `package`: NonEmptyList[String],
-    requiredPackages: List[NonEmptyList[String]],
+    requiredPackages: Set[Import],
   ): String = {
     format(
       TapirMeta.`class`(
         Meta.packageFromList(`package`),
-        requiredPackages.toSet.map(Meta.packageFromList),
+        requiredPackages,
         Term.Name(tapirEndpointsName),
         Type.Name(authTokenName),
         Meta.codecsImplicits(routes, authTokenName),
@@ -173,7 +160,7 @@ class Util() {
     tapirEndpointsName: String,
     authTokenName: String,
     httpEndpointsName: String,
-    requiredPackages: List[NonEmptyList[String]],
+    requiredPackages: Set[Import],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
     val routes = tapiroRoutes.map(_.route)
@@ -184,7 +171,7 @@ class Util() {
           format(
             Http4sMeta.`class`(
               Meta.packageFromList(`package`),
-              requiredPackages.toSet.map(Meta.packageFromList),
+              requiredPackages,
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
               Type.Name(authTokenName),
@@ -206,7 +193,7 @@ class Util() {
     tapirEndpointsName: String,
     authTokenName: String,
     httpEndpointsName: String,
-    requiredPackages: List[NonEmptyList[String]],
+    requiredPackages: Set[Import],
     tapiroRoutes: List[TapiroRoute],
   ): Option[String] = {
     val routes = tapiroRoutes.map(_.route)
@@ -217,7 +204,7 @@ class Util() {
           format(
             AkkaHttpMeta.`class`(
               Meta.packageFromList(`package`),
-              requiredPackages.toSet.map(Meta.packageFromList),
+              requiredPackages,
               Type.Name(controllerName),
               Term.Name(tapirEndpointsName),
               Type.Name(authTokenName),
