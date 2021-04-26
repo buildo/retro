@@ -15,7 +15,7 @@ object Metarpheus {
       .stripUnusedModels(config.modelsForciblyInUse, config.discardRouteErrorModels)
   }
 
-def parseFiles(paths: List[String]) : List[Source] = {
+  def parseFiles(paths: List[String]) : List[Source] = {
     val files = paths
       .flatMap(path => PlatformFileIO.listAllFilesRecursively(AbsolutePath(path)))
       .filter(_.toString.endsWith(".scala"))
