@@ -14,7 +14,7 @@ object TapirMeta {
 
   val `class` = (
     `package`: Term.Ref,
-    imports: Set[Term.Ref],
+    imports: Set[Import],
     tapirEndpointsName: Term.Name,
     authTokenName: Type.Name,
     implicits: List[Term.Param],
@@ -26,7 +26,7 @@ object TapirMeta {
       Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
     q"""
     package ${`package`} {
-      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString)}
       import io.circe.{ Decoder, Encoder }
       import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
       import sttp.tapir._

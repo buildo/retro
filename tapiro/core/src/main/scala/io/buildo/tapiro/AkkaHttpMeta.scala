@@ -7,7 +7,7 @@ import scala.meta._
 object AkkaHttpMeta {
   val `class` = (
     `package`: Term.Ref,
-    imports: Set[Term.Ref],
+    imports: Set[Import],
     controllerName: Type.Name,
     tapirEndpointsName: Term.Name,
     authTokenName: Type.Name,
@@ -21,7 +21,7 @@ object AkkaHttpMeta {
     val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[$authTokenName](statusCodes)"
     q"""
     package ${`package`} {
-      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString)}
       import akka.http.scaladsl.server._
       import akka.http.scaladsl.server.Directives._
       import io.circe.{ Decoder, Encoder }
