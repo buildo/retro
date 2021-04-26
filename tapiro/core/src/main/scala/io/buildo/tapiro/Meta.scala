@@ -9,19 +9,19 @@ import cats.data.NonEmptyList
 
 object Meta {
 
-  val controllerImports =(routes: List[TapiroRoute],imports: Set[Importer])  =>   {
+  val controllerImports =(routes: List[TapiroRoute],imports: Set[Importer],outputPackage:String)  =>   {
     val types = routes.flatMap(tr => tr.route.params.map(r=> r.tpe) ++ (if (tr.route.error.isDefined) List(tr.route.error.get,tr.route.returns) else  List(tr.route.returns))) 
     val typeNameList = types.flatMap(typeNameExtractor(_)).toSet
     val (wildcardImportList,importList) = imports.collect{
       case i : Importer if i.syntax.endsWith("._") => List(i)
       case Importer(ref,importees) => importees.filter(p=> typeNameList.contains(p.syntax)).map(p=> Importer(ref,List(p)))
     }.flatten.partition(_.syntax.endsWith("._"))
-    val importers = if (importList.flatMap(i=> typeNameList.diff(i.importees.map(_.syntax).toSet)).isEmpty) importList else  {
-      val controllerPackageStrings = routes.map(r=> s"import ${r.route.controllerPackage.mkString(".")}._")
-      val controllerPackage : List[Import] =controllerPackageStrings.flatMap(_.parse[Source].getOrElse(Source(List())).tree.children).collect{case i: Import => i}
-      controllerPackage.flatMap(cp=> cp.importers) ++ wildcardImportList ++ importList
-    }
-    val result= importers.map(i=>Import(List(i)))
+    val controllerPackageStrings = routes.map(r=> s"import ${r.route.controllerPackage.mkString(".")}._")
+    val controllerPackage : List[Import] =controllerPackageStrings.flatMap(_.parse[Source].getOrElse(Source(List())).tree.children).collect{case i: Import => i}
+    val importers = (if (importList.flatMap(i=> typeNameList.diff(i.importees.map(_.syntax).toSet)).isEmpty) importList else  {
+      (wildcardImportList ++ importList)
+    }).map(i=>Import(List(i)))
+    val result= if (controllerPackageStrings.filter(_.endsWith(outputPackage+"._")).isEmpty) controllerPackage ++ importers else importers
     deduplicate(result.toList).toSet
   } : Set[Import]
 

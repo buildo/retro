@@ -86,7 +86,7 @@ class Util() {
             val pathNameOrController = pathName.getOrElse(controllerName)
             val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
             val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
-            val controllerImports = Meta.controllerImports(routes,imports)
+            val controllerImports = Meta.controllerImports(routes,imports,nonEmptyPackage.toList.mkString("."))
             val tapirEndpoints =
               createTapirEndpoints(
                 tapirEndpointsName,
