@@ -20,13 +20,14 @@ class EmailSender(
 )(
   implicit
   ec: ExecutionContext,
-  conf: Config = ConfigFactory.load()
-) extends Mailo with LazyLogging {
+  conf: Config = ConfigFactory.load(),
+) extends Mailo
+    with LazyLogging {
   implicit private[this] val scalaCache = ScalaCache(GuavaCache())
 
   private[this] case class MailoConfig(cachingTTLSeconds: Int)
   private[this] val mailoConfig = MailoConfig(
-    cachingTTLSeconds = conf.getInt("mailo.cachingTTLSeconds")
+    cachingTTLSeconds = conf.getInt("mailo.cachingTTLSeconds"),
   )
 
   def send(mail: Mail) = {
@@ -43,12 +44,38 @@ class EmailSender(
           from = mail.from,
           cc = mail.cc,
           bcc = mail.bcc,
+          replyTo = mail.replyTo,
           subject = mail.subject,
           content = HTMLContent(parsedContent),
           attachments = mail.attachments,
           tags = mail.tags,
-          headers = mail.headers
-        )
+          headers = mail.headers,
+        ),
+      )
+      _ = logger.info(s"email sent with id: ${result.id}")
+    } yield result
+
+    result.value
+  }
+
+  def sendBatch(batch: BatchMail) = {
+    val result = for {
+      content <- EitherT(cachingWithTTL(batch.templateName)(mailoConfig.cachingTTLSeconds.seconds) {
+        mailData.get(batch.templateName)
+      })
+      _ = logger.debug(s"retrieved ${batch.templateName} content")
+      result <- EitherT(
+        mailClient.sendBatch(
+          from = batch.from,
+          cc = batch.cc,
+          bcc = batch.bcc,
+          subject = batch.subject,
+          content = HTMLContent(content.template),
+          attachments = batch.attachments,
+          tags = batch.tags,
+          recipientVariables = batch.recipientVariables,
+          headers = batch.headers,
+        ),
       )
       _ = logger.info(s"email sent with id: ${result.id}")
     } yield result

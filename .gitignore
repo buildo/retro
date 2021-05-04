@@ -17,7 +17,7 @@ project/plugins/project/
 
 .metals
 .bloop
-project/metals.sbt
+project/**/metals.sbt
 
 node_modules
 build

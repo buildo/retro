@@ -8,15 +8,15 @@ import scala.meta.contrib._
 import cats.data.NonEmptyList
 
 object Meta {
-  val codecsImplicits = (routes: List[TapiroRoute]) => {
+  val codecsImplicits = (routes: List[TapiroRoute], authTokenName: String) => {
     val notUnit = (t: MetarpheusType) => t != MetarpheusType.Name("Unit")
-    val toDecoder = (t: Type) => t"Decoder[$t]"
-    val toEncoder = (t: Type) => t"Encoder[$t]"
-    val toJsonCodec = (t: Type) => t"JsonCodec[$t]"
-    val toPlainCodec = (t: Type) => t"PlainCodec[$t]"
+    val toDecoder = (t: Type) => t"Decoder[${extractListType(t)}]"
+    val toEncoder = (t: Type) => t"Encoder[${extractListType(t)}]"
+    val toJsonCodec = (t: Type) => t"JsonCodec[${extractListType(t)}]"
+    val toPlainCodec = (t: Type) => t"PlainCodec[${extractListType(t)}]"
     val routeRequiredImplicits = (route: TapiroRoute) => {
       val (authParamTypes, nonAuthParamTypes) =
-        route.route.params.map(_.tpe).partition(isAuthToken)
+        route.route.params.map(_.tpe).partition(isAuthToken(_, authTokenName))
       val inputImplicits =
         route.method match {
           case RouteMethod.GET =>
@@ -39,13 +39,18 @@ object Meta {
     deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
   }
 
+  private[this] def extractListType(t: Type) : Type = t match {
+    case Type.Apply(Type.Name("List"),args) => args.head
+    case _ => t
+  }
+
   private[this] val deduplicate: List[Type] => List[Type] = (ts: List[Type]) =>
     ts match {
       case Nil          => Nil
       case head :: tail => head :: deduplicate(tail.filter(!_.isEqual(head)))
     }
 
-  private[this] val isAuthToken = (t: MetarpheusType) => t == MetarpheusType.Name("AuthToken")
+  private[this] val isAuthToken = (t: MetarpheusType, authTokenName: String) => t == MetarpheusType.Name(authTokenName)
 
   private[this] val toImplicitParam = (paramType: Type, index: Int) => {
     val paramName = Term.Name(s"codec$index")
@@ -60,9 +65,19 @@ object Meta {
       case MetarpheusType.Name(name)     => name
     }
 
+  val authTypeString = (`type`: MetarpheusType) =>
+    `type` match {
+      case MetarpheusType.Apply(_, args) =>
+        args.last match {
+          case MetarpheusType.Name(name)  => Some(name)
+          case MetarpheusType.Apply(_, _) => None
+        }
+      case MetarpheusType.Name(_) => None
+    }
+
   val metarpheusTypeToScalametaType: MetarpheusType => Type = {
     case MetarpheusType.Apply(name, args) =>
-      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList)
+      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList) 
     case MetarpheusType.Name(name) => Type.Name(name)
   }
 
@@ -82,7 +97,7 @@ object Meta {
     `package`.tail
       .foldLeft[Term.Ref](Term.Name(`package`.head))((acc, n) => Term.Select(acc, Term.Name(n)))
 
-  val toEndpointImplementation = (route: TapiroRoute) => {
+  val toEndpointImplementation = (route: TapiroRoute, authTokenName: String) => {
     val name = Term.Name(route.route.name.last)
     val controllersName = q"controller.$name"
     route.method match {
@@ -94,10 +109,10 @@ object Meta {
         }
       case RouteMethod.POST =>
         val fields = route.route.params
-          .filterNot(_.tpe == MetarpheusType.Name("AuthToken"))
+          .filterNot(_.tpe == MetarpheusType.Name(authTokenName))
           .map(p => Term.Name(p.name.getOrElse(Meta.typeNameString(p.tpe))))
         val hasAuth = route.route.params
-          .exists(_.tpe == MetarpheusType.Name("AuthToken"))
+          .exists(_.tpe == MetarpheusType.Name(authTokenName))
         if (hasAuth)
           q"{ case (x, token) => $controllersName(..${fields.map(f => q"x.$f")}, token) }"
         else

@@ -13,8 +13,8 @@ import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
 
 import scala.concurrent.{ExecutionContext, Future}
-import javax.mail.Message.RecipientType
-import javax.mail.internet.MimeMessage
+import jakarta.mail.Message.RecipientType
+import jakarta.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -92,11 +92,47 @@ class MailgunClient(
     } yield res).value
   }
 
+  def sendBatch(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] =
+    for {
+      entity <- batchEntity(
+        from = from,
+        cc = cc,
+        bcc = bcc,
+        subject = subject,
+        content = content,
+        attachments = attachments,
+        tags = tags,
+        recipientVariables = recipientVariables,
+        headers = headers,
+      )
+      request = HttpRequest(
+        method = HttpMethods.POST,
+        uri = s"${mailgunConfig.uri}/messages",
+        headers = List(auth),
+        entity = entity,
+      )
+      res <- sendRequest(request)
+    } yield res
+
   def send(
     to: String,
     from: String,
     cc: Option[String] = None,
     bcc: Option[String] = None,
+    replyTo: Option[String] = None,
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
@@ -112,6 +148,7 @@ class MailgunClient(
         to = to,
         cc = cc,
         bcc = bcc,
+        replyTo = replyTo,
         subject = subject,
         content = content,
         attachments = attachments,
@@ -215,6 +252,7 @@ class MailgunClient(
     to: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
@@ -250,7 +288,62 @@ class MailgunClient(
         ) ++ List(
           cc.map(Multipart.FormData.BodyPart.Strict("cc", _)),
           bcc.map(Multipart.FormData.BodyPart.Strict("bcc", _)),
+          replyTo.map(Multipart.FormData.BodyPart.Strict("h:Reply-To", _)),
         ).flatten ++ tagsForm(tags) ++ attachmentsForm ++ headersForm(headers) :+ contentForm,
+      ),
+    )
+
+    Marshal(multipartForm).to[RequestEntity]
+  }
+
+  private[this] def batchEntity(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionCon: scala.concurrent.ExecutionContext,
+  ): Future[RequestEntity] = {
+    import mailo.MailRefinedContent._
+    import io.circe.syntax._
+
+    val contentForm = content match {
+      case HTMLContent(html) => Multipart.FormData.BodyPart.Strict("html", html)
+      case TEXTContent(text) => Multipart.FormData.BodyPart.Strict("text", text)
+    }
+
+    val recipientVariablesEntity =
+      HttpEntity(ContentTypes.`application/json`, ByteString(recipientVariables.asJson.noSpaces))
+    val recipientVariablesForm =
+      Multipart.FormData.BodyPart.Strict("recipient-variables", recipientVariablesEntity)
+    val tos = recipientVariables.map { case (to, _) => Multipart.FormData.BodyPart.Strict("to", to) }
+
+    val attachmentsForm = attachments.map(
+      attachment =>
+        attachmentForm(
+          attachment.name,
+          attachment.`type`,
+          attachment.content,
+          attachment.transferEncoding,
+        ),
+    )
+
+    val multipartForm = Multipart.FormData(
+      Source(
+        List(
+          Multipart.FormData.BodyPart.Strict("from", from),
+          Multipart.FormData.BodyPart.Strict("subject", subject),
+          recipientVariablesForm,
+        ) ++ List(
+          cc.map(Multipart.FormData.BodyPart.Strict("cc", _)),
+          bcc.map(Multipart.FormData.BodyPart.Strict("bcc", _)),
+        ).flatten ++ tagsForm(tags) ++ tos ++ attachmentsForm ++ headersForm(headers) :+ contentForm,
       ),
     )
 

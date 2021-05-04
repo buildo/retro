@@ -4,12 +4,12 @@ import java.util.{Properties, UUID}
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import javax.mail.internet.{InternetAddress, MimeMessage}
+import jakarta.mail.internet.{InternetAddress, MimeMessage}
 import mailo.{Attachment, MailError, MailRefinedContent, MailResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util._
-import javax.mail._
+import jakarta.mail._
 import mailo.MailRefinedContent.{HTMLContent, TEXTContent}
 import mailo.http.MailClientError.{BadRequest, UnknownError}
 import scala.util.control.NonFatal
@@ -79,6 +79,7 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     from: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent.MailRefinedContent,
     attachments: List[Attachment],
@@ -111,4 +112,20 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     headers.foreach(h => message.addHeader(h._1, h._2))
     internalSend(message, attachments, tags)
   }
+
+  override def sendBatch(
+    from: String,
+    cc: Option[String],
+    bcc: Option[String],
+    subject: String,
+    content: MailRefinedContent.MailRefinedContent,
+    attachments: List[Attachment],
+    tags: List[String],
+    recipientVariables: Map[String, Map[String, String]],
+    headers: Map[String, String],
+  )(
+    implicit
+    executionContext: ExecutionContext,
+  ): Future[Either[MailError, MailResponse]] =
+    throw new UnsupportedOperationException("unable to send batch messages in SMTP")
 }

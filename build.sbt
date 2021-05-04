@@ -5,6 +5,8 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 val scala212 = "2.12.11"
 val scala213 = "2.13.1"
 
+publishTo := sonatypePublishToBundle.value
+
 inThisBuild(
   List(
     scalaVersion := scala212,
@@ -27,7 +29,7 @@ lazy val `sbt-buildo` = project
   .enablePlugins(SbtPlugin)
   .settings(
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
-    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9"),
+    addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0"),
     dynverTagPrefix := "sbt-buildo-",
   )
 
@@ -55,7 +57,6 @@ lazy val mailo = project
   .settings(
     name := "mailo",
     libraryDependencies ++= mailoDependencies,
-    resolvers += Resolver.bintrayRepo("dnvriend", "maven"),
     dynverTagPrefix := "mailo-",
     mappings in (Compile, packageBin) ~= {
       _.filter { n =>

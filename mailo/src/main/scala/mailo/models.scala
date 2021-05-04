@@ -13,19 +13,19 @@ case class Attachment(
   name: String,
   `type`: ContentType,
   content: String,
-  transferEncoding: Option[String] = None
+  transferEncoding: Option[String] = None,
 )
 
 sealed trait MailResult
 case class MailResponse(
   id: String,
-  message: String
+  message: String,
 ) extends MailResult
 case object Queued extends MailResult
 
 case class MailRawContent(
   template: String,
-  partials: Map[String, String]
+  partials: Map[String, String],
 )
 
 object MailRefinedContent {
@@ -42,10 +42,24 @@ case class Mail(
   from: String,
   cc: Option[String] = None,
   bcc: Option[String] = None,
+  replyTo: Option[String] = None,
   subject: String,
   templateName: String,
   params: Map[String, String],
   attachments: List[Attachment] = Nil,
   tags: List[String] = Nil,
-  headers: Map[String, String] = Map.empty
+  headers: Map[String, String] = Map.empty,
+)
+
+case class BatchMail(
+  from: String,
+  cc: Option[String] = None,
+  bcc: Option[String] = None,
+  subject: String,
+  templateName: String,
+  params: Map[String, String],
+  attachments: List[Attachment] = Nil,
+  tags: List[String] = Nil,
+  headers: Map[String, String] = Map.empty,
+  recipientVariables: Map[String, Map[String, String]] = Map.empty,
 )

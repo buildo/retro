@@ -56,7 +56,7 @@ The unregister operation removes any associations `(c, s)` for any given subject
 `s`. This means that `s` will not be identifiable in the authentication domain.
 
 ```plaintext
-Fu: D x C ⟶ D
+Fu: D x S ⟶ D
 ```
 
 For greater flexibility we can also define a companion operation that allows to
