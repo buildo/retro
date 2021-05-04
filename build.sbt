@@ -20,6 +20,7 @@ inThisBuild(
       ),
     ),
     testFrameworks += new TestFramework("munit.Framework"),
+    publishTo := sonatypePublishToBundle.value,
   ),
 )
 
