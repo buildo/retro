@@ -1,8 +1,8 @@
 package com.geirsson
 
 import com.typesafe.sbt.GitPlugin
-import com.typesafe.sbt.SbtPgp
-import com.typesafe.sbt.SbtPgp.autoImport._
+import com.jsuereth.sbtpgp.SbtPgp
+import com.jsuereth.sbtpgp.SbtPgp.autoImport._
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Base64
