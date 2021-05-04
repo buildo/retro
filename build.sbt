@@ -5,6 +5,8 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 val scala212 = "2.12.11"
 val scala213 = "2.13.1"
 
+publishTo := sonatypePublishToBundle.value
+
 inThisBuild(
   List(
     scalaVersion := scala212,
@@ -20,7 +22,6 @@ inThisBuild(
       ),
     ),
     testFrameworks += new TestFramework("munit.Framework"),
-    publishTo := sonatypePublishToBundle.value,
   ),
 )
 
