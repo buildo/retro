@@ -81,7 +81,7 @@ object Dependencies {
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
   val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
-  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.13.1"
+  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.13.2"
 
   val enumeroDependencies = List(
     munit,
