@@ -18,7 +18,7 @@ object Dependencies {
     val monixCatnap = "3.0.0-RC2"
     val config = "1.4.1"
     val scalacacheGuava = "0.9.3"
-    val scalaLogging = "3.8.0"
+    val scalaLogging = "3.9.3"
     val logback = "1.2.3"
     val leveldb = "1.8"
     val mailin = "3.0.1"
