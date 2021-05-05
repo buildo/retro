@@ -41,7 +41,7 @@ object CiReleasePlugin extends AutoPlugin {
   )
 
   override def globalSettings: Seq[Def.Setting[_]] = List(
-    publishArtifact.in(Test) := false,
+    Test / publishArtifact := false,
     publishMavenStyle := true,
   )
 
@@ -51,15 +51,15 @@ object CiReleasePlugin extends AutoPlugin {
       publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration :=
       publishLocalConfiguration.value.withOverwrite(true),
-    publishTo := sonatypePublishTo.value,
+    publishTo := sonatypePublishToBundle.value,
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
       setupGpg()
       val extracted = Project.extract(currentState)
       val (releaseProjects, snapshotProjects) = extracted.structure.allProjectRefs.partition {
         projectRef =>
-          val prefix = extracted.get(dynverTagPrefix.in(projectRef))
-          val v = extracted.get(version.in(projectRef))
+          val prefix = extracted.get(projectRef / dynverTagPrefix)
+          val v = extracted.get(projectRef / version)
           tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
       }
 
