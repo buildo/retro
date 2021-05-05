@@ -10,9 +10,9 @@ object Dependencies {
     val scalacheckMagnolia = "0.6.0"
     val mockito = "1.9.5"
     val akka = "2.6.11"
-    val akkaHttp = "10.1.11"
+    val akkaHttp = "10.1.14"
     val akkaHttpCirce = "1.36.0"
-    val awscala = "0.5.+"
+    val awscala = "0.8.5"
     val cats = "1.6.0"
     val catsEffect = "1.3.0"
     val monixCatnap = "3.0.0-RC2"
@@ -25,12 +25,12 @@ object Dependencies {
     val jakartaMail = "2.0.1"
     val slick = "3.3.3"
     val postgresql = "42.2.20"
-    val mysql = "8.0.24"
-    val ldap = "4.0.14"
+    val mysql = "8.0.23"
+    val ldap = "5.1.4"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.3.24"
+    val scalameta = "4.4.15"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.6.5"
@@ -81,7 +81,7 @@ object Dependencies {
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
   val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
-  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.13.2"
+  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.13.3"
 
   val enumeroDependencies = List(
     munit,
