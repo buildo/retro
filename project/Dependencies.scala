@@ -9,7 +9,7 @@ object Dependencies {
     val scalacheck = "1.14.0"
     val scalacheckMagnolia = "0.6.0"
     val mockito = "1.9.5"
-    val akka = "2.6.11"
+    val akka = "2.6.14"
     val akkaHttp = "10.1.14"
     val akkaHttpCirce = "1.36.0"
     val awscala = "0.8.5"
