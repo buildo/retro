@@ -81,7 +81,7 @@ object CiReleasePlugin extends AutoPlugin {
       }
 
       val releaseState =
-        if (releaseProjects.length > 0) "sonatypeRelease" :: currentState else currentState
+        if (releaseProjects.length > 0) "sonatypeBundleRelease" :: currentState else currentState
 
       publishSignedCommands ::: publishCommands ::: releaseState
     },
