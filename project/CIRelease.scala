@@ -24,7 +24,7 @@ object CiReleasePlugin extends AutoPlugin {
     JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin && Sonatype
 
   def tag(prefix: String): Option[String] =
-    Try(("git tag" #| "head").!!).toOption.map(_.trim).filter(_.startsWith(s"${prefix}v"))
+    Try("git tag".!!).toOption.map(_.split("\n")).toList.flatten.find(_.startsWith(s"${prefix}v"))
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
@@ -60,8 +60,6 @@ object CiReleasePlugin extends AutoPlugin {
         projectRef =>
           val prefix = extracted.get(projectRef / dynverTagPrefix)
           val v = extracted.get(projectRef / version)
-          println(prefix)
-          println(v)
           tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
       }
 
@@ -82,10 +80,11 @@ object CiReleasePlugin extends AutoPlugin {
         s"+${projectRef.project}/publish" :: state
       }
 
-      val releaseState =
-        if (releaseProjects.length > 0) "sonatypeBundleRelease" :: currentState else currentState
-
-      publishSignedCommands ::: publishCommands ::: releaseState
+      if (releaseProjects.length > 0) {
+        "sonatypeBundleClean" :: publishSignedCommands ::: publishCommands ::: "sonatypeBundleRelease" :: currentState
+      } else {
+        publishCommands ::: currentState
+      }
     },
   )
 

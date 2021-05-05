@@ -2,8 +2,8 @@ import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
-val scala212 = "2.13.5"
-val scala213 = "2.13.1"
+val scala212 = "2.12.13"
+val scala213 = "2.13.5"
 
 inThisBuild(
   List(
@@ -192,7 +192,9 @@ lazy val docs = project
       "SBT_BUILDO_STABLE_VERSION" -> (`sbt-buildo` / version).value.replaceFirst("\\+.*", ""),
       "SBT_TAPIRO_SNAPSHOT_VERSION" -> (`sbt-tapiro` / version).value,
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
+      "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
+      "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
     ),
   )
-  .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)
+  .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
