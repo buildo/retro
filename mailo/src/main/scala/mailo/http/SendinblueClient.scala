@@ -17,7 +17,7 @@ import MailRefinedContent._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 
 class SendinblueClient(
   implicit conf: Config = ConfigFactory.load(),
@@ -67,13 +67,14 @@ class SendinblueClient(
   def send(
     to: String,
     from: String,
-    cc: Option[String] = None,
-    bcc: Option[String] = None,
+    cc: Option[String],
+    bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
     tags: List[String],
-    headers: Map[String, String] = Map.empty,
+    headers: Map[String, String],
   )(
     implicit
     executionContext: scala.concurrent.ExecutionContext,
@@ -82,6 +83,7 @@ class SendinblueClient(
       entity <- entity(
         from = from,
         to = to,
+        replyTo = replyTo,
         subject = subject,
         content = content,
         attachments = attachments,
@@ -100,10 +102,11 @@ class SendinblueClient(
   private[this] def entity(
     from: String,
     to: String,
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
-    tags: List[String],
+    tags: List[String]
   )(implicit ec: ExecutionContext): Future[SendSmtpEmail] = Future {
     import mailo.MailRefinedContent._
     import collection.JavaConverters._
@@ -122,11 +125,16 @@ class SendinblueClient(
     sender.setEmail(fromEmail)
     sender.setName(fromName)
 
-    val toM = new SendSmtpEmailTo()
-    toM.setEmail(to)
+    val toList: List[SendSmtpEmailTo] =
+      to.split(",").map(e => new SendSmtpEmailTo().email(e)).toList
 
     email.setSender(sender)
-    email.setTo(List(toM).asJava)
+    email.setTo(toList.asJava)
+
+    replyTo.map { rt =>
+      val sRt = new SendSmtpEmailReplyTo().email(rt)
+      email.setReplyTo(sRt)
+    }
     email.setSubject(subject)
     email.setTags(tags.asJava)
     email.setHtmlContent(html)

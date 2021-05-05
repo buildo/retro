@@ -29,7 +29,7 @@ class S3MailgunMailo(
     attachments: List[Attachment] = Nil,
     tags: List[String] = Nil,
   ): Future[Either[MailError, MailResponse]] =
-    mailgunS3Mailo.send(Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags))
+    mailgunS3Mailo.send(Mail(to, from, cc, bcc, None, subject, templateName, params, attachments, tags))
 }
 
 class S3SendinblueMailo(
@@ -48,6 +48,7 @@ class S3SendinblueMailo(
     from: String,
     cc: Option[String] = None,
     bcc: Option[String] = None,
+    replyTo: Option[String] = None,
     subject: String,
     templateName: String,
     params: Map[String, String],
@@ -55,7 +56,7 @@ class S3SendinblueMailo(
     tags: List[String] = Nil,
   ): Future[Either[MailError, MailResponse]] =
     sendinblueS3Mailo.send(
-      Mail(to, from, cc, bcc, subject, templateName, params, attachments, tags),
+      Mail(to, from, cc, bcc, replyTo, subject, templateName, params, attachments, tags),
     )
 }
 

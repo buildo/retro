@@ -21,7 +21,7 @@ const siteConfig = {
 
   algolia: {
     indexName: "buildo-retro",
-    apiKey: "123eb5671fc8154df8f1f3ae0355d644"
+    apiKey: "123eb5671fc8154df8f1f3ae0355d644",
   },
 
   // For no header links in the top nav bar -> headerLinks: [],
@@ -30,8 +30,13 @@ const siteConfig = {
     { doc: "enumero/introduction", label: "enumero" },
     { doc: "sbt-buildo/introduction", label: "sbt-buildo" },
     { doc: "tapiro/introduction", label: "tapiro" },
+    { doc: "mailo/introduction", label: "mailo" },
     { search: true },
-    { href: "https://github.com/buildo/retro", label: "GitHub", external: true }
+    {
+      href: "https://github.com/buildo/retro",
+      label: "GitHub",
+      external: true,
+    },
   ],
 
   /* path to images for header/footer */
@@ -42,14 +47,14 @@ const siteConfig = {
   /* Colors for website */
   colors: {
     primaryColor: "#2b313d",
-    secondaryColor: "#0e7064"
+    secondaryColor: "#0e7064",
   },
 
   copyright: `Copyright © ${new Date().getFullYear()} buildo`,
 
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks.
-    theme: "default"
+    theme: "default",
   },
 
   // Add custom scripts here that would be placed in <script> tags.
@@ -75,7 +80,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  repoUrl: "https://github.com/buildo/retro"
+  repoUrl: "https://github.com/buildo/retro",
 };
 
 module.exports = siteConfig;

@@ -24,7 +24,7 @@ import sttp.tapir.Codec._
 
 case class Auth(token: String) //should be imported as wiro.Auth instead
 
-implicit val authCodec: PlainCodec[Auth] = Codec.stringPlainCodecUtf8
+implicit val authCodec: PlainCodec[Auth] = Codec.string
   .mapDecode(decodeAuth)(encodeAuth)
 
 def decodeAuth(s: String): DecodeResult[Auth] = {

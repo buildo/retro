@@ -16,11 +16,10 @@
   },
   "tapiro": {
     "Setup": ["tapiro/installation"],
-    "Getting started": [
-      "tapiro/introduction",
-      "tapiro/rpc",
-      "tapiro/migrate"
-    ]
+    "Getting started": ["tapiro/introduction", "tapiro/rpc", "tapiro/migrate"]
+  },
+  "mailo": {
+    "Setup": ["mailo/introduction", "mailo/installation"]
   },
   "sbt-buildo": {
     "Getting started": ["sbt-buildo/introduction"]

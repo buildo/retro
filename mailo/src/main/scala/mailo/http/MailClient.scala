@@ -1,6 +1,6 @@
 package mailo.http
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 import mailo.MailRefinedContent._
 import mailo.{Attachment, MailError, MailResponse}
 
@@ -25,6 +25,7 @@ trait MailClient {
     from: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],

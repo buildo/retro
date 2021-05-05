@@ -10,15 +10,18 @@ object AkkaHttpMeta {
     imports: Set[Term.Ref],
     controllerName: Type.Name,
     tapirEndpointsName: Term.Name,
+    authTokenName: Type.Name,
     httpEndpointsName: Term.Name,
     implicits: List[Term.Param],
     akkaHttpEndpoints: List[Defn.Val],
     routes: Term,
   ) => {
-    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[AuthToken](statusCodes)"
+    val authTokenTypeParam: Type.Param =
+      Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
+    val tapirEndpoints = q"val endpoints = $tapirEndpointsName.create[$authTokenName](statusCodes)"
     q"""
     package ${`package`} {
-      ..${imports.toList.map(i => q"import $i._")}
+      ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
       import akka.http.scaladsl.server._
       import akka.http.scaladsl.server.Directives._
       import io.circe.{ Decoder, Encoder }
@@ -27,7 +30,7 @@ object AkkaHttpMeta {
       import sttp.model.StatusCode
 
       object $httpEndpointsName {
-        def routes[AuthToken](controller: $controllerName[AuthToken], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): Route = {
+        def routes[$authTokenTypeParam](controller: $controllerName[$authTokenName], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): Route = {
           ..${tapirEndpoints +: akkaHttpEndpoints :+ routes}
         }
       }
@@ -41,10 +44,10 @@ object AkkaHttpMeta {
     q"pathPrefix($pathName) { List(..$rest).foldLeft[Route]($first)(_ ~ _) }"
   }
 
-  val endpoints = (routes: List[TapiroRoute]) =>
+  val endpoints = (routes: List[TapiroRoute], authTokenName: String) =>
     routes.map { route =>
       val name = Term.Name(route.route.name.last)
-      val endpointImpl = Meta.toEndpointImplementation(route)
+      val endpointImpl = Meta.toEndpointImplementation(route, authTokenName)
       q"val ${Pat.Var(name)} = endpoints.$name.toRoute($endpointImpl)"
     }
 }
