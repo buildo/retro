@@ -19,7 +19,7 @@
     "Getting started": ["tapiro/introduction", "tapiro/rpc", "tapiro/migrate"]
   },
   "mailo": {
-    "Setup": ["mailo/installation"]
+    "Setup": ["mailo/introduction", "mailo/installation"]
   },
   "sbt-buildo": {
     "Getting started": ["sbt-buildo/introduction"]

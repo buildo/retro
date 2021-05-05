@@ -196,5 +196,5 @@ lazy val docs = project
       "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
     ),
   )
-  .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)
+  .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
