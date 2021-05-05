@@ -162,6 +162,13 @@ lazy val `sbt-tapiro` = project
   )
   .dependsOn(tapiroCore)
 
+lazy val javaTimeCirceCodecs = project
+  .settings(
+    name := "java-time-circe-codecs",
+    dynverTagPrefix := "java-time-circe-codecs-",
+    libraryDependencies ++= javaTimeCirceCodecsDependencies,
+  )
+
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(

@@ -193,6 +193,12 @@ object Dependencies {
     munit,
   ).map(_ % Test)
 
+  val javaTimeCirceCodecsDependencies = List(
+    circeCore,
+  ) ++ List(
+    munit,
+  ).map(_ % Test)
+
   val docsDependencies = List(
     plantuml,
     tapir,

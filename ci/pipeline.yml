@@ -112,6 +112,19 @@ resources:
         - tapiro
 
   - type: pull-request
+    name: java-time-circe-codecs-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - javaTimeCirceCodecs
+
+  - type: pull-request
     name: docs-pr
     icon: source-pull
     webhook_token: 0gd4XZNL4Y94zYDLql3C
@@ -239,6 +252,16 @@ jobs:
         trigger: true
       - task: test
         file: retro/tapiro/ci/test.yml
+    on_failure:
+      <<: *slack_failure
+
+  - name: java-time-circe-codecs
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/javaTimeCirceCodecs/ci/test.yml
     on_failure:
       <<: *slack_failure
 
@@ -425,6 +448,32 @@ jobs:
         path: retro
         status: success
         context: tapiro
+
+  - name: java-time-circe-codecs-pr
+    plan:
+      - get: retro
+        resource: java-time-circe-codecs-pr
+        trigger: true
+        version: every
+      - put: java-time-circe-codecs-pr
+        params:
+          path: retro
+          status: pending
+          context: javaTimeCirceCodecs
+      - task: test
+        file: retro/javaTimeCirceCodecs/ci/test.yml
+    on_failure:
+      put: java-time-circe-codecs-pr
+      params:
+        path: retro
+        status: failure
+        context: javaTimeCirceCodecs
+    on_success:
+      put: java-time-circe-codecs-pr
+      params:
+        path: retro
+        status: success
+        context: javaTimeCirceCodecs
 
   - name: docs-pr
     plan:
