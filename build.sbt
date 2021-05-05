@@ -21,7 +21,14 @@ inThisBuild(
         url("https://github.com/gabro"),
       ),
     ),
-    testFrameworks += new TestFramework("munit.Framework"),
+    scmInfo := Some(
+      ScmInfo(
+        url(s"https://github.com/buildo/retro"),
+        s"scm:git:https://github.com/buildo/retro.git",
+        Some(s"scm:git:git@github.com:buildo/retro.git"),
+      ),
+    ),
+    versionScheme := Some("early-semver"),
   ),
 )
 

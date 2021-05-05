@@ -12,14 +12,14 @@ object AssemblySettingPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] = baseSettings
 
   lazy val baseSettings: Seq[Setting[_]] = Seq(
-    test in assembly := {},
-    assemblyJarName in assembly := s"${name.value}.jar",
-    assemblyMergeStrategy in assembly := {
+    assembly / test := {},
+    assembly / assemblyJarName := s"${name.value}.jar",
+    assembly / assemblyMergeStrategy := {
       case PathList("application.conf") => MergeStrategy.discard
       case PathList(ps @ _*) if ps.last == "module-info.class" =>
         MergeStrategy.discard
       case x =>
-        val defaultStrategy = (assemblyMergeStrategy in assembly).value
+        val defaultStrategy = (assembly / assemblyMergeStrategy).value
         defaultStrategy(x)
     },
   )
