@@ -24,7 +24,7 @@ object CiReleasePlugin extends AutoPlugin {
     JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin && Sonatype
 
   def tag(prefix: String): Option[String] =
-    Try(s"git tag --list $prefix".!!).toOption.map(_.trim).filter(_.startsWith(s"${prefix}v"))
+    Try("git tag".!!).toOption.map(_.split("\n")).toList.flatten.find(_.startsWith(s"${prefix}v"))
 
   def setupGpg(): Unit = {
     val secret = sys.env("PGP_SECRET")
