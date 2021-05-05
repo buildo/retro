@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: hseeberger/scala-sbt
-    tag: 8u242_1.3.8_2.12.10
+    tag: 8u282_1.5.1_2.12.13
 
 inputs:
   - name: retro
@@ -36,7 +36,7 @@ run:
       chmod 600 $HOME/.ssh/id_rsa
       eval "$(ssh-agent -s)"
       ssh-add $HOME/.ssh/id_rsa
-      curl -sL https://deb.nodesource.com/setup_10.x | bash -
+      curl -sL https://deb.nodesource.com/setup_14.x | bash -
       apt-get install -y nodejs
       curl -o- -L https://yarnpkg.com/install.sh | bash
       source $HOME/.bashrc

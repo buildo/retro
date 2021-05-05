@@ -16,9 +16,9 @@ class CacheSpec extends munit.FunSuite {
 
   val templateName1 = "mail.html"
   val templateName2 = "mail-image.html"
+  val s3 = new S3MailData()
 
   def action(templateName: String, ttl: Duration) = cachingWithTTL(templateName)(ttl) {
-    val s3 = new S3MailData()
     s3.get(templateName)
   }
 

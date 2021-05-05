@@ -1,187 +1,298 @@
 resource_types:
-- name: pull-request
-  type: docker-image
-  source:
-    repository: teliaoss/github-pr-resource
+  - name: pull-request
+    type: docker-image
+    check_every: 24h
+    source:
+      repository: teliaoss/github-pr-resource
+
+  - name: slack-notification
+    type: docker-image
+    check_every: 24h
+    source:
+      repository: cfcommunity/slack-notification-resource
 
 resources:
-- type: git
-  name: master
-  icon: github-circle
-  source:
-    uri: https://github.com/buildo/retro.git
-    branch: master
-    git_crypt_key: ((git-crypt-key))
+  - type: git
+    name: master
+    icon: github
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      uri: https://github.com/buildo/retro.git
+      branch: master
+      git_crypt_key: ((git-crypt-key))
 
-- type: git
-  name: tag
-  icon: tag
-  source:
-    uri: https://github.com/buildo/retro.git
-    branch: master
-    tag_filter: "*"
+  - type: git
+    name: tag
+    icon: tag
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      uri: https://github.com/buildo/retro.git
+      branch: master
+      tag_filter: "*"
 
-- type: pull-request
-  name: sbt-buildo-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    paths:
-      - build.sbt
-      - project
-      - sbt-buildo
+  - type: pull-request
+    name: sbt-buildo-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - sbt-buildo
 
-- type: pull-request
-  name: enumero-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    paths:
-      - build.sbt
-      - project
-      - enumero
+  - type: pull-request
+    name: enumero-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - enumero
 
-- type: pull-request
-  name: mailo-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    git_crypt_key: ((git-crypt-key))
-    paths:
-      - build.sbt
-      - project
-      - mailo
+  - type: pull-request
+    name: mailo-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      git_crypt_key: ((git-crypt-key))
+      paths:
+        - build.sbt
+        - project
+        - mailo
 
-- type: pull-request
-  name: toctoc-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    paths:
-      - build.sbt
-      - project
-      - toctoc
+  - type: pull-request
+    name: toctoc-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - toctoc
 
-- type: pull-request
-  name: metarpheus-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    paths:
-      - build.sbt
-      - project
-      - metarpheus
+  - type: pull-request
+    name: metarpheus-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - metarpheus
 
-- type: pull-request
-  name: tapiro-pr
-  icon: source-pull
-  source:
-    repository: buildo/retro
-    access_token: ((github-token))
-    paths:
-      - build.sbt
-      - project
-      - tapiro
+  - type: pull-request
+    name: tapiro-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - tapiro
 
-- name: postgres
-  type: docker-image
-  icon: docker
-  source:
-    repository: postgres
-    tag: "10.1-alpine"
+  - type: pull-request
+    name: java-time-circe-codecs-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - javaTimeCirceCodecs
 
-- name: mysql
-  type: docker-image
-  icon: docker
-  source:
-    repository: mysql
-    tag: "5.7"
+  - type: pull-request
+    name: docs-pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+      paths:
+        - build.sbt
+        - project
+        - docs
+        - ci/docs.yml
 
-- name: scala-sbt
-  type: docker-image
-  icon: docker
-  source:
-    repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.11_1.3.9
+  - name: postgres
+    type: docker-image
+    icon: docker
+    source:
+      repository: postgres
+      tag: "10.1-alpine"
+
+  - name: mysql
+    type: docker-image
+    icon: docker
+    source:
+      repository: mysql
+      tag: "5.7"
+
+  - name: scala-sbt
+    type: docker-image
+    icon: docker
+    source:
+      repository: buildo/scala-sbt-alpine
+      tag: 8_2.12.13_1.5.1
+
+  - name: hseeberger-scala-sbt
+    type: docker-image
+    icon: docker
+    source:
+      repository: hseeberger/scala-sbt
+      tag: 8u282_1.5.1_2.12.13
+
+  - name: slack-buildo
+    type: slack-notification
+    icon: slack
+    source:
+      url: ((buildo-slack-hook))
+
+__put_slack_failed_job: &slack_failure
+  put: slack-buildo
+  params:
+    channel: "#backends"
+    text: |
+      The build of $BUILD_JOB_NAME failed :cry:
+      See: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+  inputs: []
 
 jobs:
+  - name: sbt-buildo
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: compile
+        file: retro/sbt-buildo/ci/compile.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: sbt-buildo
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - task: compile
-    file: retro/sbt-buildo/ci/compile.yml
+  - name: enumero
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/enumero/ci/test.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: enumero
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - task: test
-    file: retro/enumero/ci/test.yml
+  - name: mailo
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/mailo/ci/test.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: mailo
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - task: test
-    file: retro/mailo/ci/test.yml
+  - name: toctoc
+    plan:
+      - in_parallel:
+          fail_fast: true
+          steps:
+            - get: retro
+              resource: master
+              trigger: true
+            - get: postgres
+              params:
+                save: true
+            - get: mysql
+              params:
+                save: true
+            - get: scala-sbt
+              params:
+                save: true
+      - task: test
+        file: retro/toctoc/ci/test.yml
+        privileged: true
+    on_failure:
+      <<: *slack_failure
 
-- name: toctoc
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - get: postgres
-    params:
-      save: true
-  - get: mysql
-    params:
-      save: true
-  - get: scala-sbt
-    params:
-      save: true
-  - task: test
-    file: retro/toctoc/ci/test.yml
-    privileged: true
+  - name: metarpheus
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/metarpheus/ci/test.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: metarpheus
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - task: test
-    file: retro/metarpheus/ci/test.yml
+  - name: tapiro
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/tapiro/ci/test.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: tapiro
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-  - task: test
-    file: retro/tapiro/ci/test.yml
+  - name: java-time-circe-codecs
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: test
+        file: retro/javaTimeCirceCodecs/ci/test.yml
+    on_failure:
+      <<: *slack_failure
 
-- name: sbt-buildo-pr
-  plan:
-  - get: retro
-    resource: sbt-buildo-pr
-    trigger: true
-    version: every
-  - put: sbt-buildo-pr
-    params:
-      path: retro
-      status: pending
-      context: sbt-buildo
-  - task: compile
-    file: retro/sbt-buildo/ci/compile.yml
+  - name: docs
+    plan:
+      - in_parallel:
+          fail_fast: true
+          steps:
+            - get: retro
+              resource: master
+              trigger: true
+            - get: hseeberger-scala-sbt
+      - task: build-docs
+        image: hseeberger-scala-sbt
+        file: retro/ci/docs.yml
+    on_failure:
+      <<: *slack_failure
+
+  - name: sbt-buildo-pr
+    plan:
+      - get: retro
+        resource: sbt-buildo-pr
+        trigger: true
+        version: every
+      - put: sbt-buildo-pr
+        params:
+          path: retro
+          status: pending
+          context: sbt-buildo
+      - task: compile
+        file: retro/sbt-buildo/ci/compile.yml
     on_failure:
       put: sbt-buildo-pr
       params:
@@ -195,19 +306,19 @@ jobs:
         status: success
         context: sbt-buildo
 
-- name: enumero-pr
-  plan:
-  - get: retro
-    resource: enumero-pr
-    trigger: true
-    version: every
-  - put: enumero-pr
-    params:
-      path: retro
-      status: pending
-      context: enumero
-  - task: test
-    file: retro/enumero/ci/test.yml
+  - name: enumero-pr
+    plan:
+      - get: retro
+        resource: enumero-pr
+        trigger: true
+        version: every
+      - put: enumero-pr
+        params:
+          path: retro
+          status: pending
+          context: enumero
+      - task: test
+        file: retro/enumero/ci/test.yml
     on_failure:
       put: enumero-pr
       params:
@@ -221,19 +332,19 @@ jobs:
         status: success
         context: enumero
 
-- name: mailo-pr
-  plan:
-  - get: retro
-    resource: mailo-pr
-    trigger: true
-    version: every
-  - put: mailo-pr
-    params:
-      path: retro
-      status: pending
-      context: mailo
-  - task: test
-    file: retro/mailo/ci/test.yml
+  - name: mailo-pr
+    plan:
+      - get: retro
+        resource: mailo-pr
+        trigger: true
+        version: every
+      - put: mailo-pr
+        params:
+          path: retro
+          status: pending
+          context: mailo
+      - task: test
+        file: retro/mailo/ci/test.yml
     on_failure:
       put: mailo-pr
       params:
@@ -247,29 +358,32 @@ jobs:
         status: success
         context: mailo
 
-- name: toctoc-pr
-  plan:
-  - get: retro
-    resource: toctoc-pr
-    trigger: true
-    version: every
-  - get: postgres
-    params:
-      save: true
-  - get: mysql
-    params:
-      save: true
-  - get: scala-sbt
-    params:
-      save: true
-  - put: toctoc-pr
-    params:
-      path: retro
-      status: pending
-      context: toctoc
-  - task: test
-    file: retro/toctoc/ci/test.yml
-    privileged: true
+  - name: toctoc-pr
+    plan:
+      - in_parallel:
+          fail_fast: true
+          steps:
+            - get: retro
+              resource: toctoc-pr
+              trigger: true
+              version: every
+            - get: postgres
+              params:
+                save: true
+            - get: mysql
+              params:
+                save: true
+            - get: scala-sbt
+              params:
+                save: true
+      - put: toctoc-pr
+        params:
+          path: retro
+          status: pending
+          context: toctoc
+      - task: test
+        file: retro/toctoc/ci/test.yml
+        privileged: true
     on_failure:
       put: toctoc-pr
       params:
@@ -283,19 +397,19 @@ jobs:
         status: success
         context: toctoc
 
-- name: metarpheus-pr
-  plan:
-  - get: retro
-    resource: metarpheus-pr
-    trigger: true
-    version: every
-  - put: metarpheus-pr
-    params:
-      path: retro
-      status: pending
-      context: metarpheus
-  - task: test
-    file: retro/metarpheus/ci/test.yml
+  - name: metarpheus-pr
+    plan:
+      - get: retro
+        resource: metarpheus-pr
+        trigger: true
+        version: every
+      - put: metarpheus-pr
+        params:
+          path: retro
+          status: pending
+          context: metarpheus
+      - task: test
+        file: retro/metarpheus/ci/test.yml
     on_failure:
       put: metarpheus-pr
       params:
@@ -309,19 +423,19 @@ jobs:
         status: success
         context: metarpheus
 
-- name: tapiro-pr
-  plan:
-  - get: retro
-    resource: tapiro-pr
-    trigger: true
-    version: every
-  - put: tapiro-pr
-    params:
-      path: retro
-      status: pending
-      context: tapiro
-  - task: test
-    file: retro/tapiro/ci/test.yml
+  - name: tapiro-pr
+    plan:
+      - get: retro
+        resource: tapiro-pr
+        trigger: true
+        version: every
+      - put: tapiro-pr
+        params:
+          path: retro
+          status: pending
+          context: tapiro
+      - task: test
+        file: retro/tapiro/ci/test.yml
     on_failure:
       put: tapiro-pr
       params:
@@ -335,26 +449,97 @@ jobs:
         status: success
         context: tapiro
 
-- name: release
-  plan:
-  - get: retro
-    resource: master
-    trigger: true
-    passed:
-      - sbt-buildo
-      - enumero
-      # - mailo
-      - toctoc
-      - metarpheus
-      - tapiro
-  - get: tag
-    trigger: true
-  - task: release on Sonatype
-    file: retro/ci/release.yml
-    params:
-      GITHUB_DEPLOY_KEY: ((private-key))
-      PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
-      PGP_SECRET: ((sonatype_pgp_secret_key))
-      SONATYPE_USERNAME: ((sonatype_username))
-      SONATYPE_PASSWORD: ((sonatype_password))
+  - name: java-time-circe-codecs-pr
+    plan:
+      - get: retro
+        resource: java-time-circe-codecs-pr
+        trigger: true
+        version: every
+      - put: java-time-circe-codecs-pr
+        params:
+          path: retro
+          status: pending
+          context: javaTimeCirceCodecs
+      - task: test
+        file: retro/javaTimeCirceCodecs/ci/test.yml
+    on_failure:
+      put: java-time-circe-codecs-pr
+      params:
+        path: retro
+        status: failure
+        context: javaTimeCirceCodecs
+    on_success:
+      put: java-time-circe-codecs-pr
+      params:
+        path: retro
+        status: success
+        context: javaTimeCirceCodecs
 
+  - name: docs-pr
+    plan:
+      - in_parallel:
+          fail_fast: true
+          steps:
+            - get: retro
+              resource: docs-pr
+              trigger: true
+              version: every
+            - get: hseeberger-scala-sbt
+      - put: docs-pr
+        params:
+          path: retro
+          status: pending
+          context: docs
+      - task: build-docs
+        image: hseeberger-scala-sbt
+        file: retro/ci/docs.yml
+    on_failure:
+      put: docs-pr
+      params:
+        path: retro
+        status: failure
+        context: docs
+    on_success:
+      put: docs-pr
+      params:
+        path: retro
+        status: success
+        context: docs
+
+  - name: release
+    plan:
+      - in_parallel:
+          fail_fast: true
+          steps:
+            - get: retro
+              resource: master
+              trigger: true
+              passed:
+                - sbt-buildo
+                - enumero
+                - mailo
+                - toctoc
+                - metarpheus
+                - tapiro
+                - docs
+            - get: tag
+              trigger: true
+            - get: hseeberger-scala-sbt
+      - task: release-on-sonatype
+        image: hseeberger-scala-sbt
+        file: retro/ci/release.yml
+        params:
+          GITHUB_DEPLOY_KEY: ((private-key))
+          PGP_PASSPHRASE: ((sonatype_pgp_passphrase))
+          PGP_SECRET: ((sonatype_pgp_secret_key))
+          SONATYPE_USERNAME: ((sonatype_username))
+          SONATYPE_PASSWORD: ((sonatype_password))
+    on_success:
+      put: slack-buildo
+      params:
+        channel: "#backends"
+        text: |
+          :tada: A new release has been successfully performed
+      inputs: []
+    on_failure:
+      <<: *slack_failure
