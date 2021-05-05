@@ -157,7 +157,7 @@ resources:
     icon: docker
     source:
       repository: buildo/scala-sbt-alpine
-      tag: 8u201_2.12.11_1.3.9
+      tag: 8_2.12.13_1.5.1
 
   - name: hseeberger-scala-sbt
     type: docker-image

@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.11_1.3.9
+    tag: 8_2.12.13_1.5.1
 
 inputs:
   - name: retro

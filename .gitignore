@@ -18,6 +18,7 @@ project/plugins/project/
 .metals
 .bloop
 project/**/metals.sbt
+.bsp
 
 node_modules
 build

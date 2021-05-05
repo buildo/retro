@@ -58,7 +58,7 @@ lazy val mailo = project
     name := "mailo",
     libraryDependencies ++= mailoDependencies,
     dynverTagPrefix := "mailo-",
-    mappings in (Compile, packageBin) ~= {
+    Compile / packageBin / mappings ~= {
       _.filter { n =>
         !(n._1.getName.endsWith(".conf.example"))
       }
@@ -172,21 +172,21 @@ lazy val javaTimeCirceCodecs = project
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(
-    skip.in(publish) := true,
+    publish / skip := true,
     moduleName := "retro-docs",
     libraryDependencies ++= docsDependencies,
     mdocVariables := Map(
       "CIRCE_VERSION" -> V.circe,
       "AKKA_HTTP_VERSION" -> V.akkaHttp,
       "TAPIR_VERSION" -> V.tapir,
-      "TOCTOC_SNAPSHOT_VERSION" -> version.in(toctocCore).value,
-      "TOCTOC_STABLE_VERSION" -> version.in(toctocCore).value.replaceFirst("\\+.*", ""),
-      "ENUMERO_SNAPSHOT_VERSION" -> version.in(enumeroCore).value,
-      "ENUMERO_STABLE_VERSION" -> version.in(enumeroCore).value.replaceFirst("\\+.*", ""),
-      "SBT_BUILDO_SNAPSHOT_VERSION" -> version.in(`sbt-buildo`).value,
-      "SBT_BUILDO_STABLE_VERSION" -> version.in(`sbt-buildo`).value.replaceFirst("\\+.*", ""),
-      "SBT_TAPIRO_SNAPSHOT_VERSION" -> version.in(`sbt-tapiro`).value,
-      "SBT_TAPIRO_STABLE_VERSION" -> version.in(`sbt-tapiro`).value.replaceFirst("\\+.*", ""),
+      "TOCTOC_SNAPSHOT_VERSION" -> (toctocCore / version).value,
+      "TOCTOC_STABLE_VERSION" -> (toctocCore / version).value.replaceFirst("\\+.*", ""),
+      "ENUMERO_SNAPSHOT_VERSION" -> (enumeroCore / version).value,
+      "ENUMERO_STABLE_VERSION" -> (enumeroCore / version).value.replaceFirst("\\+.*", ""),
+      "SBT_BUILDO_SNAPSHOT_VERSION" -> (`sbt-buildo` / version).value,
+      "SBT_BUILDO_STABLE_VERSION" -> (`sbt-buildo` / version).value.replaceFirst("\\+.*", ""),
+      "SBT_TAPIRO_SNAPSHOT_VERSION" -> (`sbt-tapiro` / version).value,
+      "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)
