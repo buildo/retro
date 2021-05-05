@@ -192,6 +192,8 @@ lazy val docs = project
       "SBT_BUILDO_STABLE_VERSION" -> (`sbt-buildo` / version).value.replaceFirst("\\+.*", ""),
       "SBT_TAPIRO_SNAPSHOT_VERSION" -> (`sbt-tapiro` / version).value,
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
+      "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
+      "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql)
