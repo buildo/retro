@@ -30,7 +30,7 @@ class TapiroSuite extends munit.FunSuite {
       |  @query
       |  def read(id: Long): F[Either[SchoolReadError, School]]
       |  @query
-      |  def list(): F[Either[Unit, List[School]]]
+      |  def list(excludedSchools: List[School]): F[Either[Unit, List[School]]]
       |}
       |""".stripMargin,
     """
@@ -59,7 +59,7 @@ class TapiroSuite extends munit.FunSuite {
       |    Nothing
       |  ]
       |  val read: Endpoint[Long, SchoolReadError, School, Nothing]
-      |  val list: Endpoint[Unit, Unit, List[School], Nothing]
+      |  val list: Endpoint[List[School], Unit, List[School], Nothing]
       |}
       |
       |object SchoolControllerTapirEndpoints {
@@ -72,7 +72,7 @@ class TapiroSuite extends munit.FunSuite {
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec7: JsonCodec[List[School]]
+      |      codec7: PlainCodec[School]
       |  ) = new SchoolControllerTapirEndpoints[Auth] {
       |    implicit val createRequestPayloadDecoder: Decoder[CreateRequestPayload] =
       |      deriveDecoder
@@ -108,8 +108,11 @@ class TapiroSuite extends munit.FunSuite {
       |          )
       |        )
       |        .out(jsonBody[School])
-      |    override val list: Endpoint[Unit, Unit, List[School], Nothing] =
-      |      endpoint.get.in("list").out(jsonBody[List[School]])
+      |    override val list: Endpoint[List[School], Unit, List[School], Nothing] =
+      |      endpoint.get
+      |        .in("list")
+      |        .in(query[List[School]]("excludedSchools[]"))
+      |        .out(jsonBody[List[School]])
       |  }
       |  case class CreateRequestPayload(school: School)
       |}
@@ -146,7 +149,7 @@ class TapiroSuite extends munit.FunSuite {
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec7: JsonCodec[List[School]],
+      |      codec7: PlainCodec[School],
       |      cs: ContextShift[F]
       |  ): HttpRoutes[F] = {
       |    val endpoints = SchoolControllerTapirEndpoints.create[Auth](statusCodes)
@@ -155,7 +158,7 @@ class TapiroSuite extends munit.FunSuite {
       |        controller.create(x.school, token)
       |    })
       |    val read = endpoints.read.toRoutes(controller.read)
-      |    val list = endpoints.list.toRoutes(_ => controller.list())
+      |    val list = endpoints.list.toRoutes(controller.list)
       |    Router("/SchoolController" -> NonEmptyList.of(create, read, list).reduceK)
       |  }
       |}
@@ -220,8 +223,7 @@ class TapiroSuite extends munit.FunSuite {
       |      codec3: PlainCodec[Auth],
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
-      |      codec6: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec7: JsonCodec[List[School]]
+      |      codec6: JsonCodec[SchoolReadError.NotFound.type]
       |  ): Route = {
       |    val endpoints = SchoolControllerTapirEndpoints.create[Auth](statusCodes)
       |    val create = endpoints.create.toRoute({
