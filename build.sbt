@@ -5,8 +5,6 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 val scala212 = "2.12.13"
 val scala213 = "2.13.1"
 
-publishTo := sonatypePublishToBundle.value
-
 inThisBuild(
   List(
     scalaVersion := scala212,

@@ -51,7 +51,7 @@ object CiReleasePlugin extends AutoPlugin {
       publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration :=
       publishLocalConfiguration.value.withOverwrite(true),
-    publishTo := sonatypePublishTo.value,
+    publishTo := sonatypePublishToBundle.value,
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
       setupGpg()
