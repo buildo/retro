@@ -1,7 +1,9 @@
-# Mailo
+---
+id: introduction
+title: Introduction
+---
 
-[![Bintray](https://img.shields.io/bintray/v/buildo/maven/mailo.svg)](https://bintray.com/buildo/maven/mailo/view)
-[![Build Status](https://drone.our.buildo.io/api/badges/buildo/mailo/status.svg)](https://drone.our.buildo.io/buildo/mailo)
+`mailo` is a library that allows you to:
 
 - Store your email templates where you like.
 - Send your email with the ESP you like.
@@ -11,18 +13,32 @@
     `a-zA-Z0-9_.-`
 - Conveniently collect errors.
 
-# Install
+# Getting started
 
-```scala
-libraryDependencies += "io.buildo" %% "mailo" % "<MAILO_VERSION>"
+First, you need to obtain a instance of `Mailo`, here's an example:
+
+```scala mdoc:invisible
+import com.typesafe.config.ConfigFactory
+
+implicit val dummyConfig = ConfigFactory.parseString("""
+  mailo {
+    s3 {
+      key = "some-key"
+      secret = "some-secret"
+      bucket = "some-bucket"
+      region = "eu-central-1"
+      partialsFolder = "partials"
+    }
+    mailgun {
+      key = "some-key"
+      uri = "some-uri"
+    }
+    cachingTTLSeconds = 30
+  }
+""")
 ```
 
-# How to use
-
-How to get mailo instance.
-
-```scala
-import akka.stream.ActorMaterializer
+```scala mdoc
 import akka.actor.ActorSystem
 
 import mailo.Mailo
@@ -31,29 +47,33 @@ import mailo.http.MailgunClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
 implicit val system = ActorSystem()
-implicit val materializer = ActorMaterializer()
 
 val s3 = new S3MailData()
 val mailgun = new MailgunClient()
 
-val mailo = new Mailo(s3, mailgun)
+val mailer = Mailo(s3, mailgun)
 ```
 
-How to send an email.
+Then you can send an email like so:
 
-```scala
-mailo.send(
-  to = "recipient@mail.com",
-  from = "Mailo sender@mail.com",
-  templateName = "mail.html",
-  subject = "Test mail",
-  params = Map("hi" -> "Hello this is your first email! :D"),
-  tags = List("test")
+```scala mdoc
+import mailo.Mail
+
+mailer.send(
+  Mail(
+    to = "recipient@mail.com",
+    from = "Mailo sender@mail.com",
+    templateName = "mail.html",
+    subject = "Test mail",
+    params = Map("hi" -> "Hello this is your first email! :D"),
+    tags = List("test")
+  )
 )
 ```
 
-# Templates
+## Templates
 
 Use double curly breakets for parameters `{{parameter}}`, remember to include
 parameters in `params` argument.
@@ -67,7 +87,7 @@ Complete example:
 [[header.html]] Hello {{personFirstName}} {{personLastName}} [[footer.html]]
 ```
 
-# How to send attachments
+## How to send attachments
 
 Mailo provide a case class `Attachment` that is used to send attachments in
 emails. `Attachment` case class is defined as:
@@ -83,38 +103,47 @@ case class Attachment(
 
 An attachment can be created as follows:
 
-```scala
+```scala mdoc
 import akka.http.scaladsl.model.MediaTypes._
 import akka.http.scaladsl.model.HttpCharsets._
+import mailo.Attachment
+
 val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plain` withCharset `UTF-8`)
 ```
 
 And sent as:
 
-```scala
+```scala mdoc
 mailer.send(
-   to = "recipient@mail.com",
-   from = "Mailo sender@mail.com",
-   cc = Some("ccrecipient@mail.com"),
-   bcc = Some("bccrecipient@mail.com"),
-   subject = "Test mail",
-   templateName = "mail.html",
-   params = Map("ciao" -> "CIAOOOONE"),
-   attachments = List(attachment),
-   tags = List("test")
+  Mail(
+    to = "recipient@mail.com",
+    from = "Mailo sender@mail.com",
+    cc = Some("ccrecipient@mail.com"),
+    bcc = Some("bccrecipient@mail.com"),
+    subject = "Test mail",
+    templateName = "mail.html",
+    params = Map("ciao" -> "CIAOOOONE"),
+    attachments = List(attachment),
+    tags = List("test")
+  )
 )
 ```
 
-# Content-Transfer-Encoding
+## Content-Transfer-Encoding
 
 You can specify add a Content-Transfer-Encoding header in the attachments as
 follows.
 
-```scala
-val attachment = Attachment(name = "test.pdf", content="<<base64pdf>>", `type`=`application/pdf`, transferEncoding = Some("base64"))
+```scala mdoc
+val attachment2 = Attachment(
+  name = "test.pdf",
+  content="<<base64pdf>>",
+  `type`=`application/pdf`,
+  transferEncoding = Some("base64")
+)
 ```
 
-# Templates caching
+## Templates caching
 
 Since version `0.1.5` templates are cached. You can set caching TTL (time to
 live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.

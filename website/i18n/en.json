@@ -14,17 +14,29 @@
       "enumero/introduction": {
         "title": "Introduction"
       },
+      "mailo/installation": {
+        "title": "Installation"
+      },
+      "mailo/introduction": {
+        "title": "Introduction"
+      },
       "releasing": {
         "title": "Managing releases"
       },
-      "sbt-buildo/features": {
-        "title": "sbt-buildo/features"
-      },
-      "sbt-buildo/installation": {
-        "title": "Installation"
-      },
       "sbt-buildo/introduction": {
         "title": "Introduction"
+      },
+      "tapiro/installation": {
+        "title": "Installation"
+      },
+      "tapiro/introduction": {
+        "title": "Introduction"
+      },
+      "tapiro/migrate": {
+        "title": "Migration from Wiro"
+      },
+      "tapiro/rpc": {
+        "title": "Why?"
       },
       "toctoc/concepts/functional-model": {
         "title": "Functional Model"
@@ -50,6 +62,7 @@
       "enumero": "enumero",
       "sbt-buildo": "sbt-buildo",
       "tapiro": "tapiro",
+      "mailo": "mailo",
       "GitHub": "GitHub"
     },
     "categories": {
