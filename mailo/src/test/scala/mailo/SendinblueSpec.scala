@@ -21,7 +21,41 @@ class SendinblueSpec extends munit.FunSuite {
       .map { value =>
         assertEquals(value.map(_.message), Right("Email sent successfully."))
       }
+    }
+
+  test("email with replyTo should be correctly sent") {
+    mailer
+      .send(
+        to = "mailo@buildo.io",
+        from = "Mailo test mailo@buildo.io",
+        cc = None,
+        bcc = None,
+        replyTo = Some("asd@asd.org"),
+        subject = "Test mail",
+        templateName = "mail.html",
+        params = Map("ciao" -> "CIAOOOONE"),
+        tags = List("test"),
+      )
+      .map { value =>
+        assertEquals(value.map(_.message), Right("Email sent successfully."))
+      }
   }
+
+  test("email should be correctly sent to multiple recipients") {
+    mailer
+      .send(
+        to = "mailo@buildo.io,email@example.com",
+        from = "Mailo test mailo@buildo.io",
+        subject = "Test mail",
+        templateName = "mail.html",
+        params = Map("ciao" -> "CIAOOOONE"),
+        tags = List("test")
+      )
+      .map { value =>
+        assertEquals(value.map(_.message), Right("Email sent successfully."))
+      }
+  }
+
 
   test("email should not be sent if FROM is malformed") {
     mailer

@@ -13,8 +13,8 @@ import akka.stream.scaladsl.Source
 import akka.actor.ActorSystem
 
 import scala.concurrent.{ExecutionContext, Future}
-import javax.mail.Message.RecipientType
-import javax.mail.internet.MimeMessage
+import jakarta.mail.Message.RecipientType
+import jakarta.mail.internet.MimeMessage
 
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -132,6 +132,7 @@ class MailgunClient(
     from: String,
     cc: Option[String] = None,
     bcc: Option[String] = None,
+    replyTo: Option[String] = None,
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
@@ -147,6 +148,7 @@ class MailgunClient(
         to = to,
         cc = cc,
         bcc = bcc,
+        replyTo = replyTo,
         subject = subject,
         content = content,
         attachments = attachments,
@@ -250,6 +252,7 @@ class MailgunClient(
     to: String,
     cc: Option[String],
     bcc: Option[String],
+    replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
     attachments: List[Attachment],
@@ -285,6 +288,7 @@ class MailgunClient(
         ) ++ List(
           cc.map(Multipart.FormData.BodyPart.Strict("cc", _)),
           bcc.map(Multipart.FormData.BodyPart.Strict("bcc", _)),
+          replyTo.map(Multipart.FormData.BodyPart.Strict("h:Reply-To", _)),
         ).flatten ++ tagsForm(tags) ++ attachmentsForm ++ headersForm(headers) :+ contentForm,
       ),
     )

@@ -12,17 +12,18 @@ import scala.meta._
 object TapirMeta {
   import Meta._
 
-  private[this] val authTokenName: String = "AuthToken"
-
   val `class` = (
     `package`: Term.Ref,
     imports: Set[Term.Ref],
     tapirEndpointsName: Term.Name,
+    authTokenName: Type.Name,
     implicits: List[Term.Param],
     body: List[Defn.Val],
     postInputClassDeclarations: List[Defn.Class],
     postInputCodecDeclarations: List[Defn.Val],
-  ) =>
+  ) =>{
+   val authTokenTypeParam: Type.Param =
+      Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
     q"""
     package ${`package`} {
       ..${imports.toList.sortWith(_.toString < _.toString).map(i => q"import $i._")}
@@ -33,57 +34,60 @@ object TapirMeta {
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
 
-      trait ${Type.Name(tapirEndpointsName.value)}[AuthToken] {
+      trait ${Type.Name(tapirEndpointsName.value)}[$authTokenTypeParam] {
         ..${body.map(defn => Decl.Val(defn.mods, defn.pats, defn.decltpe.get))}
       }
 
       object $tapirEndpointsName {
-        def create[AuthToken](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
+        def create[$authTokenTypeParam](statusCodes: String => StatusCode)(..$implicits) = new ${Init(
       Type.Name(tapirEndpointsName.value),
       Name.Anonymous(),
       Nil,
-    )}[AuthToken] {
+    )}[$authTokenName] {
           ..${postInputCodecDeclarations}
           ..${body.map(d => d.copy(mods = mod"override" :: d.mods))}
         }
-      }
 
-      ..${postInputClassDeclarations}
+        ..${postInputClassDeclarations}
+      }
     }
     """
-
-  val routeToTapirEndpoint = (route: TapiroRoute) =>
-    q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(route)} = ${endpointImpl(route)}"
-
-  private[this] val endpointType = (route: TapiroRoute) => {
-    val returnType = metarpheusTypeToScalametaType(route.route.returns)
-    val argsType = route.method match {
-      case RouteMethod.GET =>
-        val argsList = route.route.params.map(routeParamToScalametaType)
-        argsList match {
-          case Nil         => Type.Name("Unit")
-          case head :: Nil => head
-          case l           => Type.Tuple(l)
-        }
-      case RouteMethod.POST =>
-        val authTokenType = route.route.params
-          .filter(_.tpe == MetarpheusType.Name(authTokenName))
-          .map(t => metarpheusTypeToScalametaType(t.tpe))
-          .headOption
-        val inputType = postInputType(route.route)
-        authTokenType match {
-          case Some(t) => Type.Tuple(List(inputType, t))
-          case None    => inputType
-        }
-    }
-    val error = metarpheusTypeToScalametaType(route.error match {
-      case RouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
-      case RouteError.OtherError(t)       => t
-    })
-    t"Endpoint[$argsType, $error, $returnType, Nothing]"
   }
 
-  private[this] val endpointImpl = (route: TapiroRoute) => {
+  val routeToTapirEndpoint = (tapirEndpointsName: Term.Name, authTokenName: String) =>
+    (route: TapiroRoute) =>
+      q"val ${Pat.Var(Term.Name(route.route.name.tail.mkString))}: ${endpointType(tapirEndpointsName, route, authTokenName)} = ${endpointImpl(route, authTokenName)}"
+
+  private[this] val endpointType =
+    (tapirEndpointsName: Term.Name, route: TapiroRoute, authTokenName: String) => {
+      val returnType = metarpheusTypeToScalametaType(route.route.returns)
+      val argsType = route.method match {
+        case RouteMethod.GET =>
+          val argsList = route.route.params.map(routeParamToScalametaType)
+          argsList match {
+            case Nil         => Type.Name("Unit")
+            case head :: Nil => head
+            case l           => Type.Tuple(l)
+          }
+        case RouteMethod.POST =>
+          val authTokenType = route.route.params
+            .filter(_.tpe == MetarpheusType.Name(authTokenName))
+            .map(t => metarpheusTypeToScalametaType(t.tpe))
+            .headOption
+          val inputType = Type.Select(tapirEndpointsName, postInputType(route.route))
+          authTokenType match {
+            case Some(t) => Type.Tuple(List(inputType, t))
+            case None    => inputType
+          }
+      }
+      val error = metarpheusTypeToScalametaType(route.error match {
+        case RouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
+        case RouteError.OtherError(t)       => t
+      })
+      t"Endpoint[$argsType, $error, $returnType, Nothing]"
+    }
+
+  private[this] val endpointImpl = (route: TapiroRoute, authTokenName: String) => {
     val method = route.method match {
       case RouteMethod.GET  => "get"
       case RouteMethod.POST => "post"
@@ -95,14 +99,14 @@ object TapirMeta {
     )
     withOutput(
       withError(
-        withParams(basicEndpoint, route),
+        withParams(basicEndpoint, route, authTokenName),
         route.error,
       ),
       route.route.returns,
     )
   }
 
-  private[this] val withAuth = (endpoint: meta.Term) =>
+  private[this] val withAuth = (endpoint: meta.Term, authTokenName: String) =>
     Term.Apply(
       Term.Select(endpoint, Term.Name("in")),
       List(
@@ -116,21 +120,21 @@ object TapirMeta {
       ),
     )
 
-  private[this] val withParams = (endpoint: meta.Term, route: TapiroRoute) => {
-    val (auth, params) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
-    val endpointWithParams = route.method match {
-      case RouteMethod.GET =>
-        params.foldLeft(endpoint) { (acc, param) =>
-          withParam(acc, param)
-        }
-      case RouteMethod.POST =>
-        withBody(endpoint, route.route)
+  private[this] val withParams = (endpoint: meta.Term, route: TapiroRoute, authTokenName: String) => {
+      val (auth, params) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
+      val endpointWithParams = route.method match {
+        case RouteMethod.GET =>
+          params.foldLeft(endpoint) { (acc, param) =>
+            withParam(acc, param)
+          }
+        case RouteMethod.POST =>
+          withBody(endpoint, route.route)
+      }
+      auth match {
+        case Nil => endpointWithParams
+        case _   => withAuth(endpointWithParams, authTokenName)
+      }
     }
-    auth match {
-      case Nil => endpointWithParams
-      case _   => withAuth(endpointWithParams)
-    }
-  }
 
   private[this] val withBody = (endpoint: meta.Term, route: Route) => {
     Term.Apply(
@@ -190,13 +194,18 @@ object TapirMeta {
     }
 
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
+    val paramType = routeParamToScalametaType(param)
+    val arraySuffix = paramType match {
+        case Type.Apply(Type.Name("List"),_) => "[]"
+        case _ => ""
+    }
     val noDesc =
       Term.Apply(
         Term.Select(endpoint, Term.Name("in")),
         List(
           Term.Apply(
-            Term.ApplyType(Term.Name("query"), List(routeParamToScalametaType(param))),
-            List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)))),
+            Term.ApplyType(Term.Name("query"), List(paramType)),
+            List(Lit.String(param.name.getOrElse(typeNameString(param.tpe)) ++ arraySuffix)),
           ),
         ),
       )
@@ -211,7 +220,7 @@ object TapirMeta {
   private[this] val postInputType = (route: Route) =>
     Type.Name(route.name.tail.mkString.capitalize + "RequestPayload")
 
-  val routeClassDeclarations = (route: TapiroRoute) =>
+  val routeClassDeclarations = (route: TapiroRoute, authTokenName: String) =>
     route.method match {
       case RouteMethod.POST =>
         val params = route.route.params

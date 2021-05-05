@@ -14,4 +14,4 @@ run:
   path: sbt
   args:
     - -batch
-    - sbt-buildo/compile
+    - javaTimeCirceCodecs/test
