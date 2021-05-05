@@ -62,6 +62,8 @@ object CiReleasePlugin extends AutoPlugin {
           val v = extracted.get(projectRef / version)
           println(prefix)
           println(v)
+          println(tag(prefix))
+          println("---")
           tag(prefix).isDefined && !v.endsWith("-SNAPSHOT")
       }
 
