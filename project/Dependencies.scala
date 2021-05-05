@@ -25,7 +25,7 @@ object Dependencies {
     val jakartaMail = "2.0.1"
     val slick = "3.3.3"
     val postgresql = "42.2.20"
-    val mysql = "8.0.23"
+    val mysql = "8.0.24"
     val ldap = "5.1.4"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
