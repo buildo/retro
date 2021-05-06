@@ -17,4 +17,5 @@
 <url> <loc>https://buildo.github.io/retro/docs/toctoc/guides/token-based-authentication-flow</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/retro/docs/toctoc/guides/token-based-authentication-flow" /> </url>
 <url> <loc>https://buildo.github.io/retro/docs/toctoc/guides/token-based-recovery-flow</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/retro/docs/toctoc/guides/token-based-recovery-flow" /> </url>
 <url> <loc>https://buildo.github.io/retro/docs/toctoc/installation</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/retro/docs/toctoc/installation" /> </url>
+<url> <loc>https://buildo.github.io/retro/docs/wiro/installation</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://buildo.github.io/retro/docs/wiro/installation" /> </url>
 </urlset>
