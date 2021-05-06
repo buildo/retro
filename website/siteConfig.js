@@ -31,7 +31,7 @@ const siteConfig = {
     { doc: "sbt-buildo/introduction", label: "sbt-buildo" },
     { doc: "tapiro/introduction", label: "tapiro" },
     { doc: "mailo/introduction", label: "mailo" },
-    { doc: "mailo/introduction", label: "wiro" },
+    { doc: "wiro/installation", label: "wiro" },
     { search: true },
     {
       href: "https://github.com/buildo/retro",
