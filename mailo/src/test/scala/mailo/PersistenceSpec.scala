@@ -89,9 +89,7 @@ class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extend
   ): Future[Either[MailError, MailResponse]] = ???
 }
 
-class MockedData extends MailData {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
+class MockedData(implicit executionContext: ExecutionContext) extends MailData {
   override def get(name: String): Future[Either[MailError, MailRawContent]] =
     Future(Right(MailRawContent("ciao", partials = Map("name" -> "claudio"))))
 }
@@ -100,15 +98,16 @@ class PersistenceSpec extends {
   val system: ActorSystem = ActorSystem("testSystem")
 } with munit.FunSuite with TestKitBase with ImplicitSender {
 
-  implicit def executionContext: ExecutionContext = system.dispatcher
-
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }
 
   test("persistence actor should properly deliver email messages") {
     val state = new ConcurrentLinkedQueue[SimpleMail]()
-    val emailSender = new EmailSender(new MockedData, new MockedClient(state))
+    val emailSender =
+      new EmailSender(new MockedData()(munitExecutionContext), new MockedClient(state))(
+        munitExecutionContext,
+      )
     val loggingActor = system.actorOf(LoggingActor.props())
     val emailPersistanceActor =
       system.actorOf(EmailPersistanceActor.props(emailSender, loggingActor))
@@ -149,7 +148,10 @@ class PersistenceSpec extends {
 
   test("persistence actor should deliver all the queued messages") {
     val state = new ConcurrentLinkedQueue[SimpleMail]()
-    val emailSender = new EmailSender(new MockedData, new MockedClientWithDelay(state))
+    val emailSender =
+      new EmailSender(new MockedData()(munitExecutionContext), new MockedClientWithDelay(state))(
+        munitExecutionContext,
+      )
     val loggingActor = system.actorOf(LoggingActor.props())
     val emailPersistanceActor =
       system.actorOf(EmailPersistanceActor.props(emailSender, loggingActor))
@@ -174,8 +176,8 @@ class PersistenceSpec extends {
         ask(emailPersistanceActor, SendEmail(mail)).onComplete {
           case scala.util.Success(_) => queuedEmails += 1
           case scala.util.Failure(_) => failedEmails += 1
-        },
-    )
+        }(munitExecutionContext),
+    )(munitExecutionContext)
 
     Thread.sleep(5000)
 
