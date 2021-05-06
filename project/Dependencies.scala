@@ -14,7 +14,7 @@ object Dependencies {
     val akkaHttpCirce = "1.36.0"
     val awscala = "0.8.5"
     val cats = "2.6.0"
-    val catsEffect = "2.5.0"
+    val catsEffect = "3.1.0"
     val monixCatnap = "3.3.0"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
