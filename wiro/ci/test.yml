@@ -4,15 +4,14 @@ image_resource:
   type: docker-image
   source:
     repository: buildo/scala-sbt-alpine
-    tag: 8u201_2.12.8_1.2.8
+    tag: 8_2.12.13_1.5.1
 
 inputs:
-  - name: wiro
-
-caches:
-  - path: .sbt
-  - path: .ivy2
+  - name: retro
 
 run:
-  path: ci/test.sh
-  dir: wiro
+  dir: retro
+  path: sbt
+  args:
+    - -batch
+    - +wiro/test

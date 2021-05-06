@@ -24,6 +24,9 @@
   "sbt-buildo": {
     "Getting started": ["sbt-buildo/introduction"]
   },
+  "wiro": {
+    "Getting started": ["sbt-buildo/installation"]
+  },
   "contributing": {
     "Contributing": ["contributing-website", "releasing"]
   }
