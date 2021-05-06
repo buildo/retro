@@ -14,4 +14,4 @@ run:
   path: sbt
   args:
     - -batch
-    - metarpheusCoreJVM/test
+    - +metarpheusCoreJVM/test

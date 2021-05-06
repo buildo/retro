@@ -5,6 +5,7 @@ import mailo.data.S3MailData
 import scalacache._
 import guava._
 import scala.concurrent.duration._
+import scalacache.modes.scalaFuture._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -12,20 +13,20 @@ import scala.concurrent.Future
 //NOTE: run tests in this suite serially
 class CacheSpec extends munit.FunSuite {
 
-  implicit val scalaCache = ScalaCache(GuavaCache())
+  implicit val scalaCache: Cache[Either[MailError, MailRawContent]] = GuavaCache.apply
 
   val templateName1 = "mail.html"
   val templateName2 = "mail-image.html"
   val s3 = new S3MailData()
 
-  def action(templateName: String, ttl: Duration) = cachingWithTTL(templateName)(ttl) {
+  def action(templateName: String, ttl: Duration) = cachingF(templateName)(ttl = Some(ttl)) {
     s3.get(templateName)
   }
 
   test("cache should initially be empty") {
     for {
-      v1 <- get[String, NoSerialization](templateName1)
-      v2 <- get[String, NoSerialization](templateName2)
+      v1 <- get(templateName1)
+      v2 <- get(templateName2)
     } yield {
       assert(v1.isEmpty)
       assert(v2.isEmpty)
@@ -36,8 +37,8 @@ class CacheSpec extends munit.FunSuite {
     for {
       _ <- action(templateName1, ttl = 10.seconds)
       _ <- action(templateName2, ttl = 30.seconds)
-      v2 <- get[String, NoSerialization](templateName2)
-      v1 <- get[String, NoSerialization](templateName1)
+      v2 <- get(templateName2)
+      v1 <- get(templateName1)
     } yield {
       assert(v1.isDefined)
       assert(v2.isDefined)
@@ -47,8 +48,8 @@ class CacheSpec extends munit.FunSuite {
   test("eventually the cache of the first template should expire") {
     for {
       _ <- Future(Thread.sleep(20.seconds.toMillis))
-      v1 <- get[String, NoSerialization](templateName1)
-      v2 <- get[String, NoSerialization](templateName2)
+      v1 <- get(templateName1)
+      v2 <- get(templateName2)
     } yield {
       assert(v1.isEmpty)
       assert(v2.isDefined)
