@@ -86,6 +86,6 @@ class RequestBuilder(
   )
 
   private[this] def queryHttpRequest(nonTokenArgs: Map[String, Json], uri: Uri) = HttpRequest(
-    method = HttpMethods.GET, uri = uri.withQuery(Query(nonTokenArgs.view.mapValues(_.noSpaces).toMap))
+    method = HttpMethods.GET, uri = uri.withQuery(Query(nonTokenArgs.mapValues(_.noSpaces).toMap))
   )
 }
