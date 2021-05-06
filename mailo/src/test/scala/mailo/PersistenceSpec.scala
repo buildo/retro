@@ -141,7 +141,7 @@ class PersistenceSpec extends {
     }
 
     retry(times = 5, interval = 1.second) {
-      assertEquals(state.size, 2)
+      assertEquals(state.size, 1)
       println(s"${state.size} messages sent")
     }
   }
