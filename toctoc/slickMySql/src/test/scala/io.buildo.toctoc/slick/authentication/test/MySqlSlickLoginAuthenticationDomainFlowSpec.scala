@@ -10,6 +10,7 @@ import io.buildo.toctoc.slick.authentication.login.MySqlSlickLoginAuthentication
 import io.buildo.toctoc.slick.authentication.token.MySqlSlickAccessTokenAuthenticationDomain
 import cats.effect.IO
 import java.time.Duration
+import cats.effect.ContextShift
 
 class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
 
@@ -26,6 +27,8 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
 
   val authFlow =
     new TokenBasedAuthenticationFlow[IO](loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
+
+  implicit val contextShift = IO.contextShift(munitExecutionContext)
 
   override def beforeAll(): Unit = {
     IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync
