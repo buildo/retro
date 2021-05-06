@@ -32,11 +32,11 @@ object SbtTapiro extends AutoPlugin {
     Seq(
       tapiro := {
         new Util().createFiles(
-          tapiroRoutesPaths.in(tapiro).value.map(s => (scalaSource.value / s).toString),
-          tapiroModelsPaths.in(tapiro).value.map(s => (scalaSource.value / s).toString),
-          (scalaSource.value / tapiroOutputPath.in(tapiro).value).toString,
-          tapiroEndpointsPackages.in(tapiro).value,
-          tapiroServer.in(tapiro).value,
+          (tapiro / tapiroRoutesPaths).value.map(s => (scalaSource.value / s).toString),
+          (tapiro / tapiroModelsPaths).value.map(s => (scalaSource.value / s).toString),
+          (scalaSource.value / (tapiro / tapiroOutputPath).value).toString,
+          (tapiro / tapiroEndpointsPackages).value,
+          (tapiro / tapiroServer).value,
         )
       },
     ),
