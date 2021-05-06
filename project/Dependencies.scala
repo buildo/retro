@@ -211,25 +211,29 @@ object Dependencies {
     circeCore,
     circeGeneric,
     circeParser,
-  ) ++ List(
-    munit,
-    akkaTestkit,
-    akkaHttpTestKitBase,
-  ).map(_ % Test)
+  )
 
   val wiroHttpServerDependencies = List(
     scalaLogging,
     akkaStream,
     akkaHttp,
     akkaHttpCirce,
-  )
+  ) ++ List(
+    munit,
+    akkaTestkit,
+    akkaHttpTestKitBase,
+  ).map(_ % Test)
 
   val wiroHttpClientDependencies = List(
     scalaLogging,
     akkaStream,
     akkaHttp,
     akkaHttpCirce,
-  )
+  ) ++ List(
+    munit,
+    akkaTestkit,
+    akkaHttpTestKitBase,
+  ).map(_ % Test)
 
   val docsDependencies = List(
     plantuml,
