@@ -58,7 +58,7 @@ val mailer = Mailo(s3, mailgun)
 
 Then you can send an email like so:
 
-```scala mdoc
+```scala mdoc:compile-only
 import mailo.Mail
 
 mailer.send(
@@ -94,6 +94,7 @@ emails. `Attachment` case class is defined as:
 
 ```scala
 import akka.http.scaladsl.model.ContentType
+
 case class Attachment(
   name: String,
   `type`: ContentType,
@@ -113,7 +114,9 @@ val attachment = Attachment(name = "test.txt", content="test", `type`=`text/plai
 
 And sent as:
 
-```scala mdoc
+```scala mdoc:compile-only
+import mailo.Mail
+
 mailer.send(
   Mail(
     to = "recipient@mail.com",
@@ -134,8 +137,8 @@ mailer.send(
 You can specify add a Content-Transfer-Encoding header in the attachments as
 follows.
 
-```scala mdoc
-val attachment2 = Attachment(
+```scala mdoc:nest
+val attachment = Attachment(
   name = "test.pdf",
   content="<<base64pdf>>",
   `type`=`application/pdf`,
@@ -147,3 +150,7 @@ val attachment2 = Attachment(
 
 Since version `0.1.5` templates are cached. You can set caching TTL (time to
 live) in the `application.conf` as `mailo.cachingTTLSeconds: 30`.
+
+```scala mdoc:invisible
+system.terminate()
+```
