@@ -184,6 +184,39 @@ lazy val javaTimeCirceCodecs = project
     libraryDependencies ++= javaTimeCirceCodecsDependencies,
   )
 
+lazy val wiro = project
+  .aggregate(wiroCore, wiroHttpServer, wiroHttpClient)
+
+lazy val wiroCore = project
+  .in(file("wiro/core"))
+  .settings(
+    name := "wiro-core",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroCoreDependencies
+      ++ List(scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided),
+  )
+
+lazy val wiroHttpServer = project
+  .in(file("wiro/serverAkkaHttp"))
+  .settings(
+    name := "wiro-http-server",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroHttpServerDependencies,
+  )
+  .dependsOn(wiroCore)
+
+lazy val wiroHttpClient = project
+  .in(file("wiro/clientAkkaHttp"))
+  .settings(
+    name := "wiro-http-client",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroHttpClientDependencies ++ List(
+      scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
+    ),
+  )
+  .dependsOn(wiroCore)
+  .dependsOn(wiroHttpServer % "test -> test")
+
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(
@@ -204,6 +237,8 @@ lazy val docs = project
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
       "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
       "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
+      "WIRO_SNAPSHOT_VERSION" -> (wiro / version).value,
+      "WIRO_STABLE_VERSION" -> (wiro / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)
