@@ -15,6 +15,7 @@ import akka.util.Timeout
 import akka.testkit.TestKitBase
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKit
+import scala.util.Properties
 
 case class SimpleMail(subject: String)
 
@@ -94,7 +95,7 @@ class MockedData(implicit executionContext: ExecutionContext) extends MailData {
     Future(Right(MailRawContent("ciao", partials = Map("name" -> "claudio"))))
 }
 
-object SkipOnScala212 extends munit.Tag
+object SkipOnScala212 extends munit.Tag("SkipOnScala212")
 
 class PersistenceSpec extends {
   val system: ActorSystem = ActorSystem("testSystem")
@@ -103,7 +104,10 @@ class PersistenceSpec extends {
   override def munitTestTransforms: List[TestTransform] =
     super.munitTestTransforms :+ new TestTransform(
       "skip on Scala 2.12",
-      test => if (test.tags.contains(SkipOnScala212)) test.withTags(munit.Tag.Ignore) else test,
+      test =>
+        if (test.tags.contains(SkipOnScala212) && Properties.versionNumberString.startsWith("2.12"))
+          test.withTags(Set(munit.Ignore))
+        else test,
     )
 
   override def afterAll(): Unit = {
