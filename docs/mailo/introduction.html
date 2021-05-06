@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Introduction · retro</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;&lt;code&gt;mailo&lt;/code&gt; is a library that allows you to:&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Introduction · retro"/><meta property="og:type" content="website"/><meta property="og:url" content="https://buildo.github.io/retro/"/><meta property="og:description" content="&lt;p&gt;&lt;code&gt;mailo&lt;/code&gt; is a library that allows you to:&lt;/p&gt;
+"/><meta property="og:image" content="https://buildo.github.io/retro/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://buildo.github.io/retro/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/retro/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/retro/css/main.css"/><script src="/retro/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/retro/"><img class="logo" src="/retro/img/favicon.ico" alt="retro"/><h2 class="headerTitleWithLogo">retro</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/retro/docs/toctoc/installation" target="_self">toctoc</a></li><li class=""><a href="/retro/docs/enumero/introduction" target="_self">enumero</a></li><li class=""><a href="/retro/docs/sbt-buildo/introduction" target="_self">sbt-buildo</a></li><li class=""><a href="/retro/docs/tapiro/introduction" target="_self">tapiro</a></li><li class="siteNavGroupActive siteNavItemActive"><a href="/retro/docs/mailo/introduction" target="_self">mailo</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li><li class=""><a href="https://github.com/buildo/retro" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Setup</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Setup</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/retro/docs/mailo/introduction">Introduction</a></li><li class="navListItem"><a class="navItem" href="/retro/docs/mailo/installation">Installation</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              const headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                if (event.target.tagName === 'A') {
+                  document.body.classList.remove('tocActive');
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/buildo/retro/edit/master/docs/mailo/introduction.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Introduction</h1></header><article><div><span><p><code>mailo</code> is a library that allows you to:</p>
+<ul>
+<li>Store your email templates where you like.</li>
+<li>Send your email with the ESP you like.</li>
+<li>Compose your template using HTML partials (convenient for footers and
+headers).
+<ul>
+<li>Allowed chars in the names of the partials are given by the following regex
+<code>a-zA-Z0-9_.-</code></li>
+</ul></li>
+<li>Conveniently collect errors.</li>
+</ul>
+<h1><a class="anchor" aria-hidden="true" id="getting-started"></a><a href="#getting-started" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting started</h1>
+<p>First, you need to obtain a instance of <code>Mailo</code>, here's an example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
+
+<span class="hljs-keyword">import</span> mailo.<span class="hljs-type">Mailo</span>
+<span class="hljs-keyword">import</span> mailo.data.<span class="hljs-type">S3MailData</span>
+<span class="hljs-keyword">import</span> mailo.http.<span class="hljs-type">MailgunClient</span>
+
+<span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">ExecutionContext</span>.<span class="hljs-type">Implicits</span>.global
+
+
+<span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> system = <span class="hljs-type">ActorSystem</span>()
+<span class="hljs-comment">// system: ActorSystem = akka://default</span>
+
+<span class="hljs-keyword">val</span> s3 = <span class="hljs-keyword">new</span> <span class="hljs-type">S3MailData</span>()
+<span class="hljs-comment">// s3: S3MailData = mailo.data.S3MailData@248d31f0</span>
+<span class="hljs-keyword">val</span> mailgun = <span class="hljs-keyword">new</span> <span class="hljs-type">MailgunClient</span>()
+<span class="hljs-comment">// mailgun: MailgunClient = mailo.http.MailgunClient@6e67580a</span>
+
+<span class="hljs-keyword">val</span> mailer = <span class="hljs-type">Mailo</span>(s3, mailgun)
+<span class="hljs-comment">// mailer: Mailo with com.typesafe.scalalogging.LazyLogging = mailo.AtMostOnceMailo@5d484dd5</span>
+</code></pre>
+<p>Then you can send an email like so:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> mailo.<span class="hljs-type">Mail</span>
+
+mailer.send(
+  <span class="hljs-type">Mail</span>(
+    to = <span class="hljs-string">"recipient@mail.com"</span>,
+    from = <span class="hljs-string">"Mailo sender@mail.com"</span>,
+    templateName = <span class="hljs-string">"mail.html"</span>,
+    subject = <span class="hljs-string">"Test mail"</span>,
+    params = <span class="hljs-type">Map</span>(<span class="hljs-string">"hi"</span> -&gt; <span class="hljs-string">"Hello this is your first email! :D"</span>),
+    tags = <span class="hljs-type">List</span>(<span class="hljs-string">"test"</span>)
+  )
+)
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="templates"></a><a href="#templates" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Templates</h2>
+<p>Use double curly breakets for parameters <code>{{parameter}}</code>, remember to include
+parameters in <code>params</code> argument.</p>
+<p>Use double square breakets for partials <code>[[partial.html]]</code>. Mailo looks for
+partials in <code>partials</code> folder.</p>
+<p>Complete example:</p>
+<pre><code class="hljs css language-html">[[header.html]] Hello {{personFirstName}} {{personLastName}} [[footer.html]]
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="how-to-send-attachments"></a><a href="#how-to-send-attachments" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How to send attachments</h2>
+<p>Mailo provide a case class <code>Attachment</code> that is used to send attachments in
+emails. <code>Attachment</code> case class is defined as:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.http.scaladsl.model.<span class="hljs-type">ContentType</span>
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Attachment</span>(<span class="hljs-params">
+  name: <span class="hljs-type">String</span>,
+  `type`: <span class="hljs-type">ContentType</span>,
+  content: <span class="hljs-type">String</span>
+</span>)</span>
+</code></pre>
+<p>An attachment can be created as follows:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.http.scaladsl.model.<span class="hljs-type">MediaTypes</span>._
+<span class="hljs-keyword">import</span> akka.http.scaladsl.model.<span class="hljs-type">HttpCharsets</span>._
+<span class="hljs-keyword">import</span> mailo.<span class="hljs-type">Attachment</span>
+
+<span class="hljs-keyword">val</span> attachment = <span class="hljs-type">Attachment</span>(name = <span class="hljs-string">"test.txt"</span>, content=<span class="hljs-string">"test"</span>, `<span class="hljs-class"><span class="hljs-keyword">type</span>`</span>=`text/plain` withCharset `<span class="hljs-type">UTF</span><span class="hljs-number">-8</span>`)
+<span class="hljs-comment">// attachment: Attachment = Attachment(</span>
+<span class="hljs-comment">//   "test.txt",</span>
+<span class="hljs-comment">//   WithCharset(text/plain, HttpCharset("UTF-8")),</span>
+<span class="hljs-comment">//   "test",</span>
+<span class="hljs-comment">//   None</span>
+<span class="hljs-comment">// )</span>
+</code></pre>
+<p>And sent as:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> mailo.<span class="hljs-type">Mail</span>
+
+mailer.send(
+  <span class="hljs-type">Mail</span>(
+    to = <span class="hljs-string">"recipient@mail.com"</span>,
+    from = <span class="hljs-string">"Mailo sender@mail.com"</span>,
+    cc = <span class="hljs-type">Some</span>(<span class="hljs-string">"ccrecipient@mail.com"</span>),
+    bcc = <span class="hljs-type">Some</span>(<span class="hljs-string">"bccrecipient@mail.com"</span>),
+    subject = <span class="hljs-string">"Test mail"</span>,
+    templateName = <span class="hljs-string">"mail.html"</span>,
+    params = <span class="hljs-type">Map</span>(<span class="hljs-string">"ciao"</span> -&gt; <span class="hljs-string">"CIAOOOONE"</span>),
+    attachments = <span class="hljs-type">List</span>(attachment),
+    tags = <span class="hljs-type">List</span>(<span class="hljs-string">"test"</span>)
+  )
+)
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="content-transfer-encoding"></a><a href="#content-transfer-encoding" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Content-Transfer-Encoding</h2>
+<p>You can specify add a Content-Transfer-Encoding header in the attachments as
+follows.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> attachment = <span class="hljs-type">Attachment</span>(
+  name = <span class="hljs-string">"test.pdf"</span>,
+  content=<span class="hljs-string">"&lt;&lt;base64pdf&gt;&gt;"</span>,
+  `<span class="hljs-class"><span class="hljs-keyword">type</span>`</span>=`application/pdf`,
+  transferEncoding = <span class="hljs-type">Some</span>(<span class="hljs-string">"base64"</span>)
+)
+<span class="hljs-comment">// attachment: Attachment = Attachment(</span>
+<span class="hljs-comment">//   "test.pdf",</span>
+<span class="hljs-comment">//   Binary(application/pdf),</span>
+<span class="hljs-comment">//   "&lt;&lt;base64pdf&gt;&gt;",</span>
+<span class="hljs-comment">//   Some("base64")</span>
+<span class="hljs-comment">// )</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="templates-caching"></a><a href="#templates-caching" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Templates caching</h2>
+<p>Since version <code>0.1.5</code> templates are cached. You can set caching TTL (time to
+live) in the <code>application.conf</code> as <code>mailo.cachingTTLSeconds: 30</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-next button" href="/retro/docs/mailo/installation"><span>Installation</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#templates">Templates</a></li><li><a href="#how-to-send-attachments">How to send attachments</a></li><li><a href="#content-transfer-encoding">Content-Transfer-Encoding</a></li><li><a href="#templates-caching">Templates caching</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/retro/" class="nav-home"><img src="/retro/img/favicon.ico" alt="retro" width="66" height="58"/></a><div><h5>Docs</h5><a href="/retro/docs/installation">Installation</a><a href="/retro/docs/concepts/functional-model">Concepts</a></div><div><h5>More</h5><a href="https://twitter.com/buildoHQ">Twitter</a><a href="https://github.com/buildo/retro">GitHub</a><a class="github-button" href="https://github.com/buildo/retro" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2021 buildo</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '123eb5671fc8154df8f1f3ae0355d644',
+                indexName: 'buildo-retro',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
