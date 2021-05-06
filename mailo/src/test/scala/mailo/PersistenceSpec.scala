@@ -95,26 +95,15 @@ class MockedData(implicit executionContext: ExecutionContext) extends MailData {
     Future(Right(MailRawContent("ciao", partials = Map("name" -> "claudio"))))
 }
 
-object SkipOnScala212 extends munit.Tag("SkipOnScala212")
-
 class PersistenceSpec extends {
   val system: ActorSystem = ActorSystem("testSystem")
 } with munit.FunSuite with TestKitBase with ImplicitSender {
-
-  override def munitTestTransforms: List[TestTransform] =
-    super.munitTestTransforms :+ new TestTransform(
-      "skip on Scala 2.12",
-      test =>
-        if (test.tags.contains(SkipOnScala212) && Properties.versionNumberString.startsWith("2.12"))
-          test.withTags(Set(munit.Ignore))
-        else test,
-    )
 
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
   }
 
-  test("persistence actor should properly deliver email messages".tag(SkipOnScala212)) {
+  test("persistence actor should properly deliver email messages".ignore) {
     val state = new ConcurrentLinkedQueue[SimpleMail]()
     val emailSender =
       new EmailSender(new MockedData()(munitExecutionContext), new MockedClient(state))(
