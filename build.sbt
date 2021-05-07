@@ -237,8 +237,8 @@ lazy val docs = project
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
       "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
       "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
-      "WIRO_SNAPSHOT_VERSION" -> (wiro / version).value,
-      "WIRO_STABLE_VERSION" -> (wiro / version).value.replaceFirst("\\+.*", ""),
+      "WIRO_SNAPSHOT_VERSION" -> (wiroCore / version).value,
+      "WIRO_STABLE_VERSION" -> (wiroCore / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)
