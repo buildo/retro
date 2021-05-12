@@ -110,6 +110,7 @@ lazy val toctocLdap = project
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore)
 

@@ -157,7 +157,6 @@ object Dependencies {
   val toctocLdapDependencies = List(
     ldap,
     mysql,
-    slick,
     slf4jNop,
     catsEffect,
   )
