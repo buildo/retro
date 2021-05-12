@@ -4,6 +4,7 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
 val scala212 = "2.12.13"
 val scala213 = "2.13.5"
+val scala3 = "3.0.0-RC3"
 
 inThisBuild(
   List(
@@ -82,8 +83,8 @@ lazy val toctocCore = project
     name := "toctoc-core",
     libraryDependencies ++= toctocCoreDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
-  .dependsOn(enumeroCore)
 
 lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
