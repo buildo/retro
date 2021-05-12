@@ -3,7 +3,6 @@ package io.buildo.toctoc.circe
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication._
 
 import org.scalacheck.Prop.forAll
-import org.scalacheck.magnolia._
 import io.circe.syntax._
 import io.circe.Json
 import org.scalacheck.Arbitrary

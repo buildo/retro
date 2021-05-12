@@ -6,8 +6,7 @@ object Dependencies {
 
   val V = new {
     val circe = "0.13.0"
-    val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.6.0"
+    val scalacheck = "1.15.4"
     val mockito = "1.9.5"
     val akka = "2.6.14"
     val akkaHttp = "10.2.4"
@@ -43,7 +42,6 @@ object Dependencies {
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
-  val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % V.akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.akka
@@ -130,7 +128,6 @@ object Dependencies {
     munit,
     munitScalaCheck,
     scalacheck,
-    scalacheckMagnolia,
     slf4jNop,
     catsEffect,
   ).map(_ % Test)
@@ -170,7 +167,6 @@ object Dependencies {
     circeGeneric,
   ) ++ List(
     scalacheck,
-    scalacheckMagnolia,
     munit,
     munitScalaCheck,
   ).map(_ % Test)
