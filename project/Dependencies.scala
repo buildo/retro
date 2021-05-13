@@ -13,8 +13,7 @@ object Dependencies {
     val akkaHttpCirce = "1.36.0"
     val awscala = "0.8.5"
     val cats = "2.6.1"
-    val catsEffect = "2.5.1"
-    val monixCatnap = "3.3.0"
+    val catsEffect = "3.1.1"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.3"
@@ -69,7 +68,6 @@ object Dependencies {
   val flywayCore = "org.flywaydb" % "flyway-core" % V.flyway
   val mysql = "mysql" % "mysql-connector-java" % V.mysql
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
-  val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
@@ -137,7 +135,6 @@ object Dependencies {
     slick,
     slickHikari,
     catsEffect,
-    monixCatnap,
   ) ++ List(
     munit,
     slf4jNop,
@@ -148,7 +145,6 @@ object Dependencies {
     slick,
     slickHikari,
     catsEffect,
-    monixCatnap,
   ) ++ List(
     munit,
     slf4jNop,

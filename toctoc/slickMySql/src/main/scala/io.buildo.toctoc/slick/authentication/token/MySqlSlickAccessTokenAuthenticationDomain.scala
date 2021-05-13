@@ -7,22 +7,19 @@ import core.authentication._
 import core.authentication.TokenBasedAuthentication._
 
 import cats.implicits._
-import cats.effect.Sync
-import monix.catnap.FutureLift
-import monix.catnap.syntax._
+import cats.effect.Async
 import _root_.slick.jdbc.MySQLProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import scala.concurrent.Future
 import java.time.Instant
 import java.sql.Timestamp
 
-class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+class MySqlSlickAccessTokenAuthenticationDomain[F[_]](
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,
 )(
-  implicit F: Sync[F],
+  implicit F: Async[F],
 ) extends AccessTokenDomain[F] {
 
   class AccessTokenTable(tag: Tag)
@@ -42,37 +39,41 @@ class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     s: Subject,
     c: AccessToken,
   ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
-    F.delay {
-      db.run(accessTokenTable += ((0, s.ref, c.value, Timestamp.from(c.expiresAt))))
-    }.futureLift.as(this.asRight)
+    F.fromFuture(F.delay {
+        db.run(accessTokenTable += ((0, s.ref, c.value, Timestamp.from(c.expiresAt))))
+      })
+      .as(this.asRight)
 
   override def unregister(s: Subject): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
-    F.delay {
-      db.run(accessTokenTable.filter(_.ref === s.ref).delete)
-    }.futureLift.as(this.asRight)
+    F.fromFuture(F.delay {
+        db.run(accessTokenTable.filter(_.ref === s.ref).delete)
+      })
+      .as(this.asRight)
 
   override def unregister(c: AccessToken): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
-    F.delay {
-      db.run(accessTokenTable.filter(_.token === c.value).delete)
-    }.futureLift.as(this.asRight)
+    F.fromFuture(F.delay {
+        db.run(accessTokenTable.filter(_.token === c.value).delete)
+      })
+      .as(this.asRight)
 
   override def authenticate(
     c: AccessToken,
   ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
-    F.delay {
-      db.run(
-        accessTokenTable
-          .filter(t => t.token === c.value && t.expiresAt > Timestamp.from(Instant.now()))
-          .result
-          .headOption,
-      )
-    }.futureLift.map {
-      case None =>
-        AuthenticationError.InvalidCredential.asLeft
-      case Some((_, ref, _, _)) =>
-        (this, UserSubject(ref)).asRight
-      case _ =>
-        AuthenticationError.InvalidCredential.asLeft
-    }
+    F.fromFuture(F.delay {
+        db.run(
+          accessTokenTable
+            .filter(t => t.token === c.value && t.expiresAt > Timestamp.from(Instant.now()))
+            .result
+            .headOption,
+        )
+      })
+      .map {
+        case None =>
+          AuthenticationError.InvalidCredential.asLeft
+        case Some((_, ref, _, _)) =>
+          (this, UserSubject(ref)).asRight
+        case _ =>
+          AuthenticationError.InvalidCredential.asLeft
+      }
   }
 }

@@ -8,20 +8,16 @@ import core.authentication.TokenBasedAuthentication._
 
 import cats.data.EitherT
 import cats.implicits._
-import cats.effect.Sync
-import monix.catnap.FutureLift
-import monix.catnap.syntax._
+import cats.effect.Async
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import scala.concurrent.Future
-
-class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+class PostgreSqlSlickLoginAuthenticationDomain[F[_]](
   db: Database,
   tableName: String = "login_auth_domain",
   schemaName: Option[String] = None,
 )(
-  implicit F: Sync[F],
+  implicit F: Async[F],
 ) extends LoginDomain[F]
     with BCryptHashing {
 
@@ -43,9 +39,9 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
     s: Subject,
     c: Login,
   ): F[Either[AuthenticationError, LoginDomain[F]]] =
-    F.delay {
-      db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
-    }.futureLift
+    F.fromFuture(F.delay {
+        db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
+      })
       .as(this.asRight[AuthenticationError])
       .handleError {
         case _ => AuthenticationError.InvalidCredential.asLeft
@@ -53,9 +49,10 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
       .widen
 
   override def unregister(s: Subject): F[Either[AuthenticationError, LoginDomain[F]]] =
-    F.delay {
-      db.run(loginTable.filter(_.ref === s.ref).delete)
-    }.futureLift.as(this.asRight)
+    F.fromFuture(F.delay {
+        db.run(loginTable.filter(_.ref === s.ref).delete)
+      })
+      .as(this.asRight)
 
   override def unregister(c: Login): F[Either[AuthenticationError, LoginDomain[F]]] =
     (for {
@@ -67,18 +64,19 @@ class PostgreSqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
   override def authenticate(
     c: Login,
   ): F[Either[AuthenticationError, (LoginDomain[F], Subject)]] = {
-    F.delay {
-      db.run(loginTable.filter(_.username === c.username).result)
-    }.futureLift.map {
-      case l if l.size > 0 =>
-        l.find(el => checkPassword(c.password, el._4)) match {
-          case Some(el) =>
-            (this, UserSubject(el._2)).asRight
-          case None =>
-            AuthenticationError.InvalidCredential.asLeft
-        }
-      case _ =>
-        AuthenticationError.InvalidCredential.asLeft
-    }
+    F.fromFuture(F.delay {
+        db.run(loginTable.filter(_.username === c.username).result)
+      })
+      .map {
+        case l if l.size > 0 =>
+          l.find(el => checkPassword(c.password, el._4)) match {
+            case Some(el) =>
+              (this, UserSubject(el._2)).asRight
+            case None =>
+              AuthenticationError.InvalidCredential.asLeft
+          }
+        case _ =>
+          AuthenticationError.InvalidCredential.asLeft
+      }
   }
 }
