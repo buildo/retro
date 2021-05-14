@@ -3,7 +3,7 @@ package core
 package authentication
 
 import org.scalacheck.Prop.forAll
-import org.scalacheck.magnolia._
+import org.scalacheck.Arbitrary
 import cats.implicits._
 import cats.effect.IO
 import cats.data.EitherT
@@ -21,6 +21,10 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
     InMemoryAuthenticationDomain.create(Map.empty)
 
   val recoveryFlow = TokenBasedRecoveryFlow.create(loginDomain, tokenDomain, Duration.ofDays(1))
+
+  implicit val userSubjectArbitrary: Arbitrary[UserSubject] = Arbitrary {
+    Arbitrary.arbitrary[String].map(UserSubject.apply)
+  }
 
   property("recovery works for existing users") {
     forAll { (s: UserSubject, username: String, password: String) =>
@@ -49,8 +53,8 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
           result <- EitherT(f.recoverLogin(token, password) { _ =>
             IO(None)
           })
-        } yield result).void.leftMap { e =>
-          assertEquals(e, AuthenticationError.InvalidCredential)
+        } yield result).void.swap.map { result =>
+          assertEquals(result, AuthenticationError.InvalidCredential)
         }.value
       }
     }
@@ -68,8 +72,8 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
           authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
           (_, subject) = authenticateResult
           recoverResult <- EitherT(f.recoverLogin(token1, password)(_ => IO(Some(username))))
-        } yield recoverResult).void.leftMap { e =>
-          assertEquals(e, AuthenticationError.InvalidCredential)
+        } yield recoverResult).void.swap.map { result =>
+          assertEquals(result, AuthenticationError.InvalidCredential)
         }.value
       }
     }

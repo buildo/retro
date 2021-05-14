@@ -6,16 +6,15 @@ object Dependencies {
 
   val V = new {
     val circe = "0.13.0"
-    val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.6.0"
+    val scalacheck = "1.15.4"
     val mockito = "1.9.5"
     val akka = "2.6.14"
     val akkaHttp = "10.2.4"
     val akkaHttpCirce = "1.36.0"
     val awscala = "0.8.5"
     val cats = "2.6.1"
-    val catsEffect = "2.5.0"
-    val monixCatnap = "3.4.0"
+    val catsEffect = "2.5.1"
+    val monixCatnap = "3.3.0"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.3"
@@ -35,7 +34,7 @@ object Dependencies {
     val plantuml = "8059"
     val pprint = "0.6.5"
     val tapir = "0.14.4"
-    val munit = "0.7.25"
+    val munit = "0.7.26"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -43,7 +42,6 @@ object Dependencies {
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
-  val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % V.akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.akka
@@ -130,7 +128,6 @@ object Dependencies {
     munit,
     munitScalaCheck,
     scalacheck,
-    scalacheckMagnolia,
     slf4jNop,
     catsEffect,
   ).map(_ % Test)
@@ -160,7 +157,6 @@ object Dependencies {
   val toctocLdapDependencies = List(
     ldap,
     mysql,
-    slick,
     slf4jNop,
     catsEffect,
   )
@@ -170,7 +166,6 @@ object Dependencies {
     circeGeneric,
   ) ++ List(
     scalacheck,
-    scalacheckMagnolia,
     munit,
     munitScalaCheck,
   ).map(_ % Test)
