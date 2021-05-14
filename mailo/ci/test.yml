@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: buildo/scala-sbt-alpine
-    tag: 8_2.12.13_1.5.1
+    tag: 8_2.13.5_1.5.2
 
 inputs:
   - name: retro
@@ -14,4 +14,4 @@ run:
   path: sbt
   args:
     - -batch
-    - mailo/test
+    - +mailo/test

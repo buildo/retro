@@ -6,18 +6,17 @@ object Dependencies {
 
   val V = new {
     val circe = "0.13.0"
-    val scalacheck = "1.14.0"
-    val scalacheckMagnolia = "0.6.0"
+    val scalacheck = "1.15.4"
     val mockito = "1.9.5"
     val akka = "2.6.14"
     val akkaHttp = "10.2.4"
     val akkaHttpCirce = "1.36.0"
     val awscala = "0.8.5"
-    val cats = "1.6.0"
-    val catsEffect = "1.3.0"
-    val monixCatnap = "3.0.0-RC2"
+    val cats = "2.6.1"
+    val catsEffect = "2.5.1"
+    val monixCatnap = "3.3.0"
     val config = "1.4.1"
-    val scalacacheGuava = "0.9.3"
+    val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.3"
     val logback = "1.2.3"
     val leveldb = "1.8"
@@ -25,17 +24,17 @@ object Dependencies {
     val jakartaMail = "2.0.1"
     val slick = "3.3.3"
     val postgresql = "42.2.20"
-    val mysql = "8.0.24"
+    val mysql = "8.0.25"
     val ldap = "5.1.4"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.4.15"
+    val scalameta = "4.4.17"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.6.5"
-    val tapir = "0.14.5"
-    val munit = "0.7.25"
+    val tapir = "0.14.4"
+    val munit = "0.7.26"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -43,10 +42,11 @@ object Dependencies {
   val circeGeneric = "io.circe" %% "circe-generic" % V.circe
   val circeGenericExtras = "io.circe" %% "circe-generic-extras" % V.circe
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalacheck
-  val scalacheckMagnolia = "com.github.chocpanda" %% "scalacheck-magnolia" % V.scalacheckMagnolia
   val mockito = "org.mockito" % "mockito-all" % V.mockito
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % V.akka
+  val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.akka
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % V.akkaHttp
+  val akkaHttpTestKitBase = "com.typesafe.akka" %% "akka-http-testkit" % V.akkaHttp
   val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % V.akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.akka
   val awscala = "com.github.seratch" %% "awscala" % V.awscala
@@ -82,6 +82,8 @@ object Dependencies {
   val munit = "org.scalameta" %% "munit" % V.munit
   val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
   val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.14.1"
+  val autowire = "com.lihaoyi" %% "autowire" % "0.3.3"
+  val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.11.1"
 
   val enumeroDependencies = List(
     munit,
@@ -126,7 +128,6 @@ object Dependencies {
     munit,
     munitScalaCheck,
     scalacheck,
-    scalacheckMagnolia,
     slf4jNop,
     catsEffect,
   ).map(_ % Test)
@@ -156,7 +157,6 @@ object Dependencies {
   val toctocLdapDependencies = List(
     ldap,
     mysql,
-    slick,
     slf4jNop,
     catsEffect,
   )
@@ -166,7 +166,6 @@ object Dependencies {
     circeGeneric,
   ) ++ List(
     scalacheck,
-    scalacheckMagnolia,
     munit,
     munitScalaCheck,
   ).map(_ % Test)
@@ -197,6 +196,38 @@ object Dependencies {
     circeCore,
   ) ++ List(
     munit,
+  ).map(_ % Test)
+
+  val wiroCoreDependencies = List(
+    autowire,
+    akkaActor,
+    catsCore,
+    pureConfig,
+    circeCore,
+    circeGeneric,
+    circeParser,
+  )
+
+  val wiroHttpServerDependencies = List(
+    scalaLogging,
+    akkaStream,
+    akkaHttp,
+    akkaHttpCirce,
+  ) ++ List(
+    munit,
+    akkaTestkit,
+    akkaHttpTestKitBase,
+  ).map(_ % Test)
+
+  val wiroHttpClientDependencies = List(
+    scalaLogging,
+    akkaStream,
+    akkaHttp,
+    akkaHttpCirce,
+  ) ++ List(
+    munit,
+    akkaTestkit,
+    akkaHttpTestKitBase,
   ).map(_ % Test)
 
   val docsDependencies = List(

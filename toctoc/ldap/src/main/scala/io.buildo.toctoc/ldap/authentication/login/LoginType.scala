@@ -3,10 +3,9 @@ package ldap
 package authentication
 package login
 
-import io.buildo.enumero.annotations.enum
-
-@enum trait LdapLoginType {
-  object DistinguishedName
-  object UserPrincipalName
-  object Legacy
+trait LdapLoginType
+object LdapLoginType {
+  object DistinguishedName extends LdapLoginType
+  object UserPrincipalName extends LdapLoginType
+  object Legacy extends LdapLoginType
 }

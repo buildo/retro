@@ -4,11 +4,12 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
 val scala212 = "2.12.13"
 val scala213 = "2.13.5"
+val scala3 = "3.0.0"
 
 inThisBuild(
   List(
-    scalaVersion := scala212,
-    // crossScalaVersions := List(scala212, scala213),
+    scalaVersion := scala213,
+    crossScalaVersions := List(scala212, scala213),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/buildo/retro")),
     developers := List(
@@ -33,6 +34,8 @@ inThisBuild(
 lazy val `sbt-buildo` = project
   .enablePlugins(SbtPlugin)
   .settings(
+    scalaVersion := scala212,
+    crossScalaVersions := Nil,
     addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0"),
     dynverTagPrefix := "sbt-buildo-",
@@ -80,8 +83,8 @@ lazy val toctocCore = project
     name := "toctoc-core",
     libraryDependencies ++= toctocCoreDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
-  .dependsOn(enumeroCore)
 
 lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
@@ -107,6 +110,7 @@ lazy val toctocLdap = project
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore)
 
@@ -124,6 +128,8 @@ lazy val metarpheusCore = crossProject(JSPlatform, JVMPlatform)
   .in(file("metarpheus/core"))
   .settings(
     name := "metarpheus-core",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     dynverTagPrefix := "metarpheus-",
     libraryDependencies ++= metarpheusCoreDependencies,
   )
@@ -133,6 +139,8 @@ lazy val metarpheusJsFacade = project
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     name := "metarpheus-js-facade",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
     libraryDependencies ++= metarpheusJsFacadeDependencies.map(_.cross(ScalaJSCrossVersion.binary)),
     dynverTagPrefix := "metarpheus-",
@@ -143,6 +151,8 @@ lazy val tapiroCore = project
   .in(file("tapiro/core"))
   .settings(
     name := "tapiro-core",
+    // NOTE(gabro): needed for sbt-tapiro to work
+    scalaVersion := scala212,
     libraryDependencies ++= tapiroCoreDependencies,
     dynverTagPrefix := "tapiro-",
   )
@@ -153,6 +163,8 @@ lazy val `sbt-tapiro` = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-tapiro",
+    scalaVersion := scala212,
+    crossScalaVersions := Nil,
     dynverTagPrefix := "tapiro-",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
@@ -174,6 +186,39 @@ lazy val javaTimeCirceCodecs = project
     libraryDependencies ++= javaTimeCirceCodecsDependencies,
   )
 
+lazy val wiro = project
+  .aggregate(wiroCore, wiroHttpServer, wiroHttpClient)
+
+lazy val wiroCore = project
+  .in(file("wiro/core"))
+  .settings(
+    name := "wiro-core",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroCoreDependencies
+      ++ List(scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided),
+  )
+
+lazy val wiroHttpServer = project
+  .in(file("wiro/serverAkkaHttp"))
+  .settings(
+    name := "wiro-http-server",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroHttpServerDependencies,
+  )
+  .dependsOn(wiroCore)
+
+lazy val wiroHttpClient = project
+  .in(file("wiro/clientAkkaHttp"))
+  .settings(
+    name := "wiro-http-client",
+    dynverTagPrefix := "wiro-",
+    libraryDependencies ++= wiroHttpClientDependencies ++ List(
+      scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
+    ),
+  )
+  .dependsOn(wiroCore)
+  .dependsOn(wiroHttpServer % "test -> test")
+
 lazy val docs = project
   .in(file("retro-docs"))
   .settings(
@@ -194,6 +239,8 @@ lazy val docs = project
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
       "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
       "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
+      "WIRO_SNAPSHOT_VERSION" -> (wiroCore / version).value,
+      "WIRO_STABLE_VERSION" -> (wiroCore / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)

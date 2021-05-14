@@ -32,6 +32,8 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
   val authFlow =
     new TokenBasedAuthenticationFlow[IO](loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
 
+  implicit val contextShift = IO.contextShift(munitExecutionContext)
+
   override def beforeAll() = {
     IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync
   }
