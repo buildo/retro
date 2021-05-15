@@ -14,7 +14,7 @@ object Dependencies {
     val awscala = "0.8.5"
     val cats = "2.6.1"
     val catsEffect = "2.5.1"
-    val monixCatnap = "3.3.0"
+    val monixCatnap = "3.4.0"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.3"
