@@ -72,7 +72,6 @@ lazy val mailo = project
       }
     },
   )
-  .dependsOn(enumeroCore)
 
 lazy val toctoc =
   project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap, toctocCirce)
@@ -156,7 +155,6 @@ lazy val tapiroCore = project
     libraryDependencies ++= tapiroCoreDependencies,
     dynverTagPrefix := "tapiro-",
   )
-  .dependsOn(metarpheusCore.jvm)
 
 lazy val `sbt-tapiro` = project
   .in(file("tapiro/sbt-tapiro"))
