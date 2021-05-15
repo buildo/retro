@@ -32,7 +32,7 @@ object Dependencies {
     val scalameta = "4.4.17"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
-    val pprint = "0.6.5"
+    val pprint = "0.6.6"
     val tapir = "0.14.4"
     val munit = "0.7.26"
   }
