@@ -16,7 +16,7 @@ import _root_.slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.Future
 
-class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
   db: Database,
   tableName: String = "login_auth_domain",
   schemaName: Option[String] = None,

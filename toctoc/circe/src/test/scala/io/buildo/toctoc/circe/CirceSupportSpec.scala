@@ -19,6 +19,13 @@ final class CirceSupportSpec extends munit.ScalaCheckSuite {
     } yield AccessToken.generate(value, Duration.of(duration.toMillis, ChronoUnit.MILLIS))
   }
 
+  implicit val arbLogin: Arbitrary[Login] = Arbitrary {
+    for {
+      username <- Gen.alphaNumStr
+      password <- Gen.alphaNumStr
+    } yield Login(username, password)
+  }
+
   property("encodes AccessToken correctly") {
     forAll { (token: AccessToken) =>
       assertEquals(

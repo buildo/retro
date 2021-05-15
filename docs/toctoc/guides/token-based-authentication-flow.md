@@ -80,7 +80,7 @@ import scala.concurrent.Future
 import java.time.Duration
 
 object PostgreSqlSlickTokenBasedAuthenticationFlow {
-  def create[F[_]: Sync: FutureLift[?[_], Future]](
+  def create[F[_]: Sync: FutureLift[*[_], Future]](
     db: Database,
     tokenDuration: Duration
   ): TokenBasedAuthenticationFlow[F] = new TokenBasedAuthenticationFlow[F](
