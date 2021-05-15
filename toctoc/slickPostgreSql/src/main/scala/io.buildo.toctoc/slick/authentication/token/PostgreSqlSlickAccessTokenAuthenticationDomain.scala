@@ -16,7 +16,7 @@ import _root_.slick.jdbc.JdbcBackend.Database
 import scala.concurrent.Future
 import java.time.Instant
 
-class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,

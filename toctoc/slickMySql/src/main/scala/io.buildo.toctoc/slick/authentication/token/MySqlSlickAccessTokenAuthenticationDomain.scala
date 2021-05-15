@@ -17,7 +17,7 @@ import scala.concurrent.Future
 import java.time.Instant
 import java.sql.Timestamp
 
-class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[?[_], Future]](
+class MySqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,
