@@ -42,9 +42,15 @@ object ScalaSettingPlugin extends AutoPlugin {
       case Some((2, 12)) =>
         baseScala2Options ++
           Seq("-opt-warnings", "-Ypartial-unification", "-Xfuture", "-Ywarn-unused-import")
-      case Some((2, 13)) => baseScala2Options ++ Seq("-Ymacro-annotations", "-Ywarn-unused:imports")
-      case Some((3, _))  => baseScala3Options
-      case _             => Nil
+      case Some((2, 13)) =>
+        baseScala2Options ++ Seq(
+          "-Ymacro-annotations",
+          "-Ywarn-unused:imports",
+          // https://github.com/scala/bug/issues/12072
+          "-Xlint:-byname-implicit",
+        )
+      case Some((3, _)) => baseScala3Options
+      case _            => Nil
     }
 
   lazy val baseSettings: Seq[Def.Setting[_]] = Seq(
