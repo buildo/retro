@@ -14,7 +14,7 @@ object Dependencies {
     val awscala = "0.8.5"
     val cats = "2.6.1"
     val catsEffect = "2.5.1"
-    val monixCatnap = "3.3.0"
+    val monixCatnap = "3.4.0"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.3"
@@ -32,8 +32,8 @@ object Dependencies {
     val scalameta = "4.4.17"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
-    val pprint = "0.6.5"
-    val tapir = "0.14.5"
+    val pprint = "0.6.6"
+    val tapir = "0.14.4"
     val munit = "0.7.26"
   }
 
