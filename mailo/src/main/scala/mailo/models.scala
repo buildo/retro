@@ -2,11 +2,10 @@ package mailo
 
 import akka.http.scaladsl.model.ContentType
 
-import io.buildo.enumero.annotations.enum
-
-@enum trait DeliveryGuarantee {
-  object AtMostOnce
-  object AtLeastOnce
+sealed trait DeliveryGuarantee
+object DeliveryGuarantee {
+  object AtMostOnce extends DeliveryGuarantee
+  object AtLeastOnce extends DeliveryGuarantee
 }
 
 case class Attachment(

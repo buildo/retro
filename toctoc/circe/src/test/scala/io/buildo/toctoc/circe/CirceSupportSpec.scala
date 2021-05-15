@@ -3,7 +3,6 @@ package io.buildo.toctoc.circe
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication._
 
 import org.scalacheck.Prop.forAll
-import org.scalacheck.magnolia._
 import io.circe.syntax._
 import io.circe.Json
 import org.scalacheck.Arbitrary
@@ -18,6 +17,13 @@ final class CirceSupportSpec extends munit.ScalaCheckSuite {
       duration <- Gen.finiteDuration
       value <- Gen.alphaNumStr
     } yield AccessToken.generate(value, Duration.of(duration.toMillis, ChronoUnit.MILLIS))
+  }
+
+  implicit val arbLogin: Arbitrary[Login] = Arbitrary {
+    for {
+      username <- Gen.alphaNumStr
+      password <- Gen.alphaNumStr
+    } yield Login(username, password)
   }
 
   property("encodes AccessToken correctly") {

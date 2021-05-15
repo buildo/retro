@@ -4,6 +4,7 @@ import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
 val scala212 = "2.12.13"
 val scala213 = "2.13.5"
+val scala3 = "3.0.0"
 
 inThisBuild(
   List(
@@ -71,7 +72,6 @@ lazy val mailo = project
       }
     },
   )
-  .dependsOn(enumeroCore)
 
 lazy val toctoc =
   project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap, toctocCirce)
@@ -82,8 +82,8 @@ lazy val toctocCore = project
     name := "toctoc-core",
     libraryDependencies ++= toctocCoreDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
-  .dependsOn(enumeroCore)
 
 lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
@@ -109,6 +109,7 @@ lazy val toctocLdap = project
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore)
 
@@ -154,7 +155,6 @@ lazy val tapiroCore = project
     libraryDependencies ++= tapiroCoreDependencies,
     dynverTagPrefix := "tapiro-",
   )
-  .dependsOn(metarpheusCore.jvm)
 
 lazy val `sbt-tapiro` = project
   .in(file("tapiro/sbt-tapiro"))
@@ -237,8 +237,8 @@ lazy val docs = project
       "SBT_TAPIRO_STABLE_VERSION" -> (`sbt-tapiro` / version).value.replaceFirst("\\+.*", ""),
       "MAILO_SNAPSHOT_VERSION" -> (mailo / version).value,
       "MAILO_STABLE_VERSION" -> (mailo / version).value.replaceFirst("\\+.*", ""),
-      "WIRO_SNAPSHOT_VERSION" -> (wiro / version).value,
-      "WIRO_STABLE_VERSION" -> (wiro / version).value.replaceFirst("\\+.*", ""),
+      "WIRO_SNAPSHOT_VERSION" -> (wiroCore / version).value,
+      "WIRO_STABLE_VERSION" -> (wiroCore / version).value.replaceFirst("\\+.*", ""),
     ),
   )
   .dependsOn(toctocCore, enumeroCore, toctocSlickPostgreSql, mailo)

@@ -73,7 +73,7 @@ import scala.concurrent.Future
 import java.time.Duration
 
 object PostgreSqlSlickTokenBasedRecoveryFlow {
-  def create[F[_]: Sync: FutureLift[?[_], Future]](
+  def create[F[_]: Sync: FutureLift[*[_], Future]](
     db: Database,
     tokenDuration: Duration
   ): TokenBasedRecoveryFlow[F] = TokenBasedRecoveryFlow.create[F](
