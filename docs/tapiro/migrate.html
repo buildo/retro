@@ -71,7 +71,7 @@ This is a valid codec for wiro.Auth:</li>
 
 <span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> authCodec: <span class="hljs-type">PlainCodec</span>[<span class="hljs-type">Auth</span>] = <span class="hljs-type">Codec</span>.string
   .mapDecode(decodeAuth)(encodeAuth)
-<span class="hljs-comment">// authCodec: PlainCodec[Auth] = sttp.tapir.Codec$$anon$1@79cc82f6</span>
+<span class="hljs-comment">// authCodec: PlainCodec[Auth] = sttp.tapir.Codec$$anon$1@1c9ab8a</span>
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decodeAuth</span></span>(s: <span class="hljs-type">String</span>): <span class="hljs-type">DecodeResult</span>[<span class="hljs-type">Auth</span>] = {
   <span class="hljs-keyword">val</span> <span class="hljs-type">TokenPattern</span> = <span class="hljs-string">"Token token=(.+)"</span>.r
