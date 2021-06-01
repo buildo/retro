@@ -5,7 +5,7 @@ import scala.language.reflectiveCalls
 object Dependencies {
 
   val V = new {
-    val circe = "0.13.0"
+    val circe = "0.14.1"
     val scalacheck = "1.15.4"
     val mockito = "1.9.5"
     val akka = "2.6.14"
@@ -25,11 +25,11 @@ object Dependencies {
     val slick = "3.3.3"
     val postgresql = "42.2.20"
     val mysql = "8.0.25"
-    val ldap = "5.1.4"
+    val ldap = "6.0.0"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.25"
-    val scalameta = "4.4.17"
+    val scalameta = "4.4.20"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.6.6"
