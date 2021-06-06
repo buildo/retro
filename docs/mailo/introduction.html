@@ -77,12 +77,12 @@ headers).
 <span class="hljs-comment">// system: ActorSystem = akka://default</span>
 
 <span class="hljs-keyword">val</span> s3 = <span class="hljs-keyword">new</span> <span class="hljs-type">S3MailData</span>()
-<span class="hljs-comment">// s3: S3MailData = mailo.data.S3MailData@2ae31280</span>
+<span class="hljs-comment">// s3: S3MailData = mailo.data.S3MailData@2af92e0a</span>
 <span class="hljs-keyword">val</span> mailgun = <span class="hljs-keyword">new</span> <span class="hljs-type">MailgunClient</span>()
-<span class="hljs-comment">// mailgun: MailgunClient = mailo.http.MailgunClient@7fc1ba72</span>
+<span class="hljs-comment">// mailgun: MailgunClient = mailo.http.MailgunClient@fcc49e3</span>
 
 <span class="hljs-keyword">val</span> mailer = <span class="hljs-type">Mailo</span>(s3, mailgun)
-<span class="hljs-comment">// mailer: Mailo with com.typesafe.scalalogging.LazyLogging = mailo.AtMostOnceMailo@512ef6c8</span>
+<span class="hljs-comment">// mailer: Mailo with com.typesafe.scalalogging.LazyLogging = mailo.AtMostOnceMailo@1d4202ae</span>
 </code></pre>
 <p>Then you can send an email like so:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> mailo.<span class="hljs-type">Mail</span>
