@@ -89,8 +89,8 @@ case class API(models: List[Model], routes: List[Route]) {
   ): API = {
     val modelsInUse: Set[Type] = {
       routes.flatMap { route =>
-        route.route.collect {
-          case RouteSegment.Param(routeParam) => routeParam.tpe
+        route.route.collect { case RouteSegment.Param(routeParam) =>
+          routeParam.tpe
         } ++
           route.params.map(_.tpe) ++
           List(route.returns) ++

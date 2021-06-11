@@ -31,8 +31,7 @@ trait MailClient {
     attachments: List[Attachment],
     tags: List[String],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]]
 
@@ -46,8 +45,7 @@ trait MailClient {
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]]
 }
@@ -58,8 +56,7 @@ trait MimeMailClient {
     tags: List[String],
     attachments: List[Attachment],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]]
 }

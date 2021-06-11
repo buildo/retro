@@ -9,8 +9,7 @@ import scala.concurrent.ExecutionContext
 class AtMostOnceMailo(
   val mailData: MailData,
   val mailClient: MailClient,
-)(
-  implicit
+)(implicit
   ec: ExecutionContext,
   conf: Config = ConfigFactory.load(),
 ) extends Mailo

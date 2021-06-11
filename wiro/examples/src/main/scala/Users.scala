@@ -1,5 +1,5 @@
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{ HttpResponse, StatusCodes, ContentType, HttpEntity, MediaTypes }
+import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 
 import io.circe.generic.auto._
@@ -9,9 +9,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import wiro.Config
 import wiro.server.akkaHttp._
-import wiro.server.akkaHttp.{ FailSupport => ServerFailSupport }
+import wiro.server.akkaHttp.{FailSupport => ServerFailSupport}
 import wiro.client.akkaHttp._
-import wiro.client.akkaHttp.{ FailSupport => ClientFailSupport }
+import wiro.client.akkaHttp.{FailSupport => ClientFailSupport}
 
 // Models definition
 object models {
@@ -32,13 +32,13 @@ object controllers {
 
     @query(name = Some("getUser"))
     def getUser(
-      id: Int
+      id: Int,
     ): Future[Either[UserNotFoundError, User]]
 
     @command(name = Some("insertUser"))
     def insertUser(
       id: Int,
-      name: String
+      name: String,
     ): Future[Either[Error, User]]
   }
 
@@ -47,17 +47,17 @@ object controllers {
   // API implementation
   class UsersApiImpl() extends UsersApi {
     override def getUser(
-      id: Int
+      id: Int,
     ): Future[Either[UserNotFoundError, User]] = {
       users.get(id) match {
         case Some(user) => Future(Right(user))
-        case None => Future(Left(UserNotFoundError("User not found")))
+        case None       => Future(Left(UserNotFoundError("User not found")))
       }
     }
 
     override def insertUser(
       id: Int,
-      name: String
+      name: String,
     ): Future[Either[Error, User]] = {
       val newUser = User(name)
       users(id) = newUser
@@ -66,7 +66,6 @@ object controllers {
   }
 }
 
-
 object errors {
   import controllers.UserNotFoundError
 
@@ -74,7 +73,7 @@ object errors {
   implicit def notFoundToResponse = new ToHttpResponse[UserNotFoundError] {
     def response(error: UserNotFoundError) = HttpResponse(
       status = StatusCodes.NotFound,
-      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces)
+      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces),
     )
   }
 
@@ -82,7 +81,7 @@ object errors {
   implicit def errorToResponse = new ToHttpResponse[Error] {
     def response(error: Error) = HttpResponse(
       status = StatusCodes.InternalServerError,
-      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces)
+      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces),
     )
   }
 }
@@ -100,7 +99,7 @@ object UsersServer extends App with RouterDerivationModule {
 
   val rpcServer = new HttpRPCServer(
     config = Config("localhost", 8080),
-    routers = List(usersRouter)
+    routers = List(usersRouter),
   )
 }
 
@@ -116,5 +115,5 @@ object UsersClient extends App with ClientDerivationModule {
 
   val rpcClient = new RPCClient(config, ctx = deriveClientContext[UsersApi])
 
-  rpcClient[UsersApi].insertUser(0, "Pippo").call() map (println(_))
+  rpcClient[UsersApi].insertUser(0, "Pippo").call().map(println(_))
 }

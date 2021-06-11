@@ -4,22 +4,22 @@ import io.circe.Json
 
 case class Config(
   host: String,
-  port: Int
+  port: Int,
 )
 
 case class WiroRequest(
-  args: String
+  args: String,
 )
 
 case class RpcRequest(
   path: Seq[String],
-  args: Map[String, Json]
+  args: Map[String, Json],
 )
 
 case class Auth(
-  token: String
+  token: String,
 )
 
 case class OperationParameters(
-  parameters: Map[String, String]
+  parameters: Map[String, String],
 )

@@ -34,15 +34,14 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
     }
   }
 
-  def exceptionHandler = ExceptionHandler {
-    case e: FailException[_] =>
-      //logging left
-      e.response.entity match {
-        case HttpEntity.Strict(_, data) =>
-          logger.error(s"${e.response.status.value} ${data.utf8String}")
-        case complexEntity => logger.error(s"${e.response.status} ${e.response.entity}")
-      }
-      complete(e.response)
+  def exceptionHandler = ExceptionHandler { case e: FailException[_] =>
+    //logging left
+    e.response.entity match {
+      case HttpEntity.Strict(_, data) =>
+        logger.error(s"${e.response.status.value} ${data.utf8String}")
+      case complexEntity => logger.error(s"${e.response.status} ${e.response.entity}")
+    }
+    complete(e.response)
   }
 
   private[this] val requestToken: Directive1[Option[String]] = {
@@ -81,12 +80,11 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
     args: Map[String, Json],
     headers: Map[String, Json],
   ): Route =
-    requestToken(
-      token =>
-        autowireRequestRoute(
-          operationFullName,
-          args ++ token.map(tokenAsArg) ++ Some(headersAsArg(headers)),
-        ),
+    requestToken(token =>
+      autowireRequestRoute(
+        operationFullName,
+        args ++ token.map(tokenAsArg) ++ Some(headersAsArg(headers)),
+      ),
     )
 
   private[this] def routePathPrefix(
@@ -118,11 +116,12 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
   //Generates POST requests
   private[this] def command(operationFullName: String, methodMetaData: MethodMetaData): Route =
     loggingClientIP {
-      (routePathPrefix(operationFullName, methodMetaData) & pathEnd & post & entity(as[JsonObject])) {
-        request =>
-          headersDirective { headers =>
-            autowireRequestRouteWithToken(operationFullName, request.toMap, headers)
-          }
+      (routePathPrefix(operationFullName, methodMetaData) & pathEnd & post & entity(
+        as[JsonObject],
+      )) { request =>
+        headersDirective { headers =>
+          autowireRequestRouteWithToken(operationFullName, request.toMap, headers)
+        }
       }
     }
 

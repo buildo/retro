@@ -15,7 +15,7 @@ object OperationType {
 }
 
 case class MethodMetaData(
-    operationType: OperationType
+  operationType: OperationType,
 )
 
 trait MetaDataMacro {

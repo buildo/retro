@@ -27,8 +27,7 @@ import akka.util.ByteString
 
 import util._
 
-class MailgunClient(
-  implicit
+class MailgunClient(implicit
   system: ActorSystem,
   conf: Config = ConfigFactory.load(),
 ) extends MailClient
@@ -49,8 +48,7 @@ class MailgunClient(
     tags: List[String] = List.empty,
     attachments: List[Attachment] = List.empty,
     headers: Map[String, String] = Map.empty,
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] = {
     val inputs = for {
@@ -102,8 +100,7 @@ class MailgunClient(
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     for {
@@ -138,8 +135,7 @@ class MailgunClient(
     attachments: List[Attachment],
     tags: List[String],
     headers: Map[String, String] = Map.empty,
-  )(
-    implicit
+  )(implicit
     executionContext: scala.concurrent.ExecutionContext,
   ): Future[Either[MailError, MailResponse]] =
     for {
@@ -164,8 +160,7 @@ class MailgunClient(
       res <- sendRequest(request)
     } yield res
 
-  private[this] def sendRequest(request: HttpRequest)(
-    implicit
+  private[this] def sendRequest(request: HttpRequest)(implicit
     ec: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] = {
     import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
@@ -184,9 +179,8 @@ class MailgunClient(
         case 500 | 502 | 503 | 504 => Future(ServerError.asLeft[MailResponse])
         case _                     => Future(UnknownCode.asLeft[MailResponse])
       }
-    } yield result).recover {
-      case t: Throwable =>
-        UnknownError(t.getStackTraceAsString).asLeft[MailResponse]
+    } yield result).recover { case t: Throwable =>
+      UnknownError(t.getStackTraceAsString).asLeft[MailResponse]
     }
   }
 
@@ -221,14 +215,13 @@ class MailgunClient(
     attachments: List[Attachment],
   )(implicit ec: ExecutionContext): Future[RequestEntity] = {
 
-    val attachmentsForm = attachments.map(
-      attachment =>
-        attachmentForm(
-          attachment.name,
-          attachment.`type`,
-          attachment.content,
-          attachment.transferEncoding,
-        ),
+    val attachmentsForm = attachments.map(attachment =>
+      attachmentForm(
+        attachment.name,
+        attachment.`type`,
+        attachment.content,
+        attachment.transferEncoding,
+      ),
     )
 
     val multipartForm = Multipart.FormData(
@@ -258,8 +251,7 @@ class MailgunClient(
     attachments: List[Attachment],
     tags: List[String],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionCon: scala.concurrent.ExecutionContext,
   ): Future[RequestEntity] = {
     import mailo.MailRefinedContent._
@@ -269,14 +261,13 @@ class MailgunClient(
       case TEXTContent(text) => Multipart.FormData.BodyPart.Strict("text", text)
     }
 
-    val attachmentsForm = attachments.map(
-      attachment =>
-        attachmentForm(
-          attachment.name,
-          attachment.`type`,
-          attachment.content,
-          attachment.transferEncoding,
-        ),
+    val attachmentsForm = attachments.map(attachment =>
+      attachmentForm(
+        attachment.name,
+        attachment.`type`,
+        attachment.content,
+        attachment.transferEncoding,
+      ),
     )
 
     val multipartForm = Multipart.FormData(
@@ -306,8 +297,7 @@ class MailgunClient(
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionCon: scala.concurrent.ExecutionContext,
   ): Future[RequestEntity] = {
     import mailo.MailRefinedContent._
@@ -322,16 +312,17 @@ class MailgunClient(
       HttpEntity(ContentTypes.`application/json`, ByteString(recipientVariables.asJson.noSpaces))
     val recipientVariablesForm =
       Multipart.FormData.BodyPart.Strict("recipient-variables", recipientVariablesEntity)
-    val tos = recipientVariables.map { case (to, _) => Multipart.FormData.BodyPart.Strict("to", to) }
+    val tos = recipientVariables.map { case (to, _) =>
+      Multipart.FormData.BodyPart.Strict("to", to)
+    }
 
-    val attachmentsForm = attachments.map(
-      attachment =>
-        attachmentForm(
-          attachment.name,
-          attachment.`type`,
-          attachment.content,
-          attachment.transferEncoding,
-        ),
+    val attachmentsForm = attachments.map(attachment =>
+      attachmentForm(
+        attachment.name,
+        attachment.`type`,
+        attachment.content,
+        attachment.transferEncoding,
+      ),
     )
 
     val multipartForm = Multipart.FormData(

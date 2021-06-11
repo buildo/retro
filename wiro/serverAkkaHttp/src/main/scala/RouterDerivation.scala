@@ -11,7 +11,8 @@ import io.circe.Printer
 
 trait RouterDerivationModule extends PathMacro with MetaDataMacro with TypePathMacro {
   def deriveRouter[A](a: A): Router = macro RouterDerivationMacro.deriveRouterImpl[A]
-  def deriveRouter[A](a: A, printer: Printer): Router = macro RouterDerivationMacro.deriveRouterImplPrinter[A]
+  def deriveRouter[A](a: A, printer: Printer): Router =
+    macro RouterDerivationMacro.deriveRouterImplPrinter[A]
 }
 
 object RouterDerivationMacro extends RouterDerivationModule {
@@ -21,11 +22,10 @@ object RouterDerivationMacro extends RouterDerivationModule {
     //Since universe is public Tree type can be returned
     def derivePath(c: Context)(tpe: c.Type): c.Tree = {
       import c.universe._
-      tpe.typeSymbol.annotations
-        .collectFirst {
-          case pathAnnotation if pathAnnotation.tree.tpe <:< weakTypeOf[path] =>
-            q"override val path = derivePath[$tpe]"
-        }
+      tpe.typeSymbol.annotations.collectFirst {
+        case pathAnnotation if pathAnnotation.tree.tpe <:< weakTypeOf[path] =>
+          q"override val path = derivePath[$tpe]"
+      }
         .getOrElse(EmptyTree)
     }
   }
@@ -45,8 +45,7 @@ object RouterDerivationMacro extends RouterDerivationModule {
     """
   }
 
-  def deriveRouterImplPrinter[A: c.WeakTypeTag](
-      c: Context)(a: c.Tree, printer: c.Tree): c.Tree = {
+  def deriveRouterImplPrinter[A: c.WeakTypeTag](c: Context)(a: c.Tree, printer: c.Tree): c.Tree = {
     import c.universe._
     val tpe = weakTypeOf[A]
     val derivePath = MacroHelper.derivePath(c)(tpe)

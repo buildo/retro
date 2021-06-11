@@ -21,8 +21,8 @@ object TapirMeta {
     body: List[Defn.Val],
     postInputClassDeclarations: List[Defn.Class],
     postInputCodecDeclarations: List[Defn.Val],
-  ) =>{
-   val authTokenTypeParam: Type.Param =
+  ) => {
+    val authTokenTypeParam: Type.Param =
       Type.Param(List(), authTokenName, List(), Type.Bounds(None, None), List(), List())
     q"""
     package ${`package`} {
@@ -120,7 +120,8 @@ object TapirMeta {
       ),
     )
 
-  private[this] val withParams = (endpoint: meta.Term, route: TapiroRoute, authTokenName: String) => {
+  private[this] val withParams = (endpoint: meta.Term, route: TapiroRoute, authTokenName: String) =>
+    {
       val (auth, params) = route.route.params.partition(_.tpe == MetarpheusType.Name(authTokenName))
       val endpointWithParams = route.method match {
         case RouteMethod.GET =>
@@ -196,8 +197,8 @@ object TapirMeta {
   private[this] val withParam = (endpoint: meta.Term, param: RouteParam) => {
     val paramType = routeParamToScalametaType(param)
     val arraySuffix = paramType match {
-        case Type.Apply(Type.Name("List"),_) => "[]"
-        case _ => ""
+      case Type.Apply(Type.Name("List"), _) => "[]"
+      case _                                => ""
     }
     val noDesc =
       Term.Apply(

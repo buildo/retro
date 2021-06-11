@@ -114,13 +114,14 @@ object IndexedEnumMacro {
     import c.universe._
 
     def modifiedClass(classDecl: ClassDef) = {
-      val (enumName, body) = try {
-        val q"trait $enumName { ..$body }" = classDecl
-        (enumName, body)
-      } catch {
-        case _: MatchError =>
-          c.abort(c.enclosingPosition, "Annotation is only supported on objects")
-      }
+      val (enumName, body) =
+        try {
+          val q"trait $enumName { ..$body }" = classDecl
+          (enumName, body)
+        } catch {
+          case _: MatchError =>
+            c.abort(c.enclosingPosition, "Annotation is only supported on objects")
+        }
       val typeAliasTree :: memberTrees = body
       val members = memberTrees.map {
         case Apply(Ident(memberName: TermName), List(expression)) =>
@@ -136,7 +137,7 @@ object IndexedEnumMacro {
       }
       val indexType = typeAliasTree match {
         case q"type Index = $ttype" => ttype
-        case _                      => c.abort(c.enclosingPosition, "Invalid type alias declaration")
+        case _ => c.abort(c.enclosingPosition, "Invalid type alias declaration")
       }
       c.Expr(q"""
         sealed abstract trait $enumName extends _root_.io.buildo.enumero.IndexedCaseEnum {

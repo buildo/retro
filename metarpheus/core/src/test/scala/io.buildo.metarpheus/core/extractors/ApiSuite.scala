@@ -29,22 +29,22 @@ class ApiSuite extends munit.FunSuite {
 
     assert(api.models.collectFirst {
       case TaggedUnion(
-          "CreateCampingError",
-          _,
-          _,
-          _,
+            "CreateCampingError",
+            _,
+            _,
+            _,
           ) =>
         ()
     }.isDefined)
 
     assert(api.models.collectFirst {
       case CaseClass(
-          "IgnoreMe",
-          _,
-          _,
-          _,
-          _,
-          _,
+            "IgnoreMe",
+            _,
+            _,
+            _,
+            _,
+            _,
           ) =>
         ()
     }.isEmpty)
@@ -58,22 +58,22 @@ class ApiSuite extends munit.FunSuite {
 
     assert(api.models.collectFirst {
       case TaggedUnion(
-          "CreateCampingError",
-          _,
-          _,
-          _,
+            "CreateCampingError",
+            _,
+            _,
+            _,
           ) =>
         ()
     }.isEmpty)
 
     assert(api.models.collectFirst {
       case CaseClass(
-          "Camping",
-          _,
-          _,
-          _,
-          _,
-          _,
+            "Camping",
+            _,
+            _,
+            _,
+            _,
+            _,
           ) =>
         ()
     }.isDefined)

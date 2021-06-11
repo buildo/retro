@@ -1,10 +1,10 @@
 package wiro
 
-import akka.http.scaladsl.model.{ HttpResponse, StatusCodes }
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 
 import io.circe.generic.auto._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 import wiro.annotation._
 import wiro.server.akkaHttp._
@@ -22,28 +22,28 @@ object TestController extends RouterDerivationModule {
   implicit def genericErrorToResponse = new ToHttpResponse[GenericError] {
     def response(error: GenericError) = HttpResponse(
       status = StatusCodes.InternalServerError,
-      entity = "Very Bad"
+      entity = "Very Bad",
     )
   }
 
   implicit def unauthorizedToResponse = new ToHttpResponse[Unauthorized] {
     def response(error: Unauthorized) = HttpResponse(
       status = StatusCodes.Unauthorized,
-      entity = "Very Bad"
+      entity = "Very Bad",
     )
   }
 
   implicit def conflictToResponse = new ToHttpResponse[Conflict] {
     def response(error: Conflict) = HttpResponse(
       status = StatusCodes.Conflict,
-      entity = s"User already exists: ${error.userId}"
+      entity = s"User already exists: ${error.userId}",
     )
   }
 
   implicit def notFoundToResponse = new ToHttpResponse[UserNotFound] {
     def response(error: UserNotFound) = HttpResponse(
       status = StatusCodes.NotFound,
-      entity = s"User not found: ${error.userId}"
+      entity = s"User not found: ${error.userId}",
     )
   }
 
@@ -54,7 +54,9 @@ object TestController extends RouterDerivationModule {
     def nobodyCannaCrossIt(token: Auth): Future[Either[Unauthorized, Ok]]
 
     @query
-    def inLoveWithMyHeaders(parameters: OperationParameters): Future[Either[GenericError, OperationParameters]]
+    def inLoveWithMyHeaders(
+      parameters: OperationParameters,
+    ): Future[Either[GenericError, OperationParameters]]
 
     @command
     def update(id: Int, user: User): Future[Either[UserNotFound, Ok]]
@@ -79,7 +81,7 @@ object TestController extends RouterDerivationModule {
   }
 
   private[this] class UserControllerImpl(implicit
-    ec: ExecutionContext
+    ec: ExecutionContext,
   ) extends UserController {
     def nobodyCannaCrossIt(token: Auth): Future[Either[Unauthorized, Ok]] = Future {
       if (token == Auth("bus")) Right(Ok("di bus can swim"))
@@ -117,7 +119,9 @@ object TestController extends RouterDerivationModule {
       Right(1)
     }
 
-    def inLoveWithMyHeaders(parameters: OperationParameters): Future[Either[GenericError, OperationParameters]] = Future {
+    def inLoveWithMyHeaders(
+      parameters: OperationParameters,
+    ): Future[Either[GenericError, OperationParameters]] = Future {
       Right(parameters)
     }
   }
