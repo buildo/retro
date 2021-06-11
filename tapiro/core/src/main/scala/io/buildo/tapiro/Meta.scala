@@ -22,10 +22,15 @@ object Meta {
           case RouteMethod.GET =>
             nonAuthParamTypes.map(metarpheusTypeToScalametaType).map(toPlainCodec)
           case RouteMethod.POST =>
-            nonAuthParamTypes.map(metarpheusTypeToScalametaType).flatMap(t => List(toDecoder(t), toEncoder(t)))
+            nonAuthParamTypes
+              .map(metarpheusTypeToScalametaType)
+              .flatMap(t => List(toDecoder(t), toEncoder(t)))
         }
       val outputImplicits =
-        List(route.route.returns).filter(notUnit).map(metarpheusTypeToScalametaType).map(toJsonCodec)
+        List(route.route.returns)
+          .filter(notUnit)
+          .map(metarpheusTypeToScalametaType)
+          .map(toJsonCodec)
       val errorImplicits =
         route.error match {
           case RouteError.TaggedUnionError(tu) =>
@@ -39,9 +44,9 @@ object Meta {
     deduplicate(routes.flatMap(routeRequiredImplicits)).zipWithIndex.map(toImplicitParam.tupled)
   }
 
-  private[this] def extractListType(t: Type) : Type = t match {
-    case Type.Apply(Type.Name("List"),args) => args.head
-    case _ => t
+  private[this] def extractListType(t: Type): Type = t match {
+    case Type.Apply(Type.Name("List"), args) => args.head
+    case _                                   => t
   }
 
   private[this] val deduplicate: List[Type] => List[Type] = (ts: List[Type]) =>
@@ -50,7 +55,8 @@ object Meta {
       case head :: tail => head :: deduplicate(tail.filter(!_.isEqual(head)))
     }
 
-  private[this] val isAuthToken = (t: MetarpheusType, authTokenName: String) => t == MetarpheusType.Name(authTokenName)
+  private[this] val isAuthToken = (t: MetarpheusType, authTokenName: String) =>
+    t == MetarpheusType.Name(authTokenName)
 
   private[this] val toImplicitParam = (paramType: Type, index: Int) => {
     val paramName = Term.Name(s"codec$index")
@@ -77,7 +83,7 @@ object Meta {
 
   val metarpheusTypeToScalametaType: MetarpheusType => Type = {
     case MetarpheusType.Apply(name, args) =>
-      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList) 
+      Type.Apply(Type.Name(name), args.map(metarpheusTypeToScalametaType).toList)
     case MetarpheusType.Name(name) => Type.Name(name)
   }
 

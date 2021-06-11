@@ -17,8 +17,7 @@ object Mailo {
     mailData: MailData,
     mailClient: MailClient,
     deliverySemantic: DeliveryGuarantee = DeliveryGuarantee.AtMostOnce,
-  )(
-    implicit
+  )(implicit
     ec: ExecutionContext,
     conf: Config = ConfigFactory.load(),
     system: ActorSystem = ActorSystem("mailo"),

@@ -21,7 +21,7 @@ class SendinblueSpec extends munit.FunSuite {
       .map { value =>
         assertEquals(value.map(_.message), Right("Email sent successfully."))
       }
-    }
+  }
 
   test("email with replyTo should be correctly sent") {
     mailer
@@ -49,13 +49,12 @@ class SendinblueSpec extends munit.FunSuite {
         subject = "Test mail",
         templateName = "mail.html",
         params = Map("ciao" -> "CIAOOOONE"),
-        tags = List("test")
+        tags = List("test"),
       )
       .map { value =>
         assertEquals(value.map(_.message), Right("Email sent successfully."))
       }
   }
-
 
   test("email should not be sent if FROM is malformed") {
     mailer

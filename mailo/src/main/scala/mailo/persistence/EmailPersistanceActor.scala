@@ -41,36 +41,34 @@ class EmailPersistanceActor(
 
   def send(email: Mail) = emailSender.send(email)
 
-  val receiveRecover: Receive = {
-    case e @ EmailEvent(json) =>
-      decode[Mail](json) match {
-        case Right(email) =>
-          send(email)
-          ()
-        case Left(error) => deadLettersHandler ! EmailApplicativeErrorEvent(e, error.getMessage)
-      }
+  val receiveRecover: Receive = { case e @ EmailEvent(json) =>
+    decode[Mail](json) match {
+      case Right(email) =>
+        send(email)
+        ()
+      case Left(error) => deadLettersHandler ! EmailApplicativeErrorEvent(e, error.getMessage)
+    }
   }
 
-  val receiveCommand: Receive = {
-    case command @ SendEmail(email) =>
-      log.info("received command {}", command.toString)
-      persist(EmailEvent(email.asJson.noSpaces)) { event =>
-        sender() ! mailo.Queued
-        send(email).onComplete {
-          case Success(result) =>
-            result match {
-              case Right(_) =>
-                ()
-                eventStream.publish(event)
-              case Left(error) =>
-                deadLettersHandler ! EmailApplicativeErrorEvent(event, error.getMessage)
-            }
-            deleteMessages(lastSequenceNr)
-          case Failure(reason) =>
-            deadLettersHandler ! EmailCommunicationErrorEvent(command, reason.getMessage)
-            deleteMessages(lastSequenceNr)
-        }
+  val receiveCommand: Receive = { case command @ SendEmail(email) =>
+    log.info("received command {}", command.toString)
+    persist(EmailEvent(email.asJson.noSpaces)) { event =>
+      sender() ! mailo.Queued
+      send(email).onComplete {
+        case Success(result) =>
+          result match {
+            case Right(_) =>
+              ()
+              eventStream.publish(event)
+            case Left(error) =>
+              deadLettersHandler ! EmailApplicativeErrorEvent(event, error.getMessage)
+          }
+          deleteMessages(lastSequenceNr)
+        case Failure(reason) =>
+          deadLettersHandler ! EmailCommunicationErrorEvent(command, reason.getMessage)
+          deleteMessages(lastSequenceNr)
       }
+    }
   }
 
   val logSnapshotResult: Receive = SnapshotHelper.logSnapshotResult

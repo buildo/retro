@@ -171,7 +171,10 @@ class WiroSpec extends munit.FunSuite with MUnitRouteTest {
   }
 
   test("A GET request when it's authenticated should not block user having proper token") {
-    Get("/user/nobodyCannaCrossIt") ~> addHeader("Authorization", "Token token=bus") ~> userRouter.buildRoute ~> check {
+    Get("/user/nobodyCannaCrossIt") ~> addHeader(
+      "Authorization",
+      "Token token=bus",
+    ) ~> userRouter.buildRoute ~> check {
       assertEquals(status, OK)
       assertEquals(responseAs[Ok], Ok("di bus can swim"))
     }
@@ -180,7 +183,10 @@ class WiroSpec extends munit.FunSuite with MUnitRouteTest {
   test("A GET request when it has headers should allow the user to read them") {
     val headerName = "header"
     val headerContent = "content"
-    Get("/user/inLoveWithMyHeaders") ~> addHeader(headerName, headerContent) ~> userRouter.buildRoute ~> check {
+    Get("/user/inLoveWithMyHeaders") ~> addHeader(
+      headerName,
+      headerContent,
+    ) ~> userRouter.buildRoute ~> check {
       assertEquals(status, OK)
       assert(
         clue(responseAs[OperationParameters].parameters).exists(_ == headerName -> headerContent),

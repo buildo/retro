@@ -77,8 +77,7 @@ trait CampingController {
   ): F[E[Exception, String]]
 }
 
-class CampingControllerImpl(
-  implicit
+class CampingControllerImpl(implicit
   executionContext: ExecutionContext,
 ) extends CampingController {
 

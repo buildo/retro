@@ -247,8 +247,8 @@ class TapiroSuite extends munit.FunSuite {
     layout: String,
     expectedLayout: String,
     `package`: List[String] = List("endpoints"),
-  )(
-    implicit loc: munit.Location,
+  )(implicit
+    loc: munit.Location,
   ): Unit =
     test(name) {
       val projectRoot = FileLayout.fromString(layout)
@@ -261,10 +261,9 @@ class TapiroSuite extends munit.FunSuite {
         server,
       )
 
-      FileLayout.mapFromString(expectedLayout).map {
-        case (path, content) =>
-          val filePath = path.split("/").foldLeft(projectRoot)(_.resolve(_))
-          assertNoDiff(new String(Files.readAllBytes(filePath.toNIO)), content)
+      FileLayout.mapFromString(expectedLayout).map { case (path, content) =>
+        val filePath = path.split("/").foldLeft(projectRoot)(_.resolve(_))
+        assertNoDiff(new String(Files.readAllBytes(filePath.toNIO)), content)
       }
 
     }

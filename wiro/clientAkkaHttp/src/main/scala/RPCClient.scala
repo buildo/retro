@@ -25,8 +25,7 @@ class RPCClient(
   prefix: Option[String] = None,
   scheme: String = "http",
   ctx: RPCClientContext[_],
-)(
-  implicit
+)(implicit
   system: ActorSystem,
   executionContext: ExecutionContext,
 ) extends autowire.Client[Json, WiroDecoder, Encoder] {
