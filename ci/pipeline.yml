@@ -33,6 +33,15 @@ resources:
       tag_filter: "*"
 
   - type: pull-request
+    name: pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+
+  - type: pull-request
     name: sbt-buildo-pr
     icon: source-pull
     webhook_token: 0gd4XZNL4Y94zYDLql3C
@@ -303,6 +312,16 @@ jobs:
     on_failure:
       <<: *slack_failure
 
+  - name: scalafmt
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: scalafmt
+        file: retro/ci/scalafmt.yml
+    on_failure:
+      <<: *slack_failure
+
   - name: sbt-buildo-pr
     plan:
       - get: retro
@@ -554,6 +573,32 @@ jobs:
         path: retro
         status: success
         context: docs
+
+  - name: scalafmt-pr
+    plan:
+      - get: retro
+        resource: pr
+        trigger: true
+        version: every
+      - put: pr
+        params:
+          path: retro
+          status: pending
+          context: scalafmt
+      - task: scalafmt
+        file: retro/ci/scalafmt.yml
+    on_failure:
+      put: pr
+      params:
+        path: retro
+        status: failure
+        context: scalafmt
+    on_success:
+      put: pr
+      params:
+        path: retro
+        status: success
+        context: scalafmt
 
   - name: release
     plan:
