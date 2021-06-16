@@ -2,7 +2,7 @@ package wiro.apps
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{ HttpResponse, StatusCodes, ContentType, HttpEntity, MediaTypes }
+import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 
 import io.circe.Json
 import io.circe.generic.auto._
@@ -10,11 +10,11 @@ import io.circe.generic.auto._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-import wiro.{ Config, Auth, OperationParameters }
+import wiro.{Auth, Config, OperationParameters}
 import wiro.server.akkaHttp._
-import wiro.server.akkaHttp.{ FailSupport => ServerFailSupport }
+import wiro.server.akkaHttp.{FailSupport => ServerFailSupport}
 import wiro.client.akkaHttp._
-import wiro.client.akkaHttp.{ FailSupport => ClientFailSupport }
+import wiro.client.akkaHttp.{FailSupport => ClientFailSupport}
 
 object controllers {
   import models._
@@ -30,18 +30,18 @@ object controllers {
     def getPuppy(
       token: Auth,
       wa: Int,
-      parameters: OperationParameters
+      parameters: OperationParameters,
     ): Future[Either[Nope, Dog]]
 
     @query(name = Some("pallino"))
     def getPallino(
-      something: String
+      something: String,
     ): Future[Either[Nope, Dog]]
   }
 
   class DoghouseApiImpl() extends DoghouseApi {
     override def getPallino(
-      something: String
+      something: String,
     ): Future[Either[Nope, Dog]] = Future {
       Right(Dog("pallino"))
     }
@@ -49,7 +49,7 @@ object controllers {
     override def getPuppy(
       token: Auth,
       wa: Int,
-      parameters: OperationParameters
+      parameters: OperationParameters,
     ): Future[Either[Nope, Dog]] = Future {
       if (token == Auth("tokenone")) Right(Dog("pallino"))
       else Left(Nope("nope"))
@@ -65,7 +65,7 @@ object errors {
   implicit def nopeToResponse = new ToHttpResponse[Nope] {
     def response(error: Nope) = HttpResponse(
       status = StatusCodes.UnprocessableEntity,
-      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces)
+      entity = HttpEntity(ContentType(MediaTypes.`application/json`), error.asJson.noSpaces),
     )
   }
 }
@@ -83,9 +83,11 @@ object Client extends App with ClientDerivationModule {
   val doghouseClient = deriveClientContext[DoghouseApi]
   val rpcClient = new RPCClient(config, ctx = doghouseClient)
 
-  val res = rpcClient[DoghouseApi].getPuppy(Auth("tokenone"), 1, OperationParameters(parameters = Map())).call()
+  val res = rpcClient[DoghouseApi]
+    .getPuppy(Auth("tokenone"), 1, OperationParameters(parameters = Map()))
+    .call()
 
-  res map (println(_)) recover { case e: Exception => e.printStackTrace }
+  res.map(println(_)).recover { case e: Exception => e.printStackTrace }
 }
 
 object Server extends App with RouterDerivationModule {
@@ -101,7 +103,7 @@ object Server extends App with RouterDerivationModule {
 
   val rpcServer = new HttpRPCServer(
     config = Config("localhost", 8080),
-    routers = List(doghouseRouter)
+    routers = List(doghouseRouter),
   )
 }
 

@@ -3,15 +3,14 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: buildo/scala-sbt-alpine
-    tag: 8_2.13.5_1.5.4
+    repository: openjdk
+    tag: 8-jre-alpine
 
 inputs:
   - name: retro
 
 run:
   dir: retro
-  path: sbt
+  path: ./scalafmt
   args:
-    - -batch
-    - +mailo/test
+    - --test

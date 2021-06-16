@@ -33,6 +33,15 @@ resources:
       tag_filter: "*"
 
   - type: pull-request
+    name: pr
+    icon: source-pull
+    webhook_token: 0gd4XZNL4Y94zYDLql3C
+    check_every: 30m
+    source:
+      repository: buildo/retro
+      access_token: ((github-token))
+
+  - type: pull-request
     name: sbt-buildo-pr
     icon: source-pull
     webhook_token: 0gd4XZNL4Y94zYDLql3C
@@ -170,14 +179,14 @@ resources:
     icon: docker
     source:
       repository: buildo/scala-sbt-alpine
-      tag: 8_2.13.5_1.5.3
+      tag: 8_2.13.5_1.5.4
 
   - name: hseeberger-scala-sbt
     type: docker-image
     icon: docker
     source:
       repository: hseeberger/scala-sbt
-      tag: 8u282_1.5.3_2.13.5
+      tag: 8u282_1.5.4_2.13.5
 
   - name: slack-buildo
     type: slack-notification
@@ -300,6 +309,16 @@ jobs:
       - task: build-docs
         image: hseeberger-scala-sbt
         file: retro/ci/docs.yml
+    on_failure:
+      <<: *slack_failure
+
+  - name: scalafmt
+    plan:
+      - get: retro
+        resource: master
+        trigger: true
+      - task: scalafmt
+        file: retro/ci/scalafmt.yml
     on_failure:
       <<: *slack_failure
 
@@ -554,6 +573,32 @@ jobs:
         path: retro
         status: success
         context: docs
+
+  - name: scalafmt-pr
+    plan:
+      - get: retro
+        resource: pr
+        trigger: true
+        version: every
+      - put: pr
+        params:
+          path: retro
+          status: pending
+          context: scalafmt
+      - task: scalafmt
+        file: retro/ci/scalafmt.yml
+    on_failure:
+      put: pr
+      params:
+        path: retro
+        status: failure
+        context: scalafmt
+    on_success:
+      put: pr
+      params:
+        path: retro
+        status: success
+        context: scalafmt
 
   - name: release
     plan:

@@ -5,7 +5,8 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
 trait ClientDerivationModule extends TypePathMacro {
-  def deriveClientContext[A]: RPCClientContext[A] = macro ClientDerivationMacro.deriveClientContextImpl[A]
+  def deriveClientContext[A]: RPCClientContext[A] =
+    macro ClientDerivationMacro.deriveClientContextImpl[A]
 }
 
 object ClientDerivationMacro extends ClientDerivationModule {

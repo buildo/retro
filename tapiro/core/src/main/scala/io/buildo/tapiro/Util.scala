@@ -77,69 +77,66 @@ class Util() {
         val routes: List[TapiroRoute] =
           routesWithAuthParams.map(toTapiroRoute(models))
         val controllersRoutes =
-          routes.groupBy(
-            route => (route.route.controllerType, route.route.pathName),
-          )
+          routes.groupBy(route => (route.route.controllerType, route.route.pathName))
         val modelsPackages = models.map {
           case c: CaseClass   => c.`package`
           case c: CaseEnum    => c.`package`
           case t: TaggedUnion => t.`package`
-        }.collect {
-          case head :: tail => NonEmptyList(head, tail)
+        }.collect { case head :: tail =>
+          NonEmptyList(head, tail)
         }
-        controllersRoutes.foreach {
-          case ((controllerType, pathName), routes) =>
-            val controllerName = typeNameString(controllerType)
-            val authTypeString = Meta.authTypeString(controllerType).getOrElse("AuthToken")
-            val pathNameOrController = pathName.getOrElse(controllerName)
-            val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
-            val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
-            val tapirEndpoints =
-              createTapirEndpoints(
-                tapirEndpointsName,
-                authTypeString,
-                routes,
-                nonEmptyPackage,
-                modelsPackages,
-              )
-            writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
+        controllersRoutes.foreach { case ((controllerType, pathName), routes) =>
+          val controllerName = typeNameString(controllerType)
+          val authTypeString = Meta.authTypeString(controllerType).getOrElse("AuthToken")
+          val pathNameOrController = pathName.getOrElse(controllerName)
+          val tapirEndpointsName = s"${pathNameOrController}TapirEndpoints".capitalize
+          val httpEndpointsName = s"${pathNameOrController}HttpEndpoints".capitalize
+          val tapirEndpoints =
+            createTapirEndpoints(
+              tapirEndpointsName,
+              authTypeString,
+              routes,
+              nonEmptyPackage,
+              modelsPackages,
+            )
+          writeToFile(outputPath, tapirEndpoints, tapirEndpointsName)
 
-            val routesPackages = routes
-              .map(_.route.controllerPackage)
-              .collect {
-                case head :: tail => NonEmptyList(head, tail)
-              }
-            server match {
-              case Server.Http4s =>
-                val http4sEndpoints =
-                  createHttp4sEndpoints(
-                    nonEmptyPackage,
-                    pathNameOrController,
-                    controllerName,
-                    tapirEndpointsName,
-                    authTypeString,
-                    httpEndpointsName,
-                    modelsPackages ++ routesPackages,
-                    routes,
-                  )
-                http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
-              case Server.AkkaHttp =>
-                val akkaHttpEndpoints =
-                  createAkkaHttpEndpoints(
-                    nonEmptyPackage,
-                    pathNameOrController,
-                    controllerName,
-                    tapirEndpointsName,
-                    authTypeString,
-                    httpEndpointsName,
-                    modelsPackages ++ routesPackages,
-                    routes,
-                  )
-                akkaHttpEndpoints.foreach(
-                  writeToFile(outputPath, _, httpEndpointsName),
-                )
-              case Server.NoServer => ()
+          val routesPackages = routes
+            .map(_.route.controllerPackage)
+            .collect { case head :: tail =>
+              NonEmptyList(head, tail)
             }
+          server match {
+            case Server.Http4s =>
+              val http4sEndpoints =
+                createHttp4sEndpoints(
+                  nonEmptyPackage,
+                  pathNameOrController,
+                  controllerName,
+                  tapirEndpointsName,
+                  authTypeString,
+                  httpEndpointsName,
+                  modelsPackages ++ routesPackages,
+                  routes,
+                )
+              http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
+            case Server.AkkaHttp =>
+              val akkaHttpEndpoints =
+                createAkkaHttpEndpoints(
+                  nonEmptyPackage,
+                  pathNameOrController,
+                  controllerName,
+                  tapirEndpointsName,
+                  authTypeString,
+                  httpEndpointsName,
+                  modelsPackages ++ routesPackages,
+                  routes,
+                )
+              akkaHttpEndpoints.foreach(
+                writeToFile(outputPath, _, httpEndpointsName),
+              )
+            case Server.NoServer => ()
+          }
         }
       case None => logger.error("please provide a package to tapiro")
     }
@@ -190,7 +187,10 @@ class Util() {
               Type.Name(authTokenName),
               Term.Name(httpEndpointsName),
               Meta
-                .codecsImplicits(tapiroRoutes, authTokenName) :+ param"implicit cs: ContextShift[F]",
+                .codecsImplicits(
+                  tapiroRoutes,
+                  authTokenName,
+                ) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(tapiroRoutes, authTokenName),
               Http4sMeta.routes(Lit.String(pathName), head, tail),
             ),

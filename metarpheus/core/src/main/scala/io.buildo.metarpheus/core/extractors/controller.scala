@@ -71,9 +71,8 @@ package object controller {
     }
 
   private[this] def extractErrorType(m: Decl.Def): Option[intermediate.Type] =
-    m.decltpe.collect {
-      case Type.Apply(Type.Name(_), Seq(Type.Apply(Type.Name(_), Seq(tpe, _)))) =>
-        tpeToIntermediate(tpe)
+    m.decltpe.collect { case Type.Apply(Type.Name(_), Seq(Type.Apply(Type.Name(_), Seq(tpe, _)))) =>
+      tpeToIntermediate(tpe)
     }.headOption
 
   private[this] def extractTraitType(t: Defn.Trait): intermediate.Type =

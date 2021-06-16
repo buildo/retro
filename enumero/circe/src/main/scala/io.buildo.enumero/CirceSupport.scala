@@ -20,30 +20,30 @@ trait CirceSupport {
         .getOrElse(Left(deserializationError(str, s.name)))
     }
 
-  implicit final def decodeKeyCaseEnum[E <: CaseEnum](
-    implicit s: CaseEnumSerialization[E]
+  implicit final def decodeKeyCaseEnum[E <: CaseEnum](implicit
+    s: CaseEnumSerialization[E],
   ): KeyDecoder[E] =
     KeyDecoder.instance[E](s.caseFromString)
 
-  implicit final def encodeKeyCaseEnum[E <: CaseEnum](
-    implicit s: CaseEnumSerialization[E]
+  implicit final def encodeKeyCaseEnum[E <: CaseEnum](implicit
+    s: CaseEnumSerialization[E],
   ): KeyEncoder[E] =
     KeyEncoder.instance[E](s.caseToString)
 
-  implicit def encodeIndexedCaseEnum[E <: IndexedCaseEnum](
-    implicit c: CaseEnumIndex[E],
-    e: Encoder[E#Index]
+  implicit def encodeIndexedCaseEnum[E <: IndexedCaseEnum](implicit
+    c: CaseEnumIndex[E],
+    e: Encoder[E#Index],
   ): Encoder[E] = e.contramap(c.caseToIndex)
 
-  implicit def decodeIndexedCaseEnum[E <: IndexedCaseEnum](
-    implicit c: CaseEnumIndex[E],
+  implicit def decodeIndexedCaseEnum[E <: IndexedCaseEnum](implicit
+    c: CaseEnumIndex[E],
     s: CaseEnumSerialization[E],
-    d: Decoder[E#Index]
+    d: Decoder[E#Index],
   ): Decoder[E] = d.emap { index =>
     c.caseFromIndex(index)
       .map(Right(_))
       .getOrElse(
-        Left(deserializationErrorForIndex(index.toString, s.name))
+        Left(deserializationErrorForIndex(index.toString, s.name)),
       )
   }
 }

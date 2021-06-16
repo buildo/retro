@@ -29,8 +29,8 @@ final class InMemoryAuthenticationDomain[F[_]: Applicative, C] private (
       .widen
 
   override def unregister(s: Subject): F[Either[AuthenticationError, AuthenticationDomain[F, C]]] =
-    new InMemoryAuthenticationDomain(credentials.filterNot {
-      case (_, v) => v == s
+    new InMemoryAuthenticationDomain(credentials.filterNot { case (_, v) =>
+      v == s
     }).asRight[AuthenticationError]
       .pure[F]
       .widen

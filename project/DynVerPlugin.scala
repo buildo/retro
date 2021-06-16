@@ -241,12 +241,11 @@ sealed case class DynVer(prefix: String, wd: Option[File], separator: String) {
       .map(_.replaceAll("-([0-9]+)-g([0-9a-f]{8})", "+$1-$2"))
       .map(GitDescribeOutput.parse)
       .filter(_.prefix.value == prefix)
-      .flatMap(
-        output =>
-          if (output.hasNoTags)
-            getDistanceToFirstCommit()
-              .map(dist => output.copy(commitSuffix = output.commitSuffix.copy(distance = dist)))
-          else Some(output),
+      .flatMap(output =>
+        if (output.hasNoTags)
+          getDistanceToFirstCommit()
+            .map(dist => output.copy(commitSuffix = output.commitSuffix.copy(distance = dist)))
+        else Some(output),
       )
   }
 

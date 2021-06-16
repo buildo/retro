@@ -20,8 +20,8 @@ class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[*[_], Futu
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,
-)(
-  implicit F: Sync[F],
+)(implicit
+  F: Sync[F],
 ) extends AccessTokenDomain[F] {
 
   class AccessTokenTable(tag: Tag)

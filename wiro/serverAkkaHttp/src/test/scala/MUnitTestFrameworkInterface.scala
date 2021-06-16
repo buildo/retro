@@ -10,7 +10,7 @@ trait MUnitTestFrameworkInterface extends TestFrameworkInterface { self: munit.F
 
   override def failTest(msg: String): Nothing = fail(msg)
 
-  def testExceptionHandler: ExceptionHandler = ExceptionHandler {
-    case e => throw e
+  def testExceptionHandler: ExceptionHandler = ExceptionHandler { case e =>
+    throw e
   }
 }

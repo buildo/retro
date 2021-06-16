@@ -48,8 +48,7 @@ class MockedClient(val state: ConcurrentLinkedQueue[SimpleMail]) extends MailCli
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] = ???
 }
@@ -84,8 +83,7 @@ class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extend
     tags: List[String],
     recipientVariables: Map[String, Map[String, String]],
     headers: Map[String, String],
-  )(
-    implicit
+  )(implicit
     executionContext: ExecutionContext,
   ): Future[Either[MailError, MailResponse]] = ???
 }
@@ -95,9 +93,13 @@ class MockedData(implicit executionContext: ExecutionContext) extends MailData {
     Future(Right(MailRawContent("ciao", partials = Map("name" -> "claudio"))))
 }
 
-class PersistenceSpec extends {
-  val system: ActorSystem = ActorSystem("testSystem")
-} with munit.FunSuite with TestKitBase with ImplicitSender {
+class PersistenceSpec
+    extends {
+      val system: ActorSystem = ActorSystem("testSystem")
+    }
+    with munit.FunSuite
+    with TestKitBase
+    with ImplicitSender {
 
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
@@ -172,12 +174,11 @@ class PersistenceSpec extends {
     var failedEmails = 0
     println("start")
 
-    val task = system.scheduler.scheduleAtFixedRate(0.seconds, 1.milliseconds)(
-      () =>
-        ask(emailPersistanceActor, SendEmail(mail)).onComplete {
-          case scala.util.Success(_) => queuedEmails += 1
-          case scala.util.Failure(_) => failedEmails += 1
-        }(munitExecutionContext),
+    val task = system.scheduler.scheduleAtFixedRate(0.seconds, 1.milliseconds)(() =>
+      ask(emailPersistanceActor, SendEmail(mail)).onComplete {
+        case scala.util.Success(_) => queuedEmails += 1
+        case scala.util.Failure(_) => failedEmails += 1
+      }(munitExecutionContext),
     )(munitExecutionContext)
 
     Thread.sleep(5000)
