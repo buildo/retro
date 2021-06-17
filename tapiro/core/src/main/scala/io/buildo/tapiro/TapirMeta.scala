@@ -45,7 +45,7 @@ object TapirMeta {
       Nil,
     )}[$authTokenName] {
           ..${postInputCodecDeclarations}
-          ..${body.map(d => d.copy(mods = mod"override" :: d.mods))}
+          ..${body.map(d => d.copy(mods = mod"override" :: mod"lazy" :: d.mods))}
         }
 
         ..${postInputClassDeclarations}
