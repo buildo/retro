@@ -28,7 +28,7 @@ object Dependencies {
     val ldap = "6.0.0"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
-    val slf4j = "1.7.25"
+    val slf4j = "1.7.31"
     val scalameta = "4.4.21"
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
