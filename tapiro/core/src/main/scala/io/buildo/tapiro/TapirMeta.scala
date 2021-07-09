@@ -227,7 +227,7 @@ object TapirMeta {
         val params = route.route.params
           .filterNot(_.tpe == MetarpheusType.Name(authTokenName))
           .map { p =>
-            param"${Term.Name(p.name.getOrElse(typeNameString(p.tpe)))}: ${metarpheusTypeToScalametaType(p.tpe)}"
+            param"${Term.Name(p.name.getOrElse(typeNameString(p.tpe)))}: ${routeParamToScalametaType(p)}"
           }
         List(q"case class ${postInputType(route.route)}(..$params)")
       case RouteMethod.GET =>

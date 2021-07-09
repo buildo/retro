@@ -3,8 +3,8 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSCrossVersion
 
 val scala212 = "2.12.13"
-val scala213 = "2.13.6"
-val scala3 = "3.0.0"
+val scala213 = "2.13.5"
+val scala3 = "3.0.1"
 
 inThisBuild(
   List(
