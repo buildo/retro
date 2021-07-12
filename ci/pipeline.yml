@@ -616,6 +616,9 @@ jobs:
                 - metarpheus
                 - tapiro
                 - docs
+                - wiro
+                - scalafmt
+                - java-time-circe-codecs
             - get: tag
               trigger: true
             - get: hseeberger-scala-sbt
