@@ -179,14 +179,14 @@ resources:
     icon: docker
     source:
       repository: buildo/scala-sbt-alpine
-      tag: 8_2.13.5_1.5.4
+      tag: 8_2.13.6_1.5.4
 
   - name: hseeberger-scala-sbt
     type: docker-image
     icon: docker
     source:
       repository: hseeberger/scala-sbt
-      tag: 8u282_1.5.4_2.13.5
+      tag: 8u282_1.5.4_2.13.6
 
   - name: slack-buildo
     type: slack-notification

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   tests:
-    image: buildo/scala-sbt-alpine:8_2.13.5_1.5.4
+    image: buildo/scala-sbt-alpine:8_2.13.6_1.5.4
     container_name: tests
     environment:
       DB_USER: postgres
