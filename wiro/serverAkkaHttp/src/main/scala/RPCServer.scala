@@ -16,13 +16,12 @@ import pureconfig.generic.auto._
 import pureconfig.loadConfigOrThrow
 
 class HttpRPCServer(
-    config: Config,
-    routers: List[WiroRouter],
-    customRoute: Route = reject
-)(
-    implicit
-    system: ActorSystem,
-    materializer: ActorMaterializer
+  config: Config,
+  routers: List[WiroRouter],
+  customRoute: Route = reject,
+)(implicit
+  system: ActorSystem,
+  materializer: ActorMaterializer,
 ) {
   private[this] val referenceConfig = loadConfigOrThrow[ReferenceConfig]("wiro")
   private[this] val foldedRoutes = routers
@@ -38,12 +37,11 @@ class HttpRPCServer(
 }
 
 class HttpRPCServerActor(
-    config: Config,
-    route: Route
-)(
-    implicit
-    system: ActorSystem,
-    materializer: ActorMaterializer
+  config: Config,
+  route: Route,
+)(implicit
+  system: ActorSystem,
+  materializer: ActorMaterializer,
 ) extends Actor
     with LazyLogging {
   import system.dispatcher
@@ -59,9 +57,9 @@ class HttpRPCServerActor(
     .bindAndHandle(route, config.host, config.port)
     .pipeTo(self)
 
-  scala.sys.addShutdownHook({
+  scala.sys.addShutdownHook {
     logger.info("Wiro unbinding on exit")
     bindingFuture
       .flatMap(_.unbind())
-  })
+  }
 }

@@ -17,8 +17,7 @@ case class MailPersistenceError(override val message: String) extends MailError(
 class AtLeastOnceMailo(
   val data: MailData,
   val client: MailClient,
-)(
-  implicit
+)(implicit
   ec: ExecutionContext,
   conf: Config = ConfigFactory.load(),
   system: ActorSystem = ActorSystem("mailo"),

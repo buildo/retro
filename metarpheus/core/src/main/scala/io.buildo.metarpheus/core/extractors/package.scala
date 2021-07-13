@@ -136,8 +136,8 @@ package object extractors {
     }
 
   private[extractors] def extractPackage(source: scala.meta.Source): List[String] =
-    source.collect {
-      case pkg: scala.meta.Pkg => flattenPackage(pkg)
+    source.collect { case pkg: scala.meta.Pkg =>
+      flattenPackage(pkg)
     }.flatten match {
       case Nil => List("_root_")
       case x   => x

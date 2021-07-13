@@ -28,13 +28,12 @@ package object model {
     val (classDesc, tags) = extractDescAndTagsFromComment(comment)
     // FIXME fail if unmatched parameter descriptions are found
     val paramDescs = tags.collect { case p: ParamDesc => p }
-    val members = plist.map {
-      case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
-        intermediate.CaseClass.Member(
-          name = name,
-          tpe = tpeToIntermediate(tpe),
-          desc = paramDescs.find(_.name == name).flatMap(_.desc),
-        )
+    val members = plist.map { case Term.Param(_, Term.Name(name), Some(tpe: scala.meta.Type), _) =>
+      intermediate.CaseClass.Member(
+        name = name,
+        tpe = tpeToIntermediate(tpe),
+        desc = paramDescs.find(_.name == name).flatMap(_.desc),
+      )
     }.toList
     val typeParams = defn.tparams.map(typeParamToIntermediate).toList
     intermediate.CaseClass(

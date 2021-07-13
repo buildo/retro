@@ -63,7 +63,7 @@ object CatsHttp4sEndpoints {
 Here is how to run the server:
 
 ```scala mdoc
-import org.http4s.server.blaze._
+import org.http4s.blaze.server._
 import org.http4s.implicits._
 
 object Main extends IOApp {

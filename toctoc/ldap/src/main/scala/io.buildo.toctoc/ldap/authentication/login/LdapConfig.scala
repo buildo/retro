@@ -4,9 +4,9 @@ package authentication
 package login
 
 case class LdapConfig(
-  host: String, 
+  host: String,
   port: Int,
   loginType: LdapLoginType,
   domain: String,
-  distinguishedNameCommonName: String
+  distinguishedNameCommonName: String,
 )
