@@ -34,7 +34,7 @@ object Dependencies {
     val plantuml = "8059"
     val pprint = "0.6.6"
     val tapir = "0.18.1"
-    val munit = "0.7.27"
+    val munit = "0.7.28"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
