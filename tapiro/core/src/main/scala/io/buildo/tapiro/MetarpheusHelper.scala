@@ -1,6 +1,6 @@
 package io.buildo.tapiro
 
-import io.buildo.metarpheus.core.intermediate.{Type => MetarpheusType, Model, TaggedUnion, Route}
+import io.buildo.metarpheus.core.intermediate.{Model, Route, TaggedUnion, Type => MetarpheusType}
 
 object MetarpheusHelper {
   def toTapiroRoute(models: List[Model])(route: Route): TapiroRoute =

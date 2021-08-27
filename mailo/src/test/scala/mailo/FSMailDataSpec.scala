@@ -1,6 +1,6 @@
 package mailo
 
-import mailo.data.{FSMailData}
+import mailo.data.FSMailData
 import java.nio.file.Files
 import java.io.{File, PrintWriter}
 
