@@ -33,8 +33,8 @@ object Dependencies {
     val scalafmtCore = "2.0.0-RC5"
     val plantuml = "8059"
     val pprint = "0.6.6"
-    val tapir = "0.18.3"
-    val munit = "0.7.28"
+    val tapir = "0.18.1"
+    val munit = "0.7.29"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
