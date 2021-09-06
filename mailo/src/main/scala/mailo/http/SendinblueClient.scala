@@ -80,6 +80,8 @@ class SendinblueClient(implicit
       entity <- entity(
         from = from,
         to = to,
+        cc = cc,
+        bcc = bcc,
         replyTo = replyTo,
         subject = subject,
         content = content,
@@ -99,6 +101,8 @@ class SendinblueClient(implicit
   private[this] def entity(
     from: String,
     to: String,
+    cc: Option[String],
+    bcc: Option[String],
     replyTo: Option[String],
     subject: String,
     content: MailRefinedContent,
@@ -127,6 +131,16 @@ class SendinblueClient(implicit
 
     email.setSender(sender)
     email.setTo(toList.asJava)
+
+    cc.map { ccStr =>
+      val ccEmail = new SendSmtpEmailCc().email(ccStr)
+      email.addCcItem(ccEmail)
+    }
+
+    bcc.map { bccStr =>
+      val bccEmail = new SendSmtpEmailBcc().email(bccStr)
+      email.addBccItem(bccEmail)
+    }
 
     replyTo.map { rt =>
       val sRt = new SendSmtpEmailReplyTo().email(rt)
