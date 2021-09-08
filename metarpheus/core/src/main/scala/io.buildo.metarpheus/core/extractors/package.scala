@@ -19,22 +19,6 @@ package object extractors {
     intermediate.API(models, routes)
   }
 
-  /**
-    * Extract all terms from a sequence of applications of an infix operator
-    * (which translates to nested `ApplyInfix`es).
-    * e.g. getAllInfix(t1 + t2 + t3 + t4, "+") results in List(t1, t2, t3, t4)
-    */
-  private[extractors] def getAllInfix(ainfix: Term, op: String): List[Term] = {
-    import scala.meta._
-    ainfix match {
-      case Term.ApplyInfix(subinfix: Term.ApplyInfix, Term.Name(`op`), Nil, List(term: Term)) =>
-        getAllInfix(subinfix, `op`) :+ term
-      case Term.ApplyInfix(term1: Term, Term.Name(`op`), Nil, List(term2: Term)) =>
-        term1 :: term2 :: Nil
-      case term: Term => term :: Nil
-    }
-  }
-
   /*
    * Convert a scala-meta representation of a type to a metarpheus
    * intermediate representation

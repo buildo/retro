@@ -78,7 +78,7 @@ class TapiroSuite extends munit.FunSuite {
       |      deriveDecoder
       |    implicit val createRequestPayloadEncoder: Encoder[CreateRequestPayload] =
       |      deriveEncoder
-      |    override val create: Endpoint[
+      |    override lazy val create: Endpoint[
       |      (SchoolControllerTapirEndpoints.CreateRequestPayload, Auth),
       |      SchoolCreateError,
       |      Unit,
@@ -95,7 +95,7 @@ class TapiroSuite extends munit.FunSuite {
       |          )
       |        )
       |      )
-      |    override val read: Endpoint[Long, SchoolReadError, School, Nothing] =
+      |    override lazy val read: Endpoint[Long, SchoolReadError, School, Nothing] =
       |      endpoint.get
       |        .in("read")
       |        .in(query[Long]("id"))
@@ -108,11 +108,11 @@ class TapiroSuite extends munit.FunSuite {
       |          )
       |        )
       |        .out(jsonBody[School])
-      |    override val list: Endpoint[List[School], Unit, List[School], Nothing] =
-      |      endpoint.get
-      |        .in("list")
-      |        .in(query[List[School]]("excludedSchools[]"))
-      |        .out(jsonBody[List[School]])
+      |    override lazy val list
+      |        : Endpoint[List[School], Unit, List[School], Nothing] = endpoint.get
+      |      .in("list")
+      |      .in(query[List[School]]("excludedSchools[]"))
+      |      .out(jsonBody[List[School]])
       |  }
       |  case class CreateRequestPayload(school: School)
       |}
