@@ -29,7 +29,7 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
         Future.successful(Left(UnknownError(exception.getMessage)))
     }
 
-  //attachments - tags guard
+  // attachments - tags guard
   private[this] def internalSend(
     message: MimeMessage,
     attachments: List[Attachment],
@@ -91,7 +91,7 @@ class SMTPClient(implicit conf: Config = ConfigFactory.load())
     Either[MailError, MailResponse],
   ] = {
     val recipients = to + cc.map(a => s"; $a").getOrElse("")
-    //handling addresses parsing like mailo wants it
+    // handling addresses parsing like mailo wants it
     (for {
       from <- Try(new InternetAddress(from))
     } yield send(from, recipients, subject, content, attachments, tags, headers)).getOrElse(

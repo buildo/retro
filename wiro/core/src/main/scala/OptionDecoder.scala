@@ -13,7 +13,7 @@ trait CustomOptionDecoder {
         else
           d(c) match {
             case Right(a) => Right(Some(a))
-            //removed part of the code here
+            // removed part of the code here
             case Left(df) => Left(df)
           }
       case c: FailedCursor =>
