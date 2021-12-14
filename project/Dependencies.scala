@@ -18,7 +18,7 @@ object Dependencies {
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.4"
-    val logback = "1.2.5"
+    val logback = "1.2.8"
     val leveldb = "1.8"
     val mailin = "3.0.1"
     val jakartaMail = "2.0.1"
