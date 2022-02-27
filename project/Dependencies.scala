@@ -81,7 +81,7 @@ object Dependencies {
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
   val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
-  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.14.1"
+  val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.17.2"
   val autowire = "com.lihaoyi" %% "autowire" % "0.3.3"
   val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.11.1"
   val metarpheusCore = "io.buildo" %% "metarpheus-core" % "1.0.0"
