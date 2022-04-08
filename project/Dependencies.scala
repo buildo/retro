@@ -6,7 +6,7 @@ object Dependencies {
 
   val V = new {
     val circe = "0.14.1"
-    val scalacheck = "1.15.4"
+    val scalacheck = "1.16.0"
     val mockito = "1.9.5"
     val akka = "2.6.15"
     val akkaHttp = "10.2.6"
