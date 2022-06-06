@@ -33,7 +33,7 @@ object Http4sMeta {
       import sttp.model.StatusCode
 
       object $httpEndpointsName {
-        def routes[F[_]: Sync, $authTokenTypeParam](controller: $controllerName[F, $authTokenName], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): HttpRoutes[F] = {
+        def routes[F[_]: Async, $authTokenTypeParam](controller: $controllerName[F, $authTokenName], statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity)(..$implicits): HttpRoutes[F] = {
           ..${tapirEndpoints +: http4sEndpoints :+ routes}
         }
       }
@@ -52,6 +52,6 @@ object Http4sMeta {
     routes.map { route =>
       val name = Term.Name(route.route.name.last)
       val endpointImpl = Meta.toEndpointImplementation(route, authTokenName)
-      q"val ${Pat.Var(name)} = endpoints.$name.toRoutes($endpointImpl)"
+      q"val ${Pat.Var(name)} = Http4sServerInterpreter[F]().toRoutes(endpoints.$name.serverLogic($endpointImpl))"
     }
 }
