@@ -1,10 +1,10 @@
 package testo
 
-import cats.implicits._
 import cats.effect._
-import org.http4s.server.blaze._
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.implicits._
 import endpoints.ExampleControllerHttpEndpoints
+import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe._
 import io.circe.generic.auto._
 
