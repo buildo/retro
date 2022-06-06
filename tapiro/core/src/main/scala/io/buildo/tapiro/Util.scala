@@ -163,7 +163,7 @@ class Util() {
                 .codecsImplicits(
                   tapiroRoutes,
                   authTokenName,
-                ) :+ param"implicit cs: ContextShift[F]",
+                ),
               Http4sMeta.endpoints(tapiroRoutes, authTokenName),
               Http4sMeta.routes(Lit.String(pathName), head, tail),
             ),
