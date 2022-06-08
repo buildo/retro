@@ -56,10 +56,10 @@
 <ol>
 <li>Install the plugin (as described in the <a href="/retro/docs/tapiro/installation">guide</a>)</li>
 <li>Configure your <code>build.sbt</code> (as described in the <a href="/retro/docs/tapiro/installation">guide</a>)</li>
-<li>Add <code>AuthToken</code> type parameter to controllers
-<code>trait AccountController[F]</code> -&gt; <code>trait AccountController[F[_], AuthToken]</code></li>
-<li>Modify controllers so that wiro <code>Auth</code> is replaced with AuthToken and move as last argument
-<code>def read(token: Auth, arg: Int)</code> -&gt; <code>def read(arg: Int, token: AuthToken)</code></li>
+<li>Add <code>Auth</code> type parameter to controllers
+<code>trait AccountController[F]</code> -&gt; <code>trait AccountController[F[_], Auth]</code></li>
+<li>Modify controllers so that wiro <code>Auth</code> is replaced with <code>Auth</code> and move as last argument
+<code>def read(token: wiro.Auth, arg: Int)</code> -&gt; <code>def read(arg: Int, token: Auth)</code></li>
 <li>Add <code>**/*Endpoints.scala linguist-generated</code> to repository's <code>.gitattributes</code> to automatically collapse tapiro generated code in GitHub diffs</li>
 <li>Add required codecs
 This is a valid codec for wiro.Auth:</li>
@@ -71,7 +71,7 @@ This is a valid codec for wiro.Auth:</li>
 
 <span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> authCodec: <span class="hljs-type">PlainCodec</span>[<span class="hljs-type">Auth</span>] = <span class="hljs-type">Codec</span>.string
   .mapDecode(decodeAuth)(encodeAuth)
-<span class="hljs-comment">// authCodec: PlainCodec[Auth] = sttp.tapir.Codec$$anon$1@2e6cc50a</span>
+<span class="hljs-comment">// authCodec: PlainCodec[Auth] = sttp.tapir.Codec$$anon$1@31b8a21b</span>
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decodeAuth</span></span>(s: <span class="hljs-type">String</span>): <span class="hljs-type">DecodeResult</span>[<span class="hljs-type">Auth</span>] = {
   <span class="hljs-keyword">val</span> <span class="hljs-type">TokenPattern</span> = <span class="hljs-string">"Token token=(.+)"</span>.r
@@ -86,8 +86,7 @@ This is a valid codec for wiro.Auth:</li>
 <ol start="7">
 <li>Run <code>sbt tapiro</code></li>
 </ol>
-<p>Using <code>Server.AkkaHttp</code> the resulting routes can be added to wiro as custom routes.</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/retro/docs/tapiro/rpc"><span class="arrow-prev">← </span><span>Why?</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/retro/" class="nav-home"><img src="/retro/img/favicon.ico" alt="retro" width="66" height="58"/></a><div><h5>Docs</h5><a href="/retro/docs/installation">Installation</a><a href="/retro/docs/concepts/functional-model">Concepts</a></div><div><h5>More</h5><a href="https://twitter.com/buildoHQ">Twitter</a><a href="https://github.com/buildo/retro">GitHub</a><a class="github-button" href="https://github.com/buildo/retro" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2021 buildo</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/retro/docs/tapiro/rpc"><span class="arrow-prev">← </span><span>Why?</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/retro/" class="nav-home"><img src="/retro/img/favicon.ico" alt="retro" width="66" height="58"/></a><div><h5>Docs</h5><a href="/retro/docs/installation">Installation</a><a href="/retro/docs/concepts/functional-model">Concepts</a></div><div><h5>More</h5><a href="https://twitter.com/buildoHQ">Twitter</a><a href="https://github.com/buildo/retro">GitHub</a><a class="github-button" href="https://github.com/buildo/retro" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2022 buildo</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
