@@ -32,8 +32,6 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 To use the code generator, you need to add this to your `build.sbt`.
 
 ```scala
-import _root_.io.buildo.tapiro.Server
-
 lazy val application = project
   .settings(
     libraryDependencies ++= applicationDependencies ++ tapiroDependencies,
@@ -41,36 +39,15 @@ lazy val application = project
     tapiro / tapiroModelsPaths := List("[path to models]"),
     tapiro / tapiroOutputPath := "[path to endpoints]",
     tapiro / tapiroEndpointsPackages := List("[package]", "[subpackage]"),
-    tapiro / tapiroServer := Server.AkkaHttp, //or Server.Http4s
   )
   .enablePlugins(SbtTapiro)
 ```
 
 You can now run it with `sbt application/tapiro`.
 
-```scala
 ## Dependencies
 
 The generated code comes with library dependencies.
-
-In case akka-http version is used:
-```scala
-val V = new {
-  val circe = "@CIRCE_VERSION@"
-  val tapir = "@TAPIR_VERSION@"
-  val akkaHttp = "@AKKA_HTTP_VERSION@"
-}
-
-val tapiroDependencies = Seq(
-  "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.tapir,
-  "com.softwaremill.sttp.tapir" %% "tapir-core" % V.tapir,
-  "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % V.tapir,
-  "com.typesafe.akka" %% "akka-http" % V.akkaHttp,
-  "io.circe" %% "circe-core" % V.circe,
-)
-```
-
-In case http4s is used:
 
 ```scala
 val V = new {
@@ -86,4 +63,4 @@ val tapiroDependencies = Seq(
 )
 ```
 
-These dependencies usually go under `project/Dependencies.scala`
+These dependencies usually go under `project/Dependencies.scala`.
