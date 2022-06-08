@@ -19,13 +19,6 @@ import org.apache.logging.log4j.LogManager
 import Meta.typeNameString
 import _root_.io.buildo.metarpheus.core.intermediate.RouteParam
 
-sealed trait Server
-object Server {
-  case object AkkaHttp extends Server
-  case object Http4s extends Server
-  case object NoServer extends Server
-}
-
 sealed trait RouteError
 object RouteError {
   case class TaggedUnionError(taggedUnion: TaggedUnion) extends RouteError
@@ -50,7 +43,6 @@ class Util() {
     modelsPaths: List[String],
     outputPath: String,
     `package`: List[String],
-    server: Server,
   ) = {
     NonEmptyList.fromList(`package`) match {
       case Some(nonEmptyPackage) =>
@@ -106,37 +98,18 @@ class Util() {
             .collect { case head :: tail =>
               NonEmptyList(head, tail)
             }
-          server match {
-            case Server.Http4s =>
-              val http4sEndpoints =
-                createHttp4sEndpoints(
-                  nonEmptyPackage,
-                  pathNameOrController,
-                  controllerName,
-                  tapirEndpointsName,
-                  authTypeString,
-                  httpEndpointsName,
-                  modelsPackages ++ routesPackages,
-                  routes,
-                )
-              http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
-            case Server.AkkaHttp =>
-              val akkaHttpEndpoints =
-                createAkkaHttpEndpoints(
-                  nonEmptyPackage,
-                  pathNameOrController,
-                  controllerName,
-                  tapirEndpointsName,
-                  authTypeString,
-                  httpEndpointsName,
-                  modelsPackages ++ routesPackages,
-                  routes,
-                )
-              akkaHttpEndpoints.foreach(
-                writeToFile(outputPath, _, httpEndpointsName),
-              )
-            case Server.NoServer => ()
-          }
+          val http4sEndpoints =
+            createHttp4sEndpoints(
+              nonEmptyPackage,
+              pathNameOrController,
+              controllerName,
+              tapirEndpointsName,
+              authTypeString,
+              httpEndpointsName,
+              modelsPackages ++ routesPackages,
+              routes,
+            )
+          http4sEndpoints.foreach(writeToFile(outputPath, _, httpEndpointsName))
         }
       case None => logger.error("please provide a package to tapiro")
     }
@@ -193,38 +166,6 @@ class Util() {
                 ) :+ param"implicit cs: ContextShift[F]",
               Http4sMeta.endpoints(tapiroRoutes, authTokenName),
               Http4sMeta.routes(Lit.String(pathName), head, tail),
-            ),
-          ),
-        )
-    }
-  }
-
-  private[this] def createAkkaHttpEndpoints(
-    `package`: NonEmptyList[String],
-    pathName: String,
-    controllerName: String,
-    tapirEndpointsName: String,
-    authTokenName: String,
-    httpEndpointsName: String,
-    requiredPackages: List[NonEmptyList[String]],
-    tapiroRoutes: List[TapiroRoute],
-  ): Option[String] = {
-    val routes = tapiroRoutes.map(_.route)
-    routes match {
-      case Nil => None
-      case head :: tail =>
-        Some(
-          format(
-            AkkaHttpMeta.`class`(
-              Meta.packageFromList(`package`),
-              requiredPackages.toSet.map(Meta.packageFromList),
-              Type.Name(controllerName),
-              Term.Name(tapirEndpointsName),
-              Type.Name(authTokenName),
-              Term.Name(httpEndpointsName),
-              Meta.codecsImplicits(tapiroRoutes, authTokenName),
-              AkkaHttpMeta.endpoints(tapiroRoutes, authTokenName),
-              AkkaHttpMeta.routes(Lit.String(pathName), head, tail),
             ),
           ),
         )

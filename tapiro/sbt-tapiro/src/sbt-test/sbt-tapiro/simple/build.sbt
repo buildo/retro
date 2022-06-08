@@ -2,7 +2,6 @@ val circeVersion = "0.10.0"
 val http4sVersion = "0.20.0-M7"
 
 import cats.data.NonEmptyList
-import _root_.io.buildo.tapiro.Server
 
 lazy val root = (project in file("."))
   .enablePlugins(SbtTapiro)
@@ -25,5 +24,4 @@ lazy val root = (project in file("."))
     tapiro / tapiroRoutesPaths := List(""),
     tapiro / tapiroOutputPath := "endpoints",
     tapiro / tapiroEndpointsPackages := List("endpoints"),
-    tapiro / tapiroServer := Server.Http4s,
   )
