@@ -45,20 +45,21 @@ class TapiroSuite extends munit.FunSuite {
       |import io.circe.{Decoder, Encoder}
       |import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
       |import sttp.tapir._
+      |import sttp.tapir.generic.auto._
       |import sttp.tapir.json.circe._
       |import sttp.tapir.Codec.{JsonCodec, PlainCodec}
       |import sttp.model.StatusCode
       |
       |trait SchoolControllerTapirEndpoints[Auth] {
       |
-      |  val create: Endpoint[
+      |  val create: PublicEndpoint[
       |    (SchoolControllerTapirEndpoints.CreateRequestPayload, Auth),
       |    SchoolCreateError,
       |    Unit,
-      |    Nothing
+      |    Any
       |  ]
-      |  val read: Endpoint[Long, SchoolReadError, School, Nothing]
-      |  val list: Endpoint[List[School], Unit, List[School], Nothing]
+      |  val read: PublicEndpoint[Long, SchoolReadError, School, Any]
+      |  val list: PublicEndpoint[List[School], Unit, List[School], Any]
       |}
       |
       |object SchoolControllerTapirEndpoints {
@@ -77,30 +78,30 @@ class TapiroSuite extends munit.FunSuite {
       |      deriveDecoder
       |    implicit val createRequestPayloadEncoder: Encoder[CreateRequestPayload] =
       |      deriveEncoder
-      |    override lazy val create: Endpoint[
+      |    override lazy val create: PublicEndpoint[
       |      (SchoolControllerTapirEndpoints.CreateRequestPayload, Auth),
       |      SchoolCreateError,
       |      Unit,
-      |      Nothing
+      |      Any
       |    ] = endpoint.post
       |      .in("create")
       |      .in(jsonBody[CreateRequestPayload])
       |      .in(header[Auth]("Authorization"))
       |      .errorOut(
       |        oneOf[SchoolCreateError](
-      |          statusMapping(
+      |          oneOfVariant(
       |            statusCodes("DuplicateId"),
       |            jsonBody[SchoolCreateError.DuplicateId.type]
       |          )
       |        )
       |      )
-      |    override lazy val read: Endpoint[Long, SchoolReadError, School, Nothing] =
+      |    override lazy val read: PublicEndpoint[Long, SchoolReadError, School, Any] =
       |      endpoint.get
       |        .in("read")
       |        .in(query[Long]("id"))
       |        .errorOut(
       |          oneOf[SchoolReadError](
-      |            statusMapping(
+      |            oneOfVariant(
       |              statusCodes("NotFound"),
       |              jsonBody[SchoolReadError.NotFound.type]
       |            )
@@ -108,7 +109,7 @@ class TapiroSuite extends munit.FunSuite {
       |        )
       |        .out(jsonBody[School])
       |    override lazy val list
-      |        : Endpoint[List[School], Unit, List[School], Nothing] = endpoint.get
+      |        : PublicEndpoint[List[School], Unit, List[School], Any] = endpoint.get
       |      .in("list")
       |      .in(query[List[School]]("excludedSchools[]"))
       |      .out(jsonBody[List[School]])
@@ -137,7 +138,7 @@ class TapiroSuite extends munit.FunSuite {
       |
       |object SchoolControllerHttpEndpoints {
       |
-      |  def routes[F[_]: Sync, Auth](
+      |  def routes[F[_]: Async, Auth](
       |      controller: SchoolController[F, Auth],
       |      statusCodes: String => StatusCode = _ => StatusCode.UnprocessableEntity
       |  )(
@@ -148,16 +149,18 @@ class TapiroSuite extends munit.FunSuite {
       |      codec4: PlainCodec[Long],
       |      codec5: JsonCodec[School],
       |      codec6: JsonCodec[SchoolReadError.NotFound.type],
-      |      codec7: PlainCodec[School],
-      |      cs: ContextShift[F]
+      |      codec7: PlainCodec[School]
       |  ): HttpRoutes[F] = {
       |    val endpoints = SchoolControllerTapirEndpoints.create[Auth](statusCodes)
-      |    val create = endpoints.create.toRoutes({
-      |      case (x, token) =>
-      |        controller.create(x.school, token)
-      |    })
-      |    val read = endpoints.read.toRoutes(controller.read)
-      |    val list = endpoints.list.toRoutes(controller.list)
+      |    val create =
+      |      Http4sServerInterpreter[F]().toRoutes(endpoints.create.serverLogic({
+      |        case (x, token) =>
+      |          controller.create(x.school, token)
+      |      }))
+      |    val read = Http4sServerInterpreter[F]()
+      |      .toRoutes(endpoints.read.serverLogic(controller.read))
+      |    val list = Http4sServerInterpreter[F]()
+      |      .toRoutes(endpoints.list.serverLogic(controller.list))
       |    Router("/SchoolController" -> NonEmptyList.of(create, read, list).reduceK)
       |  }
       |}

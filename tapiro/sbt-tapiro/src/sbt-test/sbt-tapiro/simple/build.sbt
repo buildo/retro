@@ -1,5 +1,6 @@
-val circeVersion = "0.10.0"
-val http4sVersion = "0.20.0-M7"
+val circeVersion = "0.14.1"
+val http4sVersion = "0.23.12"
+val tapirVersion = "0.20.2"
 
 import cats.data.NonEmptyList
 
@@ -9,17 +10,16 @@ lazy val root = (project in file("."))
     version := "0.1",
     scalaVersion := "2.12.10",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "1.2.0",
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % "0.12.15",
-      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % "0.12.15",
-      "com.softwaremill.sttp.tapir" %% "tapir-core" % "0.12.15",
+      "org.typelevel" %% "cats-effect" % "3.3.12",
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapirVersion,
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
-      "org.apache.logging.log4j" % "log4j-core" % "2.13.1",
-    ) ++ Seq(
-      "io.circe" %% "circe-core",
-      "io.circe" %% "circe-generic",
-    ).map(_ % circeVersion),
+      "org.apache.logging.log4j" % "log4j-core" % "2.17.2",
+      "io.circe" %% "circe-core" % circeVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
+    ),
     tapiro / tapiroModelsPaths := List(""),
     tapiro / tapiroRoutesPaths := List(""),
     tapiro / tapiroOutputPath := "endpoints",

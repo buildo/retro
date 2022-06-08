@@ -30,6 +30,7 @@ object TapirMeta {
       import io.circe.{ Decoder, Encoder }
       import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
       import sttp.tapir._
+      import sttp.tapir.generic.auto._
       import sttp.tapir.json.circe._
       import sttp.tapir.Codec.{ JsonCodec, PlainCodec }
       import sttp.model.StatusCode
@@ -84,7 +85,7 @@ object TapirMeta {
         case RouteError.TaggedUnionError(t) => MetarpheusType.Name(t.name)
         case RouteError.OtherError(t)       => t
       })
-      t"Endpoint[$argsType, $error, $returnType, Nothing]"
+      t"PublicEndpoint[$argsType, $error, $returnType, Any]"
     }
 
   private[this] val endpointImpl = (route: TapiroRoute, authTokenName: String) => {
@@ -169,7 +170,7 @@ object TapirMeta {
       Term.ApplyType(Term.Name("oneOf"), List(Type.Name(taggedUnion.name))),
       taggedUnion.values.map { member =>
         Term.Apply(
-          Term.Name("statusMapping"),
+          Term.Name("oneOfVariant"),
           List(
             Term.Apply(Term.Name("statusCodes"), List(Lit.String(member.name))),
             Term.ApplyType(Term.Name("jsonBody"), List(taggedUnionMemberType(taggedUnion)(member))),

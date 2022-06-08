@@ -1,12 +1,13 @@
 package testo
 
 import cats._
+import io.circe.generic.JsonCodec
 
 import scala.annotation.StaticAnnotation
 class query extends StaticAnnotation
 class command extends StaticAnnotation
 
-case class CustomError(message: String)
+@JsonCodec case class CustomError(message: String)
 
 trait ExampleController[F[_], T] {
   @query
