@@ -20,7 +20,7 @@ object Dependencies {
     val scalaLogging = "3.9.4"
     val logback = "1.2.5"
     val leveldb = "1.8"
-    val mailin = "3.0.1"
+    val mailin = "6.0.0"
     val jakartaMail = "2.0.1"
     val slick = "3.3.3"
     val postgresql = "42.2.21"
