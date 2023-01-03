@@ -28,7 +28,7 @@ class FSMailData(directory: File, loadPartials: Boolean) extends MailData {
             template.map(content => (file.getName, content))
           })
           .flatMap(_.toOption)
-          .toMap, //convert all tries to an option, remove none and create a map with the remainings
+          .toMap, // convert all tries to an option, remove none and create a map with the remainings
       ),
     ).toOption
       .flatten

@@ -35,7 +35,7 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
   }
 
   def exceptionHandler = ExceptionHandler { case e: FailException[_] =>
-    //logging left
+    // logging left
     e.response.entity match {
       case HttpEntity.Strict(_, data) =>
         logger.error(s"${e.response.status.value} ${data.utf8String}")
@@ -97,7 +97,7 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
     logger.debug(s"client ip: ${ip}")
   }
 
-  //Generates GET requests
+  // Generates GET requests
   private[this] def query(operationFullName: String, methodMetaData: MethodMetaData): Route =
     loggingClientIP {
       (routePathPrefix(operationFullName, methodMetaData) & pathEnd & get & parameterMap) {
@@ -113,7 +113,7 @@ trait Router extends RPCServer with PathMacro with MetaDataMacro with LazyLoggin
     extract(_.request.headers)
       .map(_.map(header => header.name -> Json.fromString(header.value)).toMap)
 
-  //Generates POST requests
+  // Generates POST requests
   private[this] def command(operationFullName: String, methodMetaData: MethodMetaData): Route =
     loggingClientIP {
       (routePathPrefix(operationFullName, methodMetaData) & pathEnd & post & entity(
