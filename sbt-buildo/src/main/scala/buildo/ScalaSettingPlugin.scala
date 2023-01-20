@@ -68,7 +68,7 @@ object ScalaSettingPlugin extends AutoPlugin {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, _)) =>
           compilerPlugin(
-            ("org.typelevel" % "kind-projector" % "0.13.1").cross(CrossVersion.full),
+            ("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full),
           ) :: Nil
         case _ => Nil
       }
