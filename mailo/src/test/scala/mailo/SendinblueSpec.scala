@@ -89,7 +89,7 @@ class SendinblueSpec extends munit.FunSuite {
           value,
           Left(
             http.MailClientError.UnknownError(
-              "{\"code\":\"missing_parameter\",\"message\":\"sender name is missing\"}",
+              "{\"code\":\"invalid_parameter\",\"message\":\"valid sender email required\"}\n",
             ),
           ),
         )
