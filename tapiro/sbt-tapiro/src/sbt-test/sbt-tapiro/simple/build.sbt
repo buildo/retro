@@ -1,4 +1,4 @@
-val circeVersion = "0.14.1"
+val circeVersion = "0.14.5"
 val http4sVersion = "0.23.12"
 val tapirVersion = "0.20.2"
 
