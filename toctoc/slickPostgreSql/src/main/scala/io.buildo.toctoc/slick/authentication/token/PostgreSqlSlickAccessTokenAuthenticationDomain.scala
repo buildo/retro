@@ -3,26 +3,20 @@ package slick
 package authentication
 package token
 
-import core.authentication._
-import core.authentication.TokenBasedAuthentication._
+import java.time.Instant
 
-import cats.implicits._
-import cats.effect.Sync
-import monix.catnap.FutureLift
-import monix.catnap.syntax._
+import zio.{IO, ZIO}
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import scala.concurrent.Future
-import java.time.Instant
+import core.authentication._
+import core.authentication.TokenBasedAuthentication._
 
-class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
+class PostgreSqlSlickAccessTokenAuthenticationDomain(
   db: Database,
   tableName: String = "access_token_auth_domain",
   schemaName: Option[String] = None,
-)(implicit
-  F: Sync[F],
-) extends AccessTokenDomain[F] {
+) extends AccessTokenDomain {
 
   class AccessTokenTable(tag: Tag)
       extends Table[(Int, String, String, Instant)](tag, schemaName, tableName) {
@@ -40,43 +34,43 @@ class PostgreSqlSlickAccessTokenAuthenticationDomain[F[_]: FutureLift[*[_], Futu
   override def register(
     s: Subject,
     c: AccessToken,
-  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] = {
-    F.delay {
+  ): IO[AuthenticationError, AccessTokenDomain] = {
+    ZIO.fromFuture { _ =>
       db.run(accessTokenTable += ((0, s.ref, c.value, c.expiresAt)))
-    }.futureLift.as(this.asRight)
+    }.map(_ => this).mapError(_ => AuthenticationError.InvalidCredential)
   }
 
   override def unregister(
     s: Subject,
-  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
-    F.delay {
+  ): IO[AuthenticationError, AccessTokenDomain] =
+    ZIO.fromFuture { _ =>
       db.run(accessTokenTable.filter(_.ref === s.ref).delete)
-    }.futureLift.as(this.asRight)
+    }.map(_ => this).mapError(_ => AuthenticationError.Forbidden)
 
   override def unregister(
     c: AccessToken,
-  ): F[Either[AuthenticationError, AccessTokenDomain[F]]] =
-    F.delay {
+  ): IO[AuthenticationError, AccessTokenDomain] =
+    ZIO.fromFuture { _ =>
       db.run(accessTokenTable.filter(_.token === c.value).delete)
-    }.futureLift.as(this.asRight)
+    }.map(_ => this).mapError(_ => AuthenticationError.Forbidden)
 
   override def authenticate(
     c: AccessToken,
-  ): F[Either[AuthenticationError, (AccessTokenDomain[F], Subject)]] = {
-    F.delay {
+  ): IO[AuthenticationError, (AccessTokenDomain, Subject)] = {
+    ZIO.fromFuture { _ =>
       db.run(
         accessTokenTable
           .filter(t => t.token === c.value && t.expiresAt > Instant.now())
           .result
           .headOption,
       )
-    }.futureLift.map {
+    }.mapError(_ => AuthenticationError.InvalidCredential).flatMap {
       case None =>
-        AuthenticationError.InvalidCredential.asLeft
+        ZIO.fail(AuthenticationError.InvalidCredential)
       case Some((_, ref, _, _)) =>
-        (this, UserSubject(ref)).asRight
+        ZIO.succeed((this, UserSubject(ref)))
       case _ =>
-        AuthenticationError.InvalidCredential.asLeft
+        ZIO.fail(AuthenticationError.InvalidCredential)
     }
   }
 }
