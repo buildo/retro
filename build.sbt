@@ -92,7 +92,7 @@ lazy val toctocSlickPostgreSql = project
     libraryDependencies ++= toctocSlickPostgresDependencies,
     dynverTagPrefix := "toctoc-",
   )
-  .dependsOn(toctocCore)
+  .dependsOn(toctocCore % "compile->compile;test->test")
 
 lazy val toctocSlickMySql = project
   .in(file("toctoc/slickMySql"))
@@ -101,7 +101,7 @@ lazy val toctocSlickMySql = project
     libraryDependencies ++= toctocSlickMySqlDependencies,
     dynverTagPrefix := "toctoc-",
   )
-  .dependsOn(toctocCore)
+  .dependsOn(toctocCore % "compile->compile;test->test")
 
 lazy val toctocLdap = project
   .in(file("toctoc/ldap"))
