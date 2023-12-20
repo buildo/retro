@@ -72,20 +72,16 @@ import io.buildo.toctoc.slick.authentication.token.PostgreSqlSlickAccessTokenAut
 // The specialized Login domain
 import io.buildo.toctoc.slick.authentication.login.PostgreSqlSlickLoginAuthenticationDomain
 
-import cats.effect.Sync
-import monix.catnap.FutureLift
 import slick.jdbc.JdbcBackend.Database
-
-import scala.concurrent.Future
 import java.time.Duration
 
 object PostgreSqlSlickTokenBasedAuthenticationFlow {
-  def create[F[_]: Sync: FutureLift[*[_], Future]](
+  def create(
     db: Database,
     tokenDuration: Duration
-  ): TokenBasedAuthenticationFlow[F] = new TokenBasedAuthenticationFlow[F](
-    loginD = new PostgreSqlSlickLoginAuthenticationDomain[F](db),
-    accessTokenD = new PostgreSqlSlickAccessTokenAuthenticationDomain[F](db),
+  ): TokenBasedAuthenticationFlow = new TokenBasedAuthenticationFlow(
+    loginD = new PostgreSqlSlickLoginAuthenticationDomain(db),
+    accessTokenD = new PostgreSqlSlickAccessTokenAuthenticationDomain(db),
     tokenDuration = tokenDuration,
   )
 }
@@ -103,20 +99,20 @@ import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.TokenBasedA
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.AccessToken
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.Login
 import io.buildo.toctoc.core.authentication.AuthenticationError
-import cats.effect.Sync
+import zio.IO
 
-trait AuthenticationController[F[_]] {
-  def login(credentials: Login): F[Either[AuthenticationError, AccessToken]]
-  def logout(accessToken: AccessToken): F[Either[AuthenticationError, Unit]]
+trait AuthenticationController {
+  def login(credentials: Login): IO[AuthenticationError, AccessToken]
+  def logout(accessToken: AccessToken): IO[AuthenticationError, Unit]
 }
 
 object AuthenticationController {
-  def create[F[_]: Sync](authFlow: TokenBasedAuthenticationFlow[F]): AuthenticationController[F] = new AuthenticationController[F] {
+  def create(authFlow: TokenBasedAuthenticationFlow): AuthenticationController = new AuthenticationController {
 
-    override def login(credentials: Login):  F[Either[AuthenticationError, AccessToken]] =
+    override def login(credentials: Login):  IO[AuthenticationError, AccessToken] =
       authFlow.exchangeForTokens(credentials)
 
-    override def logout(accessToken: AccessToken): F[Either[AuthenticationError, Unit]] =
+    override def logout(accessToken: AccessToken): IO[AuthenticationError, Unit] =
       authFlow.unregisterToken(accessToken)
 
   }
@@ -131,13 +127,14 @@ Let's introduce a `UserService` which manages our users:
 
 ```scala mdoc
 import java.util.UUID
+import zio.UIO
 
 case class User(id: UUID, firstName: String, lastName: String)
 case class UserCreate(firstName: String, lastName: String)
 
-trait UserService[F[_]] {
-  def create(user: UserCreate): F[UUID]
-  def read(id: UUID): F[Option[User]]
+trait UserService {
+  def create(user: UserCreate): UIO[UUID]
+  def read(id: UUID): UIO[Option[User]]
 }
 ```
 
@@ -149,16 +146,15 @@ import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.TokenBasedA
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.Login
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.UserSubject
 import io.buildo.toctoc.core.authentication.AuthenticationError
-import cats.effect.Sync
-import cats.implicits._
+import zio.IO
 
-trait UserController[F[_]] {
-  def signup(credentials: Login, user: UserCreate): F[Either[AuthenticationError, Unit]]
+trait UserController {
+  def signup(credentials: Login, user: UserCreate): IO[AuthenticationError, Unit]
 }
 
 object UserController {
-  def create[F[_]: Sync](userService: UserService[F], authFlow: TokenBasedAuthenticationFlow[F]): UserController[F] = new UserController[F] {
-    override def signup(credentials: Login, user: UserCreate): F[Either[AuthenticationError, Unit]] =
+  def create(userService: UserService, authFlow: TokenBasedAuthenticationFlow): UserController = new UserController {
+    override def signup(credentials: Login, user: UserCreate): IO[AuthenticationError, Unit] =
     for {
       // create the user
       userId <- userService.create(user)
