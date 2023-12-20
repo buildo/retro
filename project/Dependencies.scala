@@ -13,8 +13,6 @@ object Dependencies {
     val akkaHttpCirce = "1.37.0"
     val awscala = "0.8.5"
     val cats = "2.6.1"
-    val catsEffect = "2.5.3"
-    val monixCatnap = "3.4.0"
     val config = "1.4.1"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.4"
@@ -35,6 +33,7 @@ object Dependencies {
     val pprint = "0.6.6"
     val tapir = "0.18.1"
     val munit = "0.7.29"
+    val zio = "2.0.19"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -51,7 +50,6 @@ object Dependencies {
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.akka
   val awscala = "com.github.seratch" %% "awscala" % V.awscala
   val catsCore = "org.typelevel" %% "cats-core" % V.cats
-  val catsEffect = "org.typelevel" %% "cats-effect" % V.catsEffect
   val alleyCatsCore = "org.typelevel" %% "alleycats-core" % V.cats
   val akkaHttpCirce = "de.heikoseeberger" %% "akka-http-circe" % V.akkaHttpCirce
   val typesafeConfig = "com.typesafe" % "config" % V.config
@@ -69,7 +67,6 @@ object Dependencies {
   val flywayCore = "org.flywaydb" % "flyway-core" % V.flyway
   val mysql = "mysql" % "mysql-connector-java" % V.mysql
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
-  val monixCatnap = "io.monix" %% "monix-catnap" % V.monixCatnap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
   val scalafmtCore = "org.scalameta" %% "scalafmt-core" % V.scalafmtCore
@@ -85,6 +82,7 @@ object Dependencies {
   val autowire = "com.lihaoyi" %% "autowire" % "0.3.3"
   val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.11.1"
   val metarpheusCore = "io.buildo" %% "metarpheus-core" % "1.0.0"
+  val zio = "dev.zio" %% "zio" % V.zio
 
   val enumeroDependencies = List(
     munit,
@@ -124,21 +122,19 @@ object Dependencies {
 
   val toctocCoreDependencies = List(
     bcrypt,
-    catsCore,
+    zio,
   ) ++ List(
     munit,
     munitScalaCheck,
     scalacheck,
     slf4jNop,
-    catsEffect,
   ).map(_ % Test)
 
   val toctocSlickPostgresDependencies = List(
     postgresql,
     slick,
     slickHikari,
-    catsEffect,
-    monixCatnap,
+    zio,
   ) ++ List(
     munit,
     slf4jNop,
@@ -148,8 +144,7 @@ object Dependencies {
     mysql,
     slick,
     slickHikari,
-    catsEffect,
-    monixCatnap,
+    zio,
   ) ++ List(
     munit,
     slf4jNop,
@@ -159,7 +154,7 @@ object Dependencies {
     ldap,
     mysql,
     slf4jNop,
-    catsEffect,
+    zio,
   )
 
   val toctocCirceDependencies = List(
