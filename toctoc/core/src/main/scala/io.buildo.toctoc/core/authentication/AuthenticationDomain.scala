@@ -2,35 +2,34 @@ package io.buildo.toctoc
 package core
 package authentication
 
-import cats.data.EitherT
-import cats.Monad
+import zio.IO
 
-trait AuthenticationDomain[F[_], Credential] {
+trait AuthenticationDomain[Credential] {
   def authenticate(
     c: Credential,
-  ): F[Either[AuthenticationError, (AuthenticationDomain[F, Credential], Subject)]]
+  ): IO[AuthenticationError, (AuthenticationDomain[Credential], Subject)]
   def register(
     s: Subject,
     c: Credential,
-  ): F[Either[AuthenticationError, AuthenticationDomain[F, Credential]]]
-  def unregister(s: Subject): F[Either[AuthenticationError, AuthenticationDomain[F, Credential]]]
-  def unregister(c: Credential): F[Either[AuthenticationError, AuthenticationDomain[F, Credential]]]
+  ): IO[AuthenticationError, AuthenticationDomain[Credential]]
+  def unregister(s: Subject): IO[AuthenticationError, AuthenticationDomain[Credential]]
+  def unregister(c: Credential): IO[AuthenticationError, AuthenticationDomain[Credential]]
 }
 
 object AuthenticationDomain {
-  def exchangeCredentials[F[_]: Monad, Credential1, Credential2](
-    ac: AuthenticationDomain[F, Credential1],
-    at: AuthenticationDomain[F, Credential2],
+  def exchangeCredentials[Credential1, Credential2](
+    ac: AuthenticationDomain[Credential1],
+    at: AuthenticationDomain[Credential2],
   )(
     c: Credential1,
     t: Credential2,
-  ): F[Either[
+  ): IO[
     AuthenticationError,
-    (AuthenticationDomain[F, Credential1], AuthenticationDomain[F, Credential2]),
-  ]] =
-    (for {
-      res <- EitherT(ac.authenticate(c))
+    (AuthenticationDomain[Credential1], AuthenticationDomain[Credential2]),
+  ] =
+    for {
+      res <- ac.authenticate(c)
       (nac, s) = res
-      nat <- EitherT(at.register(s, t))
-    } yield (nac, nat)).value
+      nat <- at.register(s, t)
+    } yield (nac, nat)
 }

@@ -2,53 +2,49 @@ package io.buildo.toctoc
 package core
 package authentication
 
-import cats.Monad
-import cats.data.EitherT
-
 import java.time.Duration
+
+import zio.IO
 
 object TokenBasedRecovery {
   import TokenBasedAuthentication._
 
-  final case class TokenBasedRecoveryFlow[F[_]: Monad] private (
-    loginD: LoginDomain[F],
-    recoveryTokenD: AccessTokenDomain[F],
+  final case class TokenBasedRecoveryFlow private (
+    loginD: LoginDomain,
+    recoveryTokenD: AccessTokenDomain,
     tokenDuration: Duration,
   ) extends BCryptHashing {
     def registerForRecovery(
       s: Subject,
-    ): F[Either[AuthenticationError, (TokenBasedRecoveryFlow[F], AccessToken)]] =
-      (for {
-        rtd <- EitherT(recoveryTokenD.unregister(s))
+    ): IO[AuthenticationError, (TokenBasedRecoveryFlow, AccessToken)] =
+      for {
+        rtd <- recoveryTokenD.unregister(s)
         token = AccessToken.generate(randomString(64), tokenDuration)
-        rtd2 <- EitherT(rtd.register(s, token))
+        rtd2 <- rtd.register(s, token)
         flow = copy(recoveryTokenD = rtd2)
-      } yield (flow, token)).value
+      } yield (flow, token)
 
     def recoverLogin(token: AccessToken, password: String)(
-      usernameForSubject: Subject => F[Option[String]],
-    ): F[Either[AuthenticationError, TokenBasedRecoveryFlow[F]]] =
-      (for {
-        authResult <- EitherT(recoveryTokenD.authenticate(token))
+      usernameForSubject: Subject => IO[AuthenticationError, Option[String]],
+    ): IO[AuthenticationError, TokenBasedRecoveryFlow] =
+      for {
+        authResult <- recoveryTokenD.authenticate(token)
         (rtd, s) = authResult
-        username <- EitherT.fromOptionF(
-          usernameForSubject(s),
-          AuthenticationError.InvalidCredential,
-        )
-        ld <- EitherT(loginD.unregister(s))
-        ld2 <- EitherT(ld.register(s, Login(username, password)))
-        rtd2 <- EitherT(rtd.unregister(s))
+        username <- usernameForSubject(s).someOrFail(AuthenticationError.InvalidCredential)
+        ld <- loginD.unregister(s)
+        ld2 <- ld.register(s, Login(username, password))
+        rtd2 <- rtd.unregister(s)
         flow = copy(loginD = ld2, recoveryTokenD = rtd2)
-      } yield flow).value
+      } yield flow
 
   }
 
   object TokenBasedRecoveryFlow {
-    def create[F[_]: Monad](
-      loginD: LoginDomain[F],
-      recoveryTokenD: AccessTokenDomain[F],
+    def create(
+      loginD: LoginDomain,
+      recoveryTokenD: AccessTokenDomain,
       tokenDuration: Duration,
-    ): TokenBasedRecoveryFlow[F] = TokenBasedRecoveryFlow(loginD, recoveryTokenD, tokenDuration)
+    ): TokenBasedRecoveryFlow = TokenBasedRecoveryFlow(loginD, recoveryTokenD, tokenDuration)
   }
 
 }
