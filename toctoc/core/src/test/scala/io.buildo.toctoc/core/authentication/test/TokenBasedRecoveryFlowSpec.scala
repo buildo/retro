@@ -1,23 +1,23 @@
 package io.buildo.toctoc
 package core
 package authentication
+package test
 
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Arbitrary
-import cats.implicits._
-import cats.effect.IO
-import cats.data.EitherT
 import java.time.Duration
 
-final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIOSupport {
+import zio.ZIO
+import org.scalacheck.Prop.forAll
+import org.scalacheck.Arbitrary
+
+final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with ZIOSupport {
 
   import TokenBasedAuthentication._
   import TokenBasedRecovery._
 
-  val loginDomain: LoginDomain[IO] =
+  val loginDomain: LoginDomain =
     InMemoryAuthenticationDomain.create(Map.empty)
 
-  val tokenDomain: AccessTokenDomain[IO] =
+  val tokenDomain: AccessTokenDomain =
     InMemoryAuthenticationDomain.create(Map.empty)
 
   val recoveryFlow = TokenBasedRecoveryFlow.create(loginDomain, tokenDomain, Duration.ofDays(1))
@@ -29,17 +29,17 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
   property("recovery works for existing users") {
     forAll { (s: UserSubject, username: String, password: String) =>
       await {
-        (for {
-          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+        for {
+          registerResult <- recoveryFlow.registerForRecovery(s)
           (f, token) = registerResult
-          f2 <- EitherT(f.recoverLogin(token, password) { _ =>
-            IO(Some(username))
-          })
-          authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
+          f2 <- f.recoverLogin(token, password) { _ =>
+            ZIO.succeed((Some(username)))
+          }
+          authenticateResult <- f2.loginD.authenticate(Login(username, password))
           (_, subject) = authenticateResult
         } yield {
           assertEquals(subject.ref, s.ref)
-        }).value
+        }
       }
     }
   }
@@ -47,15 +47,18 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
   property("recovery returns InvalidCredential for non existing users") {
     forAll { (s: UserSubject, password: String) =>
       await {
-        (for {
-          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+        for {
+          registerResult <- recoveryFlow.registerForRecovery(s)
           (f, token) = registerResult
-          result <- EitherT(f.recoverLogin(token, password) { _ =>
-            IO(None)
-          })
-        } yield result).void.swap.map { result =>
+          result <- f
+            .recoverLogin(token, password) { _ =>
+              ZIO.succeed(None)
+            }
+            .either
+            .left
+        } yield {
           assertEquals(result, AuthenticationError.InvalidCredential)
-        }.value
+        }
       }
     }
   }
@@ -63,18 +66,21 @@ final class TokenBasedRecoveryFlowSpec extends munit.ScalaCheckSuite with CatsIO
   property("successful recovery invalidates all existing credentials for a subject") {
     forAll { (s: UserSubject, username: String, password: String) =>
       await {
-        (for {
-          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+        for {
+          registerResult <- recoveryFlow.registerForRecovery(s)
           (f, token1) = registerResult
-          registerResult <- EitherT(recoveryFlow.registerForRecovery(s))
+          registerResult <- recoveryFlow.registerForRecovery(s)
           (f, token2) = registerResult
-          f2 <- EitherT(f.recoverLogin(token2, password)(_ => IO(Some(username))))
-          authenticateResult <- EitherT(f2.loginD.authenticate(Login(username, password)))
+          f2 <- f.recoverLogin(token2, password)(_ => ZIO.succeed(Some(username)))
+          authenticateResult <- f2.loginD.authenticate(Login(username, password))
           (_, subject) = authenticateResult
-          recoverResult <- EitherT(f.recoverLogin(token1, password)(_ => IO(Some(username))))
-        } yield recoverResult).void.swap.map { result =>
-          assertEquals(result, AuthenticationError.InvalidCredential)
-        }.value
+          recoverResult <- f
+            .recoverLogin(token1, password)(_ => ZIO.succeed(Some(username)))
+            .either
+            .left
+        } yield {
+          assertEquals(recoverResult, AuthenticationError.InvalidCredential)
+        }
       }
     }
   }
