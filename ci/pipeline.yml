@@ -165,14 +165,14 @@ resources:
     icon: docker
     source:
       repository: postgres
-      tag: "10.1-alpine"
+      tag: "16.1-alpine"
 
   - name: mysql
     type: docker-image
     icon: docker
     source:
       repository: mysql
-      tag: "5.7"
+      tag: "8"
 
   - name: scala-sbt
     type: docker-image

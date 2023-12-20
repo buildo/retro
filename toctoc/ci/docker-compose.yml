@@ -19,16 +19,17 @@ services:
     command: sleep 1d
 
   postgres-db:
-    image: postgres:10.1-alpine
+    image: postgres:16.1-alpine
     container_name: postgres-db
     ports:
       - 5432:5432
     environment:
       POSTGRES_DB: toctoc
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
 
   mysql-db:
-    image: mysql:5.7
+    image: mysql:8
     container_name: mysql-db
     ports:
       - 3306:3306
