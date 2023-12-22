@@ -3,17 +3,18 @@ package slick
 package authentication
 package test
 
-import core.authentication.TokenBasedAuthentication._
-import login.PostgreSqlSlickLoginAuthenticationDomain
-import token.PostgreSqlSlickAccessTokenAuthenticationDomain
+import java.time.Duration
 
+import zio.ZIO
 import _root_.slick.jdbc.PostgresProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import cats.effect.IO
-import java.time.Duration
+import core.authentication.TokenBasedAuthentication._
+import core.authentication.test.ZIOSupport
+import io.buildo.toctoc.slick.authentication.login.PostgreSqlSlickLoginAuthenticationDomain
+import io.buildo.toctoc.slick.authentication.token.PostgreSqlSlickAccessTokenAuthenticationDomain
 
-class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
+class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite with ZIOSupport {
 
   val schemaName = Some("public")
   val loginTableName = "login"
@@ -21,30 +22,28 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
 
   val db = Database.forConfig("db")
   val loginAuthDomain =
-    new PostgreSqlSlickLoginAuthenticationDomain[IO](db, loginTableName, schemaName)
+    new PostgreSqlSlickLoginAuthenticationDomain(db, loginTableName, schemaName)
   val accessTokenAuthDomain =
-    new PostgreSqlSlickAccessTokenAuthenticationDomain[IO](db, tokenTableName)
+    new PostgreSqlSlickAccessTokenAuthenticationDomain(db, tokenTableName)
 
   val loginTable = loginAuthDomain.loginTable
   val accessTokenTable = accessTokenAuthDomain.accessTokenTable
   val schema = loginTable.schema ++ accessTokenTable.schema
 
   val authFlow =
-    new TokenBasedAuthenticationFlow[IO](loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
+    new TokenBasedAuthenticationFlow(loginAuthDomain, accessTokenAuthDomain, Duration.ofDays(1))
 
-  implicit val contextShift = IO.contextShift(munitExecutionContext)
+  override def beforeAll(): Unit = await(ZIO.fromFuture(_ => db.run(schema.create)).unit)
 
-  override def beforeAll() = {
-    IO.fromFuture(IO(db.run(schema.create))).unsafeRunSync
-  }
+  override def afterEach(context: AfterEach): Unit = await(
+    ZIO.fromFuture(_ => db.run(schema.truncate)).unit,
+  )
 
-  override def afterEach(context: AfterEach) = {
-    IO.fromFuture(IO(db.run(schema.truncate))).unsafeRunSync
-  }
-
-  override def afterAll() = {
-    IO.fromFuture(IO(db.run(schema.drop))).unsafeRunSync
-    db.close()
+  override def afterAll(): Unit = await {
+    for {
+      _ <- ZIO.fromFuture(_ => db.run(schema.drop))
+      _ <- ZIO.attempt(db.close())
+    } yield ()
   }
 
   val login = Login("username", "password")
@@ -54,66 +53,117 @@ class PostgreSqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite {
   val subject2 = UserSubject("test2")
 
   test("unregistered login credentials should not be accepted when exchanging for token") {
-    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
+    await(for {
+      result <- authFlow.exchangeForTokens(login).either
+    } yield {
+      assert(result.isLeft)
+    })
   }
 
   test("registered login credentials should be accepted when exchanging for token") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isRight)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      token <- authFlow.exchangeForTokens(login).either
+    } yield {
+      assert(register.isRight)
+      assert(token.isRight)
+    })
   }
 
   test("token obtained by login should be validated") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
-    assertEquals(authFlow.validateToken(token).unsafeRunSync.right.get, subject)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      token <- authFlow.exchangeForTokens(login)
+      result <- authFlow.validateToken(token)
+    } yield {
+      assert(register.isRight)
+      assertEquals(result, subject)
+    })
   }
 
   test("multiple login with same values should not be accepted in registration") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isLeft)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      register2 <- authFlow.registerSubjectLogin(subject, login).either
+    } yield {
+      assert(register.isRight)
+      assert(register2.isLeft)
+    })
   }
 
   test("multiple login with different values should be accepted in registration") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
-    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
-    assertEquals(authFlow.validateToken(token2).unsafeRunSync.right.get, subject2)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      register2 <- authFlow.registerSubjectLogin(subject2, login2).either
+      token2 <- authFlow.exchangeForTokens(login2)
+      result <- authFlow.validateToken(token2)
+    } yield {
+      assert(register.isRight)
+      assert(register2.isRight)
+      assertEquals(result, subject2)
+    })
   }
 
   test("single token unregistration should unregister only the specific token") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
-    val token2 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
-    authFlow.unregisterToken(token).unsafeRunSync
-    assert(authFlow.validateToken(token).unsafeRunSync.isLeft)
-    assert(authFlow.validateToken(token2).unsafeRunSync.isRight)
+    await(for {
+      registerLogin <- authFlow.registerSubjectLogin(subject, login).either
+      registerLogin2 <- authFlow.registerSubjectLogin(subject2, login2).either
+      token <- authFlow.exchangeForTokens(login)
+      token2 <- authFlow.exchangeForTokens(login2)
+      _ <- authFlow.unregisterToken(token)
+      validateToken <- authFlow.validateToken(token).either
+      validateToken2 <- authFlow.validateToken(token2).either
+    } yield {
+      assert(registerLogin.isRight)
+      assert(registerLogin2.isRight)
+      assert(validateToken.isLeft)
+      assert(validateToken2.isRight)
+    })
   }
 
   test("token unregistration should unregister all subject's tokens") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.registerSubjectLogin(subject2, login2).unsafeRunSync.isRight)
-    val token = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
-    val token2 = authFlow.exchangeForTokens(login).unsafeRunSync.right.get
-    val token3 = authFlow.exchangeForTokens(login2).unsafeRunSync.right.get
-    authFlow.unregisterAllSubjectTokens(subject).unsafeRunSync
-    assert(authFlow.validateToken(token).unsafeRunSync.isLeft)
-    assert(authFlow.validateToken(token2).unsafeRunSync.isLeft)
-    assert(authFlow.validateToken(token3).unsafeRunSync.isRight)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      register2 <- authFlow.registerSubjectLogin(subject2, login2).either
+      token <- authFlow.exchangeForTokens(login)
+      token2 <- authFlow.exchangeForTokens(login)
+      token3 <- authFlow.exchangeForTokens(login2)
+      _ <- authFlow.unregisterAllSubjectTokens(subject)
+      validateToken <- authFlow.validateToken(token).either
+      validateToken2 <- authFlow.validateToken(token2).either
+      validateToken3 <- authFlow.validateToken(token3).either
+    } yield {
+      assert(register.isRight)
+      assert(register2.isRight)
+      assert(validateToken.isLeft)
+      assert(validateToken2.isLeft)
+      assert(validateToken3.isRight)
+    })
   }
 
   test("single subject credentials unregistration should take effect") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    authFlow.unregisterLogin(login).unsafeRunSync
-    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      _ <- authFlow.unregisterLogin(login)
+      result <- authFlow.exchangeForTokens(login).either
+    } yield {
+      assert(register.isRight)
+      assert(result.isLeft)
+    })
   }
 
   test("subject credentials unregistration should take effect") {
-    assert(authFlow.registerSubjectLogin(subject, login).unsafeRunSync.isRight)
-    assert(authFlow.registerSubjectLogin(subject, login3).unsafeRunSync.isRight)
-    authFlow.unregisterAllSubjectLogins(subject).unsafeRunSync
-    assert(authFlow.exchangeForTokens(login).unsafeRunSync.isLeft)
-    assert(authFlow.exchangeForTokens(login3).unsafeRunSync.isLeft)
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
+      register3 <- authFlow.registerSubjectLogin(subject, login3).either
+      _ <- authFlow.unregisterAllSubjectLogins(subject)
+      result <- authFlow.exchangeForTokens(login).either
+      result2 <- authFlow.exchangeForTokens(login3).either
+    } yield {
+      assert(register.isRight)
+      assert(register3.isRight)
+      assert(result.isLeft)
+      assert(result2.isLeft)
+    })
   }
-
 }

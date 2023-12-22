@@ -65,20 +65,16 @@ import io.buildo.toctoc.slick.authentication.token.PostgreSqlSlickAccessTokenAut
 // The specialized Login domain
 import io.buildo.toctoc.slick.authentication.login.PostgreSqlSlickLoginAuthenticationDomain
 
-import cats.effect.Sync
-import monix.catnap.FutureLift
 import slick.jdbc.JdbcBackend.Database
-
-import scala.concurrent.Future
 import java.time.Duration
 
 object PostgreSqlSlickTokenBasedRecoveryFlow {
-  def create[F[_]: Sync: FutureLift[*[_], Future]](
+  def create(
     db: Database,
     tokenDuration: Duration
-  ): TokenBasedRecoveryFlow[F] = TokenBasedRecoveryFlow.create[F](
-    loginD = new PostgreSqlSlickLoginAuthenticationDomain[F](db),
-    recoveryTokenD = new PostgreSqlSlickAccessTokenAuthenticationDomain[F](db),
+  ): TokenBasedRecoveryFlow = TokenBasedRecoveryFlow.create(
+    loginD = new PostgreSqlSlickLoginAuthenticationDomain(db),
+    recoveryTokenD = new PostgreSqlSlickAccessTokenAuthenticationDomain(db),
     tokenDuration = tokenDuration,
   )
 }
@@ -93,14 +89,15 @@ possible implementation:
 
 ```scala mdoc
 import java.util.UUID
+import zio.UIO
 
 case class User(id: UUID, username: String, firstName: String, lastName: String)
 case class UserCreate(firstName: String, lastName: String)
 
-trait UserService[F[_]] {
-  def create(user: UserCreate): F[UUID]
-  def read(id: UUID): F[Option[User]]
-  def readByUsername(username: String): F[Option[User]]
+trait UserService {
+  def create(user: UserCreate): UIO[UUID]
+  def read(id: UUID): UIO[Option[User]]
+  def readByUsername(username: String): UIO[Option[User]]
 }
 ```
 
@@ -112,43 +109,37 @@ import io.buildo.toctoc.core.authentication.TokenBasedRecovery.TokenBasedRecover
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.AccessToken
 import io.buildo.toctoc.core.authentication.TokenBasedAuthentication.UserSubject
 import io.buildo.toctoc.core.authentication.AuthenticationError
-import cats.effect.Sync
-import cats.data.EitherT
-import cats.implicits._
 import java.util.UUID
+import zio.IO
 
-trait PasswordResetController[F[_]] {
-  def beginPasswordReset(username: String): F[Either[AuthenticationError, AccessToken]]
+trait PasswordResetController {
+  def beginPasswordReset(username: String): IO[AuthenticationError, AccessToken]
   def completePasswordReset(
     recoveryToken: AccessToken,
     newPassword: String
-  ): F[Either[AuthenticationError, Unit]]
+  ): IO[AuthenticationError, Unit]
 }
 
 object PasswordResetController {
-  def create[F[_]: Sync](
-    recoveryFlow: TokenBasedRecoveryFlow[F],
-    userService: UserService[F]
-  ): PasswordResetController[F] = new PasswordResetController[F] {
+  def create(
+    recoveryFlow: TokenBasedRecoveryFlow,
+    userService: UserService
+  ): PasswordResetController = new PasswordResetController {
 
-    override def beginPasswordReset(username: String): F[Either[AuthenticationError, AccessToken]] =
-      (for {
-        user <- EitherT.fromOptionF(
-          userService.readByUsername(username),
-          AuthenticationError.InvalidCredential: AuthenticationError
-        )
-        result <-  EitherT(recoveryFlow.registerForRecovery(UserSubject(user.id.toString)))
+    override def beginPasswordReset(username: String): IO[AuthenticationError, AccessToken] =
+      for {
+        user <- userService.readByUsername(username).someOrFail(AuthenticationError.InvalidCredential)
+        result <-  recoveryFlow.registerForRecovery(UserSubject(user.id.toString))
         (_, recoveryToken) = result
-      } yield recoveryToken).value
+      } yield recoveryToken
 
     override def completePasswordReset(
       recoveryToken: AccessToken,
       newPassword: String
-    ): F[Either[AuthenticationError, Unit]] =
+    ): IO[AuthenticationError, Unit] =
       recoveryFlow.recoverLogin(recoveryToken, newPassword) { subject =>
         userService.read(UUID.fromString(subject.ref)).map(_.map(_.username))
-      }.map(_.void)
-
+      }.unit
   }
 }
 ```

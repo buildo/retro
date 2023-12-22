@@ -6,23 +6,16 @@ package login
 import core.authentication._
 import core.authentication.TokenBasedAuthentication._
 
-import cats.data.EitherT
-import cats.implicits._
-import monix.catnap.FutureLift
-import monix.catnap.syntax._
-import cats.effect.Sync
+import zio.{IO, ZIO}
+
 import _root_.slick.jdbc.MySQLProfile.api._
 import _root_.slick.jdbc.JdbcBackend.Database
 
-import scala.concurrent.Future
-
-class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
+class MySqlSlickLoginAuthenticationDomain(
   db: Database,
   tableName: String = "login_auth_domain",
   schemaName: Option[String] = None,
-)(implicit
-  F: Sync[F],
-) extends LoginDomain[F]
+) extends LoginDomain
     with BCryptHashing {
 
   class LoginTable(tag: Tag)
@@ -38,41 +31,36 @@ class MySqlSlickLoginAuthenticationDomain[F[_]: FutureLift[*[_], Future]](
   }
   val loginTable = TableQuery[LoginTable]
 
-  override def register(s: Subject, c: Login): F[Either[AuthenticationError, LoginDomain[F]]] =
-    F.delay {
+  override def register(s: Subject, c: Login): IO[AuthenticationError, LoginDomain] =
+    ZIO.fromFuture { _ =>
       db.run(loginTable += ((0, s.ref, c.username, hashPassword(c.password))))
-    }.futureLift
-      .as(this.asRight[AuthenticationError])
-      .handleError { case _ =>
-        AuthenticationError.InvalidCredential.asLeft
-      }
-      .widen
+    }.map(_ => this).mapError(_ => AuthenticationError.InvalidCredential)
 
-  override def unregister(s: Subject): F[Either[AuthenticationError, LoginDomain[F]]] =
-    F.delay {
+  override def unregister(s: Subject): IO[AuthenticationError, LoginDomain] =
+    ZIO.fromFuture { _ =>
       db.run(loginTable.filter(_.ref === s.ref).delete)
-    }.futureLift.as(this.asRight)
+    }.map(_ => this).orDie
 
-  override def unregister(c: Login): F[Either[AuthenticationError, LoginDomain[F]]] =
-    (for {
-      a <- EitherT(authenticate(c))
+  override def unregister(c: Login): IO[AuthenticationError, LoginDomain] =
+    for {
+      a <- authenticate(c)
       (_, s) = a
-      res <- EitherT(unregister(s))
-    } yield res).value
+      res <- unregister(s)
+    } yield res
 
-  override def authenticate(c: Login): F[Either[AuthenticationError, (LoginDomain[F], Subject)]] = {
-    F.delay {
+  override def authenticate(c: Login): IO[AuthenticationError, (LoginDomain, Subject)] = {
+    ZIO.fromFuture { _ =>
       db.run(loginTable.filter(_.username === c.username).result)
-    }.futureLift.map {
+    }.orDie.flatMap {
       case l if l.nonEmpty =>
         l.find(el => checkPassword(c.password, el._4)) match {
           case Some(el) =>
-            (this, UserSubject(el._2)).asRight
+            ZIO.succeed((this, UserSubject(el._2)))
           case None =>
-            AuthenticationError.InvalidCredential.asLeft
+            ZIO.fail(AuthenticationError.InvalidCredential)
         }
       case _ =>
-        AuthenticationError.InvalidCredential.asLeft
+        ZIO.fail(AuthenticationError.InvalidCredential)
     }
   }
 }

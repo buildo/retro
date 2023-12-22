@@ -2,12 +2,11 @@ package io.buildo.toctoc
 package core
 package authentication
 
-import token.Token
-
-import cats.implicits._
-
 import java.time.{Duration, Instant}
-import cats.Monad
+
+import zio.IO
+
+import token.Token
 
 object TokenBasedAuthentication {
   case class AccessToken(
@@ -35,45 +34,43 @@ object TokenBasedAuthentication {
     password: String,
   )
 
-  type LoginDomain[F[_]] = AuthenticationDomain[F, Login]
+  type LoginDomain = AuthenticationDomain[Login]
 
   case class UserSubject(
     ref: String,
   ) extends Subject
 
-  type AccessTokenDomain[F[_]] = AuthenticationDomain[F, AccessToken]
+  type AccessTokenDomain = AuthenticationDomain[AccessToken]
 
-  class TokenBasedAuthenticationFlow[F[_]: Monad](
-    loginD: LoginDomain[F],
-    accessTokenD: AccessTokenDomain[F],
+  class TokenBasedAuthenticationFlow(
+    loginD: LoginDomain,
+    accessTokenD: AccessTokenDomain,
     tokenDuration: Duration,
   ) extends BCryptHashing {
-    def registerSubjectLogin(s: Subject, l: Login): F[Either[AuthenticationError, Unit]] =
-      loginD.register(s, l).nested.void.value
+    def registerSubjectLogin(s: Subject, l: Login): IO[AuthenticationError, Unit] =
+      loginD.register(s, l).unit
 
-    def exchangeForTokens(l: Login): F[Either[AuthenticationError, AccessToken]] = {
+    def exchangeForTokens(l: Login): IO[AuthenticationError, AccessToken] = {
       val accessToken = AccessToken.generate(randomString(64), tokenDuration)
       AuthenticationDomain
         .exchangeCredentials(loginD, accessTokenD)(l, accessToken)
-        .nested
         .as(accessToken)
-        .value
     }
 
-    def validateToken(at: AccessToken): F[Either[AuthenticationError, Subject]] =
-      accessTokenD.authenticate(at).nested.map { case (_, s) => s }.value
+    def validateToken(at: AccessToken): IO[AuthenticationError, Subject] =
+      accessTokenD.authenticate(at).map { case (_, s) => s }
 
-    def unregisterToken(at: AccessToken): F[Either[AuthenticationError, Unit]] =
-      accessTokenD.unregister(at).nested.void.value
+    def unregisterToken(at: AccessToken): IO[AuthenticationError, Unit] =
+      accessTokenD.unregister(at).unit
 
-    def unregisterAllSubjectTokens(s: Subject): F[Either[AuthenticationError, Unit]] =
-      accessTokenD.unregister(s).nested.void.value
+    def unregisterAllSubjectTokens(s: Subject): IO[AuthenticationError, Unit] =
+      accessTokenD.unregister(s).unit
 
-    def unregisterAllSubjectLogins(s: Subject): F[Either[AuthenticationError, Unit]] =
-      loginD.unregister(s).nested.void.value
+    def unregisterAllSubjectLogins(s: Subject): IO[AuthenticationError, Unit] =
+      loginD.unregister(s).unit
 
-    def unregisterLogin(l: Login): F[Either[AuthenticationError, Unit]] =
-      loginD.unregister(l).nested.void.value
+    def unregisterLogin(l: Login): IO[AuthenticationError, Unit] =
+      loginD.unregister(l).unit
 
   }
 

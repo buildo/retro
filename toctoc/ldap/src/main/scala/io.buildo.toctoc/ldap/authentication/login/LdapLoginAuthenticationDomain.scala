@@ -7,41 +7,36 @@ import core.authentication._
 import core.authentication.TokenBasedAuthentication._
 import com.unboundid.ldap.sdk.{LDAPConnection, LDAPException, ResultCode}
 
-import cats.implicits._
-import cats.effect.Sync
+import zio.{IO, ZIO}
 
-class LdapLoginAuthenticationDomain[F[_]](ldapConfig: LdapConfig)(implicit F: Sync[F])
-    extends LoginDomain[F] {
+class LdapLoginAuthenticationDomain(ldapConfig: LdapConfig) extends LoginDomain {
 
-  override def register(s: Subject, c: Login): F[Either[AuthenticationError, LoginDomain[F]]] =
-    ???
+  override def register(s: Subject, c: Login): IO[AuthenticationError, LoginDomain] = ???
 
-  override def unregister(s: Subject): F[Either[AuthenticationError, LoginDomain[F]]] = ???
+  override def unregister(s: Subject): IO[AuthenticationError, LoginDomain] = ???
 
-  override def unregister(c: Login): F[Either[AuthenticationError, LoginDomain[F]]] = ???
+  override def unregister(c: Login): IO[AuthenticationError, LoginDomain] = ???
 
   override def authenticate(
     c: Login,
-  ): F[Either[AuthenticationError, (LoginDomain[F], Subject)]] =
-    F.delay {
+  ): IO[AuthenticationError, (LoginDomain, Subject)] = {
 
-      val username = buildUsername(c.username, ldapConfig)
-      val host = ldapConfig.host
-      val port = ldapConfig.port
+    val username = buildUsername(c.username, ldapConfig)
+    val host = ldapConfig.host
+    val port = ldapConfig.port
 
-      val conn = new LDAPConnection()
-      try {
-        conn.connect(host, port)
-        conn.bind(username, c.password)
-
-        (this, UserSubject(c.username)).asRight
-      } catch {
-        case e: LDAPException => fromResultCodeToLDAPError(e.getResultCode).asLeft
-        case _: Exception     => AuthenticationError.LDAPGenericError.asLeft
-      } finally {
-        conn.close
+    val conn = new LDAPConnection()
+    ZIO.attempt {
+      conn.connect(host, port)
+      conn.bind(username, c.password)
+      (this, UserSubject(c.username))
+    }.mapError { e =>
+      e match {
+        case e: LDAPException => fromResultCodeToLDAPError(e.getResultCode)
+        case _                => AuthenticationError.LDAPGenericError
       }
-    }
+    }.ensuring(ZIO.succeed(conn.close))
+  }
 
   private[this] def buildUsername(username: String, ldapConfig: LdapConfig): String = {
     val loginType: LdapLoginType = ldapConfig.loginType
