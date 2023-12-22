@@ -42,7 +42,7 @@ class PostgreSqlSlickLoginAuthenticationDomain(
   override def unregister(s: Subject): IO[AuthenticationError, LoginDomain] =
     ZIO.fromFuture { _ =>
       db.run(loginTable.filter(_.ref === s.ref).delete)
-    }.map(_ => this).mapError(_ => AuthenticationError.Forbidden)
+    }.map(_ => this).orDie
 
   override def unregister(c: Login): IO[AuthenticationError, LoginDomain] =
     for {
@@ -56,7 +56,7 @@ class PostgreSqlSlickLoginAuthenticationDomain(
   ): IO[AuthenticationError, (LoginDomain, Subject)] = {
     ZIO.fromFuture { _ =>
       db.run(loginTable.filter(_.username === c.username).result)
-    }.mapError(_ => AuthenticationError.InvalidCredential).flatMap {
+    }.orDie.flatMap {
       case l if l.size > 0 =>
         l.find(el => checkPassword(c.password, el._4)) match {
           case Some(el) =>

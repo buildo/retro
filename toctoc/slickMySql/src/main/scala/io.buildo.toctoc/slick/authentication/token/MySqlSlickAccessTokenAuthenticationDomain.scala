@@ -38,17 +38,17 @@ class MySqlSlickAccessTokenAuthenticationDomain(
   ): IO[AuthenticationError, AccessTokenDomain] =
     ZIO.fromFuture { _ =>
       db.run(accessTokenTable += ((0, s.ref, c.value, Timestamp.from(c.expiresAt))))
-    }.map(_ => this).mapError(_ => AuthenticationError.InvalidCredential)
+    }.map(_ => this).orDie
 
   override def unregister(s: Subject): IO[AuthenticationError, AccessTokenDomain] =
     ZIO.fromFuture { _ =>
       db.run(accessTokenTable.filter(_.ref === s.ref).delete)
-    }.map(_ => this).mapError(_ => AuthenticationError.Forbidden)
+    }.map(_ => this).orDie
 
   override def unregister(c: AccessToken): IO[AuthenticationError, AccessTokenDomain] =
     ZIO.fromFuture { _ =>
       db.run(accessTokenTable.filter(_.token === c.value).delete)
-    }.map(_ => this).mapError(_ => AuthenticationError.Forbidden)
+    }.map(_ => this).orDie
 
   override def authenticate(
     c: AccessToken,
@@ -60,7 +60,7 @@ class MySqlSlickAccessTokenAuthenticationDomain(
           .result
           .headOption,
       )
-    }.mapError(_ => AuthenticationError.InvalidCredential).flatMap {
+    }.orDie.flatMap {
       case None =>
         ZIO.fail(AuthenticationError.InvalidCredential)
       case Some((_, ref, _, _)) =>
