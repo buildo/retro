@@ -50,65 +50,59 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite with ZI
   val subject2 = UserSubject("test2")
 
   test("unregistered login credentials should not be accepted when exchanging for token") {
-    for {
+    await(for {
       result <- authFlow.exchangeForTokens(login).either
     } yield {
       assert(result.isLeft)
-    }
+    })
   }
 
   test("registered login credentials should be accepted when exchanging for token") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       token <- authFlow.exchangeForTokens(login).either
     } yield {
       assert(register.isRight)
       assert(token.isRight)
-    }
+    })
   }
 
   test("token obtained by login should be validated") {
-    for {
-      result <- authFlow.registerSubjectLogin(subject, login).either
-    } yield {
-      assert(result.isRight)
-    }
-    for {
+    await(for {
+      register <- authFlow.registerSubjectLogin(subject, login).either
       token <- authFlow.exchangeForTokens(login)
       result <- authFlow.validateToken(token)
     } yield {
+      assert(register.isRight)
       assertEquals(result, subject)
-    }
+    })
   }
 
   test("multiple login with same values should not be accepted in registration") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       register2 <- authFlow.registerSubjectLogin(subject, login).either
     } yield {
       assert(register.isRight)
       assert(register2.isLeft)
-    }
+    })
   }
 
   test("multiple login with different values should be accepted in registration") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       register2 <- authFlow.registerSubjectLogin(subject2, login2).either
-    } yield {
-      assert(register.isRight)
-      assert(register2.isRight)
-    }
-    for {
       token2 <- authFlow.exchangeForTokens(login2)
       result <- authFlow.validateToken(token2)
     } yield {
+      assert(register.isRight)
+      assert(register2.isRight)
       assertEquals(result, subject2)
-    }
+    })
   }
 
   test("single token unregistration should unregister only the specific token") {
-    for {
+    await(for {
       registerLogin <- authFlow.registerSubjectLogin(subject, login).either
       registerLogin2 <- authFlow.registerSubjectLogin(subject2, login2).either
       token <- authFlow.exchangeForTokens(login)
@@ -121,11 +115,11 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite with ZI
       assert(registerLogin2.isRight)
       assert(validateToken.isLeft)
       assert(validateToken2.isRight)
-    }
+    })
   }
 
   test("token unregistration should unregister all subject's tokens") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       register2 <- authFlow.registerSubjectLogin(subject2, login2).either
       token <- authFlow.exchangeForTokens(login)
@@ -141,22 +135,22 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite with ZI
       assert(validateToken.isLeft)
       assert(validateToken2.isLeft)
       assert(validateToken3.isRight)
-    }
+    })
   }
 
   test("single subject credentials unregistration should take effect") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       _ <- authFlow.unregisterLogin(login)
       result <- authFlow.exchangeForTokens(login).either
     } yield {
       assert(register.isRight)
       assert(result.isLeft)
-    }
+    })
   }
 
   test("subject credentials unregistration should take effect") {
-    for {
+    await(for {
       register <- authFlow.registerSubjectLogin(subject, login).either
       register3 <- authFlow.registerSubjectLogin(subject, login3).either
       _ <- authFlow.unregisterAllSubjectLogins(subject)
@@ -167,6 +161,6 @@ class MySqlSlickLoginAuthenticationDomainFlowSpec extends munit.FunSuite with ZI
       assert(register3.isRight)
       assert(result.isLeft)
       assert(result2.isLeft)
-    }
+    })
   }
 }
