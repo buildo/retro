@@ -161,28 +161,28 @@ resources:
         - ci/docs.yml
 
   - name: postgres
-    type: docker-image
+    type: registry-image
     icon: docker
     source:
       repository: postgres
       tag: "16.1-alpine"
 
   - name: mysql
-    type: docker-image
+    type: registry-image
     icon: docker
     source:
       repository: mysql
       tag: "8"
 
   - name: scala-sbt
-    type: docker-image
+    type: registry-image
     icon: docker
     source:
       repository: buildo/scala-sbt-alpine
       tag: 8_2.13.6_1.5.5
 
   - name: hseeberger-scala-sbt
-    type: docker-image
+    type: registry-image
     icon: docker
     source:
       repository: hseeberger/scala-sbt
@@ -243,14 +243,11 @@ jobs:
               resource: master
               trigger: true
             - get: postgres
-              params:
-                save: true
+              params: { format: oci }
             - get: mysql
-              params:
-                save: true
+              params: { format: oci }
             - get: scala-sbt
-              params:
-                save: true
+              params: { format: oci }
       - task: test
         file: retro/toctoc/ci/test.yml
         privileged: true
@@ -410,14 +407,11 @@ jobs:
               trigger: true
               version: every
             - get: postgres
-              params:
-                save: true
+              params: { format: oci }
             - get: mysql
-              params:
-                save: true
+              params: { format: oci }
             - get: scala-sbt
-              params:
-                save: true
+              params: { format: oci }
       - put: toctoc-pr
         params:
           path: retro
