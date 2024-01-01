@@ -163,6 +163,7 @@ resources:
   - name: postgres
     type: registry-image
     icon: docker
+    check_every: 24h
     source:
       repository: postgres
       tag: "16.1-alpine"
@@ -170,6 +171,7 @@ resources:
   - name: mysql
     type: registry-image
     icon: docker
+    check_every: 24h
     source:
       repository: mysql
       tag: "8"
@@ -177,6 +179,7 @@ resources:
   - name: scala-sbt
     type: registry-image
     icon: docker
+    check_every: 24h
     source:
       repository: buildo/scala-sbt-alpine
       tag: 8_2.13.6_1.5.5
@@ -184,6 +187,7 @@ resources:
   - name: hseeberger-scala-sbt
     type: registry-image
     icon: docker
+    check_every: 24h
     source:
       repository: hseeberger/scala-sbt
       tag: 8u282_1.5.5_2.13.6
