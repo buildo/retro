@@ -34,6 +34,7 @@ object Dependencies {
     val tapir = "0.18.1"
     val munit = "0.7.29"
     val zio = "2.0.19"
+    val pureConfig = "0.17.4"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
@@ -78,9 +79,9 @@ object Dependencies {
   val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % V.tapir
   val munit = "org.scalameta" %% "munit" % V.munit
   val munitScalaCheck = "org.scalameta" %% "munit-scalacheck" % V.munit
+  val pureConfig = "com.github.pureconfig" %% "pureconfig" % V.pureConfig
   val log4j = "org.apache.logging.log4j" % "log4j-api" % "2.14.1"
   val autowire = "com.lihaoyi" %% "autowire" % "0.3.3"
-  val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.11.1"
   val metarpheusCore = "io.buildo" %% "metarpheus-core" % "1.0.0"
   val zio = "dev.zio" %% "zio" % V.zio
 
