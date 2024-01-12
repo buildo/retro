@@ -22,7 +22,7 @@ object Dependencies {
     val jakartaMail = "2.0.1"
     val slick = "3.4.1"
     val postgresql = "42.5.0"
-    val mysql = "8.0.33"
+    val mysql = "8.2.0"
     val ldap = "6.0.0"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
@@ -66,7 +66,7 @@ object Dependencies {
   val postgresql = "org.postgresql" % "postgresql" % V.postgresql
   val bcrypt = "org.mindrot" % "jbcrypt" % V.bcrypt
   val flywayCore = "org.flywaydb" % "flyway-core" % V.flyway
-  val mysql = "mysql" % "mysql-connector-java" % V.mysql
+  val mysql = "com.mysql" % "mysql-connector-j" % V.mysql
   val ldap = "com.unboundid" % "unboundid-ldapsdk" % V.ldap
   val slf4jNop = "org.slf4j" % "slf4j-nop" % V.slf4j
   val scalameta = "org.scalameta" %% "scalameta" % V.scalameta
