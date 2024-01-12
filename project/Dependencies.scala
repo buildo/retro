@@ -33,7 +33,7 @@ object Dependencies {
     val pprint = "0.6.6"
     val tapir = "0.18.1"
     val munit = "0.7.29"
-    val zio = "2.0.19"
+    val zio = "2.0.21"
     val pureConfig = "0.17.4"
   }
 
