@@ -23,7 +23,7 @@ object Dependencies {
     val slick = "3.4.1"
     val postgresql = "42.5.0"
     val mysql = "8.0.33"
-    val ldap = "6.0.0"
+    val ldap = "6.0.11"
     val flyway = "5.2.4"
     val bcrypt = "0.4"
     val slf4j = "1.7.32"
