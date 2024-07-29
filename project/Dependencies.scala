@@ -5,7 +5,7 @@ import scala.language.reflectiveCalls
 object Dependencies {
 
   val V = new {
-    val circe = "0.14.3"
+    val circe = "0.14.4"
     val scalacheck = "1.15.4"
     val mockito = "1.9.5"
     val akka = "2.6.15"
