@@ -36,7 +36,7 @@ lazy val `sbt-buildo` = project
   .settings(
     scalaVersion := scala212,
     crossScalaVersions := Nil,
-    addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1"),
+    addSbtPlugin("io.spray" % "sbt-revolver" % "0.10.0"),
     addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "1.1.0"),
     dynverTagPrefix := "sbt-buildo-",
   )
