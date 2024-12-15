@@ -16,10 +16,10 @@ trait RouterDerivationModule extends PathMacro with MetaDataMacro with TypePathM
 }
 
 object RouterDerivationMacro extends RouterDerivationModule {
-  //val is required to make universe public
+  // val is required to make universe public
   object MacroHelper {
-    //check only annotations of path type
-    //Since universe is public Tree type can be returned
+    // check only annotations of path type
+    // Since universe is public Tree type can be returned
     def derivePath(c: Context)(tpe: c.Type): c.Tree = {
       import c.universe._
       tpe.typeSymbol.annotations.collectFirst {
