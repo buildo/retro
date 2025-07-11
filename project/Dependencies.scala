@@ -13,7 +13,7 @@ object Dependencies {
     val akkaHttpCirce = "1.37.0"
     val awscala = "0.8.5"
     val cats = "2.6.1"
-    val config = "1.4.1"
+    val config = "1.4.4"
     val scalacacheGuava = "0.28.0"
     val scalaLogging = "3.9.4"
     val logback = "1.2.5"
