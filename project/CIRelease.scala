@@ -83,7 +83,10 @@ object CiReleasePlugin extends AutoPlugin {
       if (releaseProjects.length > 0) {
         "sonatypeBundleClean" :: publishSignedCommands ::: publishCommands ::: "sonatypeBundleRelease" :: currentState
       } else {
-        publishCommands ::: currentState
+        // NOTE(gabro): disable snapshot releases since I don't have time to properly fix them
+        // It's not working due to recent changes (June 2025) to oss.sonatype.org
+        // publishCommands ::: currentState
+        currentState
       }
     },
   )
