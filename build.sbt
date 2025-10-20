@@ -6,6 +6,8 @@ val scala212 = "2.12.13"
 val scala213 = "2.13.6"
 val scala3 = "3.3.1"
 
+allowUnsafeScalaLibUpgrade := true
+
 inThisBuild(
   List(
     scalaVersion := scala213,
