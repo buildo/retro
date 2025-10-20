@@ -3,9 +3,6 @@ package com.geirsson
 import com.typesafe.sbt.GitPlugin
 import com.jsuereth.sbtpgp.SbtPgp
 import com.jsuereth.sbtpgp.SbtPgp.autoImport._
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.Base64
 import sbt.Def
 import sbt.Keys._
 import sbt._
@@ -13,15 +10,13 @@ import sbt.plugins.JvmPlugin
 import sbtdynver.DynVerPlugin
 import sbtdynver.DynVerPlugin.autoImport._
 import scala.sys.process._
-import xerial.sbt.Sonatype
-import xerial.sbt.Sonatype.autoImport._
 import scala.util.Try
 
 object CiReleasePlugin extends AutoPlugin {
 
   override def trigger = allRequirements
   override def requires =
-    JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin && Sonatype
+    JvmPlugin && SbtPgp && DynVerPlugin && GitPlugin
 
   def tag(prefix: String): Option[String] =
     Try("git tag".!!).toOption.map(_.split("\n")).toList.flatten.find(_.startsWith(s"${prefix}v"))
@@ -47,11 +42,13 @@ object CiReleasePlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = List(
     dynverSonatypeSnapshots := true,
-    publishConfiguration :=
-      publishConfiguration.value.withOverwrite(true),
-    publishLocalConfiguration :=
-      publishLocalConfiguration.value.withOverwrite(true),
-    publishTo := sonatypePublishToBundle.value,
+    ThisBuild / publishTo := {
+      val snaps = "https://central.sonatype.com/repository/maven-snapshots/"
+      if (isSnapshot.value) Some("central-snapshots".at(snaps))
+      else localStaging.value
+    },
+    publishConfiguration := publishConfiguration.value.withOverwrite(true),
+    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
     commands += Command.command("ci-release") { currentState =>
       println("Running ci-release.\n")
       setupGpg()
@@ -81,14 +78,10 @@ object CiReleasePlugin extends AutoPlugin {
       }
 
       if (releaseProjects.length > 0) {
-        "sonatypeBundleClean" :: publishSignedCommands ::: publishCommands ::: "sonatypeBundleRelease" :: currentState
+        publishSignedCommands ::: publishCommands ::: "sonaRelease" :: currentState
       } else {
-        // NOTE(gabro): disable snapshot releases since I don't have time to properly fix them
-        // It's not working due to recent changes (June 2025) to oss.sonatype.org
-        // publishCommands ::: currentState
-        currentState
+        publishCommands ::: currentState
       }
     },
   )
-
 }
