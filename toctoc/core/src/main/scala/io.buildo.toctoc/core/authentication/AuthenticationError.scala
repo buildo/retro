@@ -7,6 +7,7 @@ object AuthenticationError {
   // toctoc error
   object InvalidCredential extends AuthenticationError
   object Forbidden extends AuthenticationError
+  object CredentialCreationFailed extends AuthenticationError
   // LDAP errors
   object LDAPOperationsError extends AuthenticationError
   object LDAPProtocolError extends AuthenticationError
