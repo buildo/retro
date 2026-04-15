@@ -69,12 +69,14 @@ object CiReleasePlugin extends AutoPlugin {
         println(releaseProjects.map(_.project).mkString("  - ", "\n  - ", "\n"))
       }
 
+      def crossPrefix(projectRef: sbt.ProjectRef): String =
+        if (extracted.get(projectRef / crossScalaVersions).nonEmpty) "+" else ""
       val publishSignedCommands =
         releaseProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
-          s"+${projectRef.project}/publishSigned" :: state
+          s"${crossPrefix(projectRef)}${projectRef.project}/publishSigned" :: state
         }
       val publishCommands = snapshotProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
-        s"+${projectRef.project}/publish" :: state
+        s"${crossPrefix(projectRef)}${projectRef.project}/publish" :: state
       }
 
       if (releaseProjects.length > 0) {
