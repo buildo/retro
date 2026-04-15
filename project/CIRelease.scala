@@ -78,7 +78,7 @@ object CiReleasePlugin extends AutoPlugin {
       }
 
       if (releaseProjects.length > 0) {
-        publishSignedCommands ::: publishCommands ::: "sonaRelease" :: currentState
+        publishSignedCommands ::: "sonaRelease" :: currentState
       } else {
         publishCommands ::: currentState
       }
