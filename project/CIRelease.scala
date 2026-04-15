@@ -42,7 +42,7 @@ object CiReleasePlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = List(
     dynverSonatypeSnapshots := true,
-    ThisBuild / publishTo := {
+    publishTo := {
       val snaps = "https://central.sonatype.com/repository/maven-snapshots/"
       if (version.value.endsWith("-SNAPSHOT")) Some("central-snapshots".at(snaps))
       else localStaging.value
