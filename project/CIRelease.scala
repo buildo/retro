@@ -69,16 +69,27 @@ object CiReleasePlugin extends AutoPlugin {
         println(releaseProjects.map(_.project).mkString("  - ", "\n  - ", "\n"))
       }
 
+      def crossPrefix(projectRef: sbt.ProjectRef): String =
+        if (extracted.get(projectRef / crossScalaVersions).nonEmpty) "+" else ""
       val publishSignedCommands =
         releaseProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
-          s"+${projectRef.project}/publishSigned" :: state
+          s"${crossPrefix(projectRef)}${projectRef.project}/publishSigned" :: state
         }
       val publishCommands = snapshotProjects.foldLeft(List.empty[String]) { (state, projectRef) =>
-        s"+${projectRef.project}/publish" :: state
+        s"${crossPrefix(projectRef)}${projectRef.project}/publish" :: state
       }
 
       if (releaseProjects.length > 0) {
-        publishSignedCommands ::: "sonaRelease" :: currentState
+        // `sonaRelease` (built-in in sbt 1.10+) reads `Keys.version` at the
+        // extracted's current ref. When invoked at the root, that's the root
+        // project's version — which, with per-project dynver, is a SNAPSHOT
+        // (no tag matches the root's empty `dynverTagPrefix`). sonaRelease's
+        // SNAPSHOT check then always fails. Inject a non-SNAPSHOT version on
+        // the root (any release project's version works — they've already
+        // been filtered to non-SNAPSHOT).
+        val releaseVersion = extracted.get(releaseProjects.head / version)
+        val setRootVersion = s"""set version := "$releaseVersion""""
+        publishSignedCommands ::: setRootVersion :: "sonaRelease" :: currentState
       } else {
         publishCommands ::: currentState
       }
