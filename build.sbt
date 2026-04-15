@@ -224,6 +224,7 @@ lazy val docs = project
     publish / skip := true,
     moduleName := "retro-docs",
     libraryDependencies ++= docsDependencies,
+    run / fork := true,
     mdocVariables := Map(
       "CIRCE_VERSION" -> V.circe,
       "AKKA_HTTP_VERSION" -> V.akkaHttp,
