@@ -34,7 +34,7 @@ object Dependencies {
     val tapir = "0.18.1"
     val munit = "0.7.29"
     val zio = "2.0.19"
-    val pureConfig = "0.17.4"
+    val pureConfig = "0.17.8"
   }
 
   val circeCore = "io.circe" %% "circe-core" % V.circe
