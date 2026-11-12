@@ -92,6 +92,7 @@ lazy val toctocSlickPostgreSql = project
     name := "toctoc-slick-postgresql",
     libraryDependencies ++= toctocSlickPostgresDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore % "compile->compile;test->test")
 
