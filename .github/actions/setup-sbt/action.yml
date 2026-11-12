@@ -1,0 +1,18 @@
+name: Setup sbt
+description: Temurin JDK with the sbt cache, and the sbt launcher.
+
+inputs:
+  java-version:
+    description: JDK version
+    default: "8"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+        cache: sbt
+
+    - uses: sbt/setup-sbt@v1

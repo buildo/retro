@@ -32,6 +32,7 @@ jobs:
               - build.sbt
               - "project/**"
               - ".github/workflows/ci.yml"
+              - ".github/actions/**"
             sbt-buildo:
               - *shared
               - "sbt-buildo/**"
@@ -88,13 +89,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - uses: sbt/setup-sbt@v1
+      - uses: ./.github/actions/setup-sbt
 
       - name: Test
         run: |
@@ -139,13 +134,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: ./.github/actions/setup-sbt
         with:
-          distribution: temurin
           java-version: 17
-          cache: sbt
-
-      - uses: sbt/setup-sbt@v1
 
       - name: Test
         run: sbt -batch "; +toctocSlickPostgreSql/test; +toctocSlickMySql/test; +toctocCirce/test"
@@ -177,14 +168,7 @@ jobs:
           git-crypt unlock "$RUNNER_TEMP/git-crypt.key"
           echo "unlocked=true" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-java@v4
-        if: steps.unlock.outputs.unlocked == 'true'
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - uses: sbt/setup-sbt@v1
+      - uses: ./.github/actions/setup-sbt
         if: steps.unlock.outputs.unlocked == 'true'
 
       - name: Test
@@ -222,13 +206,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - uses: sbt/setup-sbt@v1
+      - uses: ./.github/actions/setup-sbt
 
       - uses: actions/setup-node@v4
         with:
