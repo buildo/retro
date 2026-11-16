@@ -122,6 +122,7 @@ lazy val toctocCirce = project
     name := "toctoc-circe",
     dynverTagPrefix := "toctoc-",
     libraryDependencies ++= toctocCirceDependencies,
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore)
 

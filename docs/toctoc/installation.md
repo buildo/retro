@@ -12,8 +12,7 @@ title: Installation
   databases
 - `toctoc-circe`: provides Circe encoders/decoders for core toctoc types
 
-All modules are published for Scala 2.12 and 2.13, and all but `toctoc-circe`
-also for Scala 3.
+All modules are published for Scala 2.12, 2.13 and 3.
 
 The Slick modules (`toctoc-slick-postgresql` and `toctoc-slick-mysql`) depend on
 Slick 3.5, which uses HikariCP 5: they need Java 11 or later at runtime, and a
