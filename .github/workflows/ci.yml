@@ -143,7 +143,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Slick 3.5 brings HikariCP 5, compiled for Java 11: the Slick specs do
+      # not load on JDK 8. The release keeps JDK 8, so the published bytecode
+      # still links against the Java 8 API.
       - uses: ./.github/actions/setup-sbt
+        with:
+          java-version: "17"
 
       - name: Test
         run: sbt -batch "; +toctocSlickPostgreSql/test; +toctocSlickMySql/test; +toctocCirce/test"
