@@ -102,6 +102,7 @@ lazy val toctocSlickMySql = project
     name := "toctoc-slick-mysql",
     libraryDependencies ++= toctocSlickMySqlDependencies,
     dynverTagPrefix := "toctoc-",
+    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore % "compile->compile;test->test")
 
