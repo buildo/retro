@@ -1,0 +1,257 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+    tags: ["*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# paths-filter lists the files of a pull request through the API. The release
+# pushes the website with its own deploy key, not with this token.
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # On a pull request only the projects whose files changed are tested, as the
+  # per-project `*-pr` resources did on Concourse. On master and on tags every
+  # project is tested, because the release publishes all of them.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.projects.outputs.projects }}
+      sbt_projects: ${{ steps.projects.outputs.sbt_projects }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3.0.4
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            shared: &shared
+              - build.sbt
+              - "project/**"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            sbt-buildo:
+              - *shared
+              - "sbt-buildo/**"
+            enumero:
+              - *shared
+              - "enumero/**"
+            mailo:
+              - *shared
+              - "mailo/**"
+            toctoc:
+              - *shared
+              - "toctoc/**"
+            metarpheus:
+              - *shared
+              - "metarpheus/**"
+            tapiro:
+              - *shared
+              - "tapiro/**"
+            java-time-circe-codecs:
+              - *shared
+              - "javaTimeCirceCodecs/**"
+            wiro:
+              - *shared
+              - "wiro/**"
+            # docs/mdoc compiles snippets against these projects.
+            docs:
+              - *shared
+              - "docs/**"
+              - "toctoc/**"
+              - "enumero/**"
+              - "mailo/**"
+
+      - id: projects
+        env:
+          CHANGED: ${{ steps.filter.outputs.changes }}
+        run: |
+          all='["sbt-buildo","enumero","mailo","toctoc","metarpheus","tapiro","java-time-circe-codecs","wiro","docs"]'
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            projects=$(echo "$CHANGED" | jq -c 'map(select(. != "shared"))')
+          else
+            projects="$all"
+          fi
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
+          echo "sbt_projects=$(echo "$projects" | jq -c 'map(select(. != "toctoc" and . != "mailo"))')" >> "$GITHUB_OUTPUT"
+          echo "Projects to test: $projects"
+
+  # Projects that need only sbt and JDK 8, like the buildo/scala-sbt-alpine:8
+  # image used on Concourse.
+  test:
+    name: ${{ matrix.project }}
+    needs: changes
+    if: needs.changes.outputs.sbt_projects != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(needs.changes.outputs.sbt_projects) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-sbt
+
+      - name: Test
+        run: |
+          case "${{ matrix.project }}" in
+            sbt-buildo)             sbt -batch "sbt-buildo/compile" ;;
+            enumero)                sbt -batch "; enumeroCore/test; enumeroCirce/test" ;;
+            metarpheus)             sbt -batch "+metarpheusCoreJVM/test" ;;
+            tapiro)                 sbt -batch "; +tapiroCore/test; sbt-tapiro/scripted" ;;
+            java-time-circe-codecs) sbt -batch "+javaTimeCirceCodecs/test" ;;
+            wiro)                   sbt -batch "+wiro/test" ;;
+            docs)                   sbt -batch "docs/mdoc" ;;
+            *) echo "Unknown project ${{ matrix.project }}"; exit 1 ;;
+          esac
+
+  # toctoc needs PostgreSQL and MySQL. The test configs default to localhost.
+  toctoc:
+    name: toctoc
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.projects), 'toctoc')
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.1-alpine
+        env:
+          POSTGRES_DB: toctoc
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s
+          --health-timeout 5s --health-retries 20
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: toctoc
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1" --health-interval 5s
+          --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-sbt
+
+      - name: Test
+        run: sbt -batch "; +toctocSlickPostgreSql/test; +toctocSlickMySql/test; +toctocCirce/test"
+
+  # mailo's test configuration is encrypted with git-crypt. The job unlocks it
+  # with the GIT_CRYPT_KEY secret (base64 of the exported key) and is skipped
+  # when the secret is not set. As on Concourse, the release does not wait for
+  # it.
+  mailo:
+    name: mailo
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.projects), 'mailo')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unlock the test configuration
+        id: unlock
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+        run: |
+          if [ -z "$GIT_CRYPT_KEY" ]; then
+            echo "::warning::GIT_CRYPT_KEY is not set: mailo tests skipped"
+            echo "unlocked=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sudo apt-get update -qq && sudo apt-get install -y -qq git-crypt
+          echo "$GIT_CRYPT_KEY" | base64 --decode > "$RUNNER_TEMP/git-crypt.key"
+          git-crypt unlock "$RUNNER_TEMP/git-crypt.key"
+          rm "$RUNNER_TEMP/git-crypt.key"
+          echo "unlocked=true" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/setup-sbt
+        if: steps.unlock.outputs.unlocked == 'true'
+
+      - name: Test
+        if: steps.unlock.outputs.unlocked == 'true'
+        run: sbt -batch "+mailo/test"
+
+  scalafmt:
+    name: scalafmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Check formatting
+        run: ./scalafmt --test
+
+  # Same as the Concourse `release` job: on every push to master it publishes
+  # the SNAPSHOT of every project and the website, on a `<project>-v*` tag it
+  # publishes that release to Sonatype. The website is published only from
+  # master, as Concourse did, so tagging an older commit does not roll it back.
+  release:
+    name: Release
+    needs: [test, toctoc, scalafmt]
+    if: github.event_name == 'push' && github.repository == 'buildo/retro'
+    runs-on: ubuntu-latest
+    # One group per ref: a queued tag release must not be replaced by a later
+    # push to master, which would cancel it.
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-sbt
+
+      - uses: actions/setup-node@v4
+        if: github.ref == 'refs/heads/master'
+        with:
+          node-version: 18
+
+      - if: github.ref == 'refs/heads/master'
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
+
+      - name: Configure git
+        run: |
+          git config --global user.name "nemobot"
+          git config --global user.email "nemobot@buildo.io"
+          git config --global push.default simple
+
+      - name: Publish to Sonatype
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        run: sbt ci-release
+
+      - name: Build the docs
+        if: github.ref == 'refs/heads/master'
+        run: sbt docs/mdoc
+
+      - name: Publish the website
+        if: github.ref == 'refs/heads/master'
+        working-directory: website
+        env:
+          USE_SSH: "true"
+          GIT_USER: nemobot
+        run: |
+          yarn install
+          yarn publish-gh-pages
