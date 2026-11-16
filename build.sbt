@@ -74,53 +74,56 @@ lazy val mailo = project
     },
   )
 
+// Shared by every toctoc module, so that a new one cannot miss the tag prefix
+// or the Scala 3 cross-build.
+lazy val toctocSettings = Seq(
+  dynverTagPrefix := "toctoc-",
+  crossScalaVersions += scala3,
+)
+
 lazy val toctoc =
   project.aggregate(toctocCore, toctocSlickMySql, toctocSlickPostgreSql, toctocLdap, toctocCirce)
 
 lazy val toctocCore = project
   .in(file("toctoc/core"))
+  .settings(toctocSettings)
   .settings(
     name := "toctoc-core",
     libraryDependencies ++= toctocCoreDependencies,
-    dynverTagPrefix := "toctoc-",
-    crossScalaVersions += scala3,
   )
 
 lazy val toctocSlickPostgreSql = project
   .in(file("toctoc/slickPostgreSql"))
+  .settings(toctocSettings)
   .settings(
     name := "toctoc-slick-postgresql",
     libraryDependencies ++= toctocSlickPostgresDependencies,
-    dynverTagPrefix := "toctoc-",
-    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore % "compile->compile;test->test")
 
 lazy val toctocSlickMySql = project
   .in(file("toctoc/slickMySql"))
+  .settings(toctocSettings)
   .settings(
     name := "toctoc-slick-mysql",
     libraryDependencies ++= toctocSlickMySqlDependencies,
-    dynverTagPrefix := "toctoc-",
-    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore % "compile->compile;test->test")
 
 lazy val toctocLdap = project
   .in(file("toctoc/ldap"))
+  .settings(toctocSettings)
   .settings(
     name := "toctoc-ldap",
     libraryDependencies ++= toctocLdapDependencies,
-    dynverTagPrefix := "toctoc-",
-    crossScalaVersions += scala3,
   )
   .dependsOn(toctocCore)
 
 lazy val toctocCirce = project
   .in(file("toctoc/circe"))
+  .settings(toctocSettings)
   .settings(
     name := "toctoc-circe",
-    dynverTagPrefix := "toctoc-",
     libraryDependencies ++= toctocCirceDependencies,
   )
   .dependsOn(toctocCore)

@@ -44,7 +44,7 @@ final class CirceSupportSpec extends munit.ScalaCheckSuite {
         "value" -> token.value.asJson,
         "expiresAt" -> token.expiresAt.asJson,
       )
-      assertEquals(token, json.as[AccessToken].right.get)
+      assertEquals(json.as[AccessToken], Right(token))
     }
   }
 
@@ -66,7 +66,7 @@ final class CirceSupportSpec extends munit.ScalaCheckSuite {
         "username" -> login.username.asJson,
         "password" -> login.password.asJson,
       )
-      assertEquals(login, json.as[Login].right.get)
+      assertEquals(json.as[Login], Right(login))
     }
   }
 
