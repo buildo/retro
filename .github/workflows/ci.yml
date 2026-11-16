@@ -10,8 +10,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# paths-filter lists the files of a pull request through the API. The release
-# pushes the website with its own deploy key, not with this token.
+# paths-filter lists the files of a pull request through the API. The website
+# deploy job adds the Pages permissions it needs.
 permissions:
   contents: read
   pull-requests: read
@@ -203,9 +203,8 @@ jobs:
         run: ./scalafmt --test
 
   # Same as the Concourse `release` job: on every push to master it publishes
-  # the SNAPSHOT of every project and the website, on a `<project>-v*` tag it
-  # publishes that release to Sonatype. The website is published only from
-  # master, as Concourse did, so tagging an older commit does not roll it back.
+  # the SNAPSHOT of every project, on a `<project>-v*` tag it publishes that
+  # release to Sonatype.
   release:
     name: Release
     needs: [test, toctoc, scalafmt]
@@ -223,22 +222,6 @@ jobs:
 
       - uses: ./.github/actions/setup-sbt
 
-      - uses: actions/setup-node@v4
-        if: github.ref == 'refs/heads/master'
-        with:
-          node-version: 18
-
-      - if: github.ref == 'refs/heads/master'
-        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
-
-      - name: Configure git
-        run: |
-          git config --global user.name "nemobot"
-          git config --global user.email "nemobot@buildo.io"
-          git config --global push.default simple
-
       - name: Publish to Sonatype
         env:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
@@ -247,16 +230,56 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         run: sbt ci-release
 
+  # The website is published only from master, as Concourse did, so tagging an
+  # older commit does not roll it back. It is deployed as a Pages artifact, so
+  # it needs no deploy key and no gh-pages branch: the repository's Pages
+  # source must be "GitHub Actions". It does not wait for the release, so a
+  # failure of one does not block the other.
+  website:
+    name: Build the website
+    needs: [test, toctoc, scalafmt]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository == 'buildo/retro'
+    runs-on: ubuntu-latest
+    steps:
+      # The docs show the versions computed by sbt-dynver from the tags.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-sbt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
       - name: Build the docs
-        if: github.ref == 'refs/heads/master'
         run: sbt docs/mdoc
 
-      - name: Publish the website
-        if: github.ref == 'refs/heads/master'
+      - name: Build the website
         working-directory: website
-        env:
-          USE_SSH: "true"
-          GIT_USER: nemobot
         run: |
-          yarn install
-          yarn publish-gh-pages
+          yarn install --frozen-lockfile
+          yarn build
+
+      # Docusaurus 1 writes the site to build/<projectName>.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build/retro
+
+  website-deploy:
+    name: Publish the website
+    needs: website
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Deploys run one at a time, and a queued one is not cancelled.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
