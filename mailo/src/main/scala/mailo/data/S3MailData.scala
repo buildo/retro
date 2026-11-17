@@ -48,7 +48,7 @@ class S3MailData(implicit
     for {
       template <- getObject(name)
       partials <- getObjects(s3Config.partialsFolder)
-      //filtering partial objects dropping initial chars
+      // filtering partial objects dropping initial chars
       partialObjects <- {
         val result: EitherMailError[Map[String, String]] = (partials
           .map(n => n.drop(folder.length + 1) -> getObject(n))
@@ -59,7 +59,7 @@ class S3MailData(implicit
     } yield (MailRawContent(template, partialObjects))
   }
 
-  //http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
+  // http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
   private[this] def convertStreamToString(is: java.io.InputStream): String = {
     val s: java.util.Scanner = new java.util.Scanner(is).useDelimiter("\\A")
     if (s.hasNext()) s.next() else ""

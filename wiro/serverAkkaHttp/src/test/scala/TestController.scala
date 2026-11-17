@@ -47,7 +47,7 @@ object TestController extends RouterDerivationModule {
     )
   }
 
-  //controllers interface and implementation
+  // controllers interface and implementation
   @path("user")
   trait UserController {
     @query

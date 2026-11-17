@@ -48,8 +48,8 @@ class Util() {
       case Some(nonEmptyPackage) =>
         val config = Config(Set.empty)
         val models = Metarpheus.run(modelsPaths, config).models
-        //this is needed because Metarpheus removes auth from params when authentication type is "Auth"
-        //see https://github.com/buildo/retro/blob/dfe62fa54d4f34c1861d694ac0cd8fa82f0a8703/metarpheus/core/src/main/scala/io.buildo.metarpheus/core/extractors/controller.scala#L35
+        // this is needed because Metarpheus removes auth from params when authentication type is "Auth"
+        // see https://github.com/buildo/retro/blob/dfe62fa54d4f34c1861d694ac0cd8fa82f0a8703/metarpheus/core/src/main/scala/io.buildo.metarpheus/core/extractors/controller.scala#L35
         val routesWithAuthParams: List[Route] = Metarpheus
           .run(routesPaths, config)
           .routes

@@ -33,7 +33,7 @@ class MockedClient(val state: ConcurrentLinkedQueue[SimpleMail]) extends MailCli
     headers: Map[String, String],
   )(implicit executionContext: ExecutionContext): Future[Either[MailError, MailResponse]] =
     Future.successful {
-      //State needs to be updated by one at the time
+      // State needs to be updated by one at the time
       state.add(SimpleMail(subject))
       Right(MailResponse(subject, "ok"))
     }
@@ -67,7 +67,7 @@ class MockedClientWithDelay(val state: ConcurrentLinkedQueue[SimpleMail]) extend
     headers: Map[String, String],
   )(implicit executionContext: ExecutionContext): Future[Either[MailError, MailResponse]] =
     Future.successful {
-      //State needs to be updated by one at the time
+      // State needs to be updated by one at the time
       Thread.sleep(200)
       state.add(SimpleMail(subject))
       Right(MailResponse(subject, "ok"))
