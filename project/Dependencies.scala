@@ -28,7 +28,7 @@ object Dependencies {
     val bcrypt = "0.4"
     val slf4j = "1.7.32"
     val scalameta = "4.4.26"
-    val scalafmtCore = "2.0.0-RC5"
+    val scalafmtCore = "2.0.1"
     val plantuml = "8059"
     val pprint = "0.6.6"
     val tapir = "0.18.1"
